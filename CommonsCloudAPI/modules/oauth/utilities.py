@@ -12,11 +12,26 @@ limitations under the License.
 
 
 """
+Import System Dependencies
+"""
+from datetime import datetime, timedelta
+
+
+"""
+Import Flask Dependencies
+"""
+from flask.ext.security import current_user
+
+
+"""
 Import Application Dependencies
 """
+from CommonsCloudAPI import db
 from CommonsCloudAPI import oauth2
 
 from CommonsCloudAPI.models import Client
+from CommonsCloudAPI.models import Grant
+from CommonsCloudAPI.models import User
 
 
 @oauth2.clientgetter
@@ -35,18 +50,25 @@ def load_grant(client_id, code):
 
 @oauth2.grantsetter
 def save_grant(client_id, code, request, *args, **kwargs):
+
     # decide the expires time yourself
     expires = datetime.utcnow() + timedelta(seconds=100)
+
+    this_user = current_user
+
     grant = Grant(
         client_id=client_id,
         code=code['code'],
         redirect_uri=request.redirect_uri,
         _scopes=' '.join(request.scopes),
-        user=current_user(),
-        expires=expires
+        user=this_user,
+        expires=expires,
+        user_id=this_user.id
     )
+
     db.session.add(grant)
     db.session.commit()
+
     return grant
 
 

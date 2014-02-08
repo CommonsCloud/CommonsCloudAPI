@@ -15,6 +15,8 @@ limitations under the License.
 Import Flask Dependencies
 """
 from flask import jsonify
+from flask import request
+from flask import render_template
 
 from flask.ext.security import current_user
 from flask.ext.security import login_required
@@ -35,6 +37,7 @@ from CommonsCloudAPI.models import Client
 Import Module Dependencies
 """
 from . import module
+from .utilities import *
 
 
 """
@@ -72,7 +75,7 @@ def oauth_client():
   item = Client(
     client_id=client_id,
     client_secret=client_secret,
-    _redirect_uris='http://localhost:8000/authorized',
+    _redirect_uris='http://127.0.0.1:5001/profile',
     _default_scopes='email',
     user_id=this_user.id,
   )
@@ -95,7 +98,12 @@ def oauth_client():
   )
 
 
-@module.route('/oauth/token')
+@module.route('/api/me')
+@oauth2.require_oauth()
+def me(req):
+    return jsonify(username=req.user.username)
+
+@module.route('/oauth/access_token')
 @oauth2.token_handler
 def oauth_access_token():
     return None
