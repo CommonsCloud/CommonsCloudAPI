@@ -2,26 +2,27 @@
 
 {% block content %}
 
+      <h1>Sign in</h1>
+
       <form method="POST" action="{{ url_for_security('login') }}" id="login_user_form" name="login_user_form">
         {{ login_user_form.hidden_tag() }}
-        <legend>Sign in</legend>
-        <fieldset>
-          <div class="form-group">
-            <label for="email" class="control-label">Email address</label>
-            <input class="text form-control" id="email" name="email" type="text" tabindex="1" />
-            <p class="help-block"><a href="{{ url_for('security.register') }}">Don't have an account?</a></p>
-          </div>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input class="text form-control" id="email" name="email" type="text" tabindex="1" />
+          <p class="help"><a href="{{ url_for('security.register') }}">Don't have an account?</a></p>
+        </div>
 
-          <div class="form-group">
-            <label for="password" class="control-label">Password</label>
-            <input class="password form-control" id="password" name="password" type="password" tabindex="2" />
-            <p class="help-block"><a href="{{ url_for('security.forgot_password') }}">Forgot your password?</a></p>
-          </div>
-          <hr />
-          <div class="form-actions">
-            <input type="submit" id="submit" name="submit" class="button large pull-right" value="Sign in" tabindex="3" />
-          </div>
-        </fieldset>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input class="password form-control" id="password" name="password" type="password" tabindex="2" />
+          <p class="help"><a href="{{ url_for('security.forgot_password') }}">Forgot your password?</a></p>
+        </div>
+        
+        <hr />
+
+        <div class="form-actions">
+          <input type="submit" id="submit" name="submit" class="button large pull-right" value="Sign in" tabindex="3" />
+        </div>
       </form>
       
 

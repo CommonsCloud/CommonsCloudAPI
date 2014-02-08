@@ -76,3 +76,10 @@ Icon
 Session.vim
 .netrwhist
 *~
+
+
+##
+# SASS
+##
+.sass-cache
+.sass-cache/*
