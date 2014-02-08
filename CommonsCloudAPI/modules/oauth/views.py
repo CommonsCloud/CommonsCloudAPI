@@ -26,6 +26,7 @@ from werkzeug.security import gen_salt
 Import Application Dependencies
 """
 from CommonsCloudAPI import db
+from CommonsCloudAPI import oauth2
 
 from CommonsCloudAPI.models import Client
 
@@ -95,13 +96,13 @@ def oauth_client():
 
 
 @module.route('/oauth/token')
-@oauth.token_handler
+@oauth2.token_handler
 def oauth_access_token():
     return None
 
 
 @module.route('/oauth/authorize', methods=['GET', 'POST'])
-@oauth.authorize_handler
+@oauth2.authorize_handler
 def oauth_authorize(*args, **kwargs):
 
   if not current_user:
