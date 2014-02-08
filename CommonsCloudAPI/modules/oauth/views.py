@@ -119,7 +119,7 @@ def oauth_authorize(*args, **kwargs):
     client = Client.query.filter_by(client_id=client_id).first()
     kwargs['client'] = client
     kwargs['user'] = this_user
-    return render_template('authorize.html', **kwargs)
+    return render_template('oauth/authorize.html', **kwargs)
 
   confirm = request.form.get('confirm', 'no')
   return confirm == 'yes'

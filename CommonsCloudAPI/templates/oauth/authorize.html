@@ -1,0 +1,22 @@
+{% extends "default.html" %}
+
+{% block content %}
+
+  <p>Client: {{ client.client_id }}</p>
+  <p>User: {{ user.username }}</p>
+  <form action="/oauth/authorize" method="post">
+    <p>Allow access?</p>
+    <input type="hidden" name="client_id" value="{{ client.client_id }}">
+    <input type="hidden" name="scope" value="{{ scopes|join(' ') }}">
+    <input type="hidden" name="response_type" value="{{ response_type }}">
+    {% if state %}
+    <input type="hidden" name="state" value="{{ state }}">
+    {% endif %}
+    <input type="submit" name="confirm" value="yes">
+    <input type="submit" name="confirm" value="no">
+  </form>
+  
+{% endblock %}
+
+
+
