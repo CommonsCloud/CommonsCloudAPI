@@ -93,3 +93,32 @@ def oauth_client():
     client_secret=client_secret,
   )
 
+
+@app.route('/oauth/token')
+@oauth.token_handler
+def oauth_access_token():
+    return None
+
+
+@app.route('/oauth/authorize', methods=['GET', 'POST'])
+@oauth.authorize_handler
+def oauth_authorize(*args, **kwargs):
+
+  if not current_user:
+    return redirect('/')
+
+  """
+  Assign the current_user object to a variable so that we don't
+  accidently alter the object during this process.
+  """
+  this_user = current_user
+
+  if request.method == 'GET':
+    client_id = kwargs.get('client_id')
+    client = Client.query.filter_by(client_id=client_id).first()
+    kwargs['client'] = client
+    kwargs['user'] = this_user
+    return render_template('authorize.html', **kwargs)
+
+  confirm = request.form.get('confirm', 'no')
+  return confirm == 'yes'
