@@ -6,7 +6,7 @@
 
       <h1>Sign in</h1>
 
-      <form method="POST" action="{{ url_for('application_profile') }}" id="user_profile_form" name="user_profile_form">
+      <form method="POST" action="{{ url_for('user.user_profile') }}" id="user_profile_form" name="user_profile_form">
       	<p>Member since: {{ current_user.confirmed_at }}</p>
 
         <div class="form-group">
