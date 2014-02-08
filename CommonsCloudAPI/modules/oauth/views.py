@@ -94,13 +94,13 @@ def oauth_client():
   )
 
 
-@app.route('/oauth/token')
+@module.route('/oauth/token')
 @oauth.token_handler
 def oauth_access_token():
     return None
 
 
-@app.route('/oauth/authorize', methods=['GET', 'POST'])
+@module.route('/oauth/authorize', methods=['GET', 'POST'])
 @oauth.authorize_handler
 def oauth_authorize(*args, **kwargs):
 
