@@ -76,11 +76,14 @@ placed in the this 'settings.py' folder in the application root.
 """
 def load_configuration(app, environment):
 
-	environment_configuration = ('config/settings_%s.py') % (environment)
+  """
+  Create the file path based on the selected environment
+  """
+  environment_configuration = ('config/settings_%s.py') % (environment)
 
-    app.config.from_object(__name__)
-    app.config.from_pyfile('config/settings_default.py')
-    app.config.from_pyfile(environment_configuration)
+  app.config.from_object(__name__)
+  app.config.from_pyfile('config/settings_default.py')
+  app.config.from_pyfile(environment_configuration)
 
 
 """

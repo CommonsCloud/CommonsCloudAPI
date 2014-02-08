@@ -1,0 +1,27 @@
+{% extends "security/email/base-email.html" %}
+
+{% block content %}
+
+<h2 style="color: #3F3A38;display: block;font-family: Helvetica, Arial, sans-serif;font-size: 24px;font-weight: bold;line-height: 100%;letter-spacing: normal;margin-top: 0;margin-right: 0;margin-bottom: 0;margin-left: 0;text-align: left;">Welcome <a style="color: #13B3CC;" href="mailto:{{ user.email }}">{{ user.email }}</a>!</h2>
+<br>
+We're happy to see you've signed up for a CommonsCloud account.
+<br>
+<br>
+{% if security.confirmable %}
+We need to make sure this email account is real, to do so <a style="color: #13B3CC;" href="{{ confirmation_link }}">please confirm your email address now to get started</a>
+
+<p style="text-align: center; padding-top:24px;padding-bottom: 16px;">
+  <a style="border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-bottom: 3px solid #09A9C2;color: white;background-color:#13b3cc;font-weight:normal;text-decoration:none;text-transform:uppercase;font-size: 13px; padding: 16px 24px;text-align: center;" href="http://mandrillapp.com/track/click.php?u=30102460&amp;id=79e8cf97355740d1bd223708ad7d02f7&amp;url=http%3A%2F%2F127.0.0.1%3A5000%2Fconfirm%2FWyI4IiwiNTg1MDAxYzU1YTBjZTNkZTMzMGZhZmE2NTA4ZDhlZTciXQ.BaSxcg.u5JiDb6Z7O5PW0fyqIxeK2vg8Qo&amp;url_id=63727f002e4c2cd2b21a54d1689ad69d7a888917" target="_blank">Confirm Your Email Address</a>
+</p>
+
+{% endif %}
+<br>
+<br>
+Thanks,
+<br>
+<strong>The CommonsCloud Team</strong>
+<br>
+<br>
+<br>
+
+{% endblock %}
