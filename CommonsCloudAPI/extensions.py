@@ -17,6 +17,7 @@ Import Flask Dependencies
 from flask.ext.security import Security
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail
+from flask_oauthlib.provider import OAuth2Provider
 
 
 """
@@ -25,3 +26,4 @@ Flask Dependencies
 db = SQLAlchemy()
 security = Security()
 mail = Mail()
+oauth2 = OAuth2Provider()

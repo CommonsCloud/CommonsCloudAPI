@@ -29,6 +29,7 @@ from flask import render_template
 from flask import send_from_directory
 from flask import url_for
 
+from flask.ext.security import current_user
 from flask.ext.security import login_required
 
 
@@ -38,6 +39,7 @@ Import Application Dependencies
 from .extensions import db
 from .extensions import mail
 from .extensions import security
+from .extensions import oauth2
 
 from .models import user_datastore
 
@@ -61,6 +63,9 @@ def create_application(name = __name__, env = 'testing'):
     
     # Setup Flask Security 
     security.init_app(app, user_datastore)
+
+    # Setup OAuth2 Provider
+    oauth2.init_app(app)
     
     # Load default application routes/paths
     basic_routing(app)
@@ -102,7 +107,18 @@ def basic_routing(app):
   @app.route('/')
   @login_required
   def application_index():
-    return 'CommonsCloudAPI Loaded'
+    return render_template('user/index.html', user=current_user), 403
+
+  """
+  The Application Index gives us a route to the "homepage" of our application. Currently
+  this takes you to the Application Dashboard, but in the future I sould see the index or
+  www.commonscloud.org going to a sales home page and linking to other "sales" pages, versus
+  just being associated with the application.
+  """
+  @app.route('/profile')
+  @login_required
+  def application_profile():
+    return render_template('user/profile.html', user=current_user), 403
 
 
   """
