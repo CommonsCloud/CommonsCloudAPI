@@ -59,6 +59,7 @@ user_permissions = db.Table('user_permissions',
 
 
 class Client(db.Model):
+  
     client_id = db.Column(db.String(40), primary_key=True)
     client_secret = db.Column(db.String(55), nullable=False)
 
