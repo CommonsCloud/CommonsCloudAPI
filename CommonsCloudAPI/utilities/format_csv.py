@@ -61,11 +61,18 @@ class CSV(FormatContent):
   """
   def create(self):
 
+    """
+    The following variables help us define what, where, and how things will be saved
+    as we walk through the CSV creation process
+    """
     this_directory = self.get_directory_name()
     this_filename  = self.get_file_name()
     this_filepath  = ('%s%s%s') % (this_directory, '/', this_filename)
     this_content   = self.serialize_object()
 
+    """
+    With the current file open, begin writing our content
+    """
     with open(this_filepath, 'wb') as open_file:
 
       """
