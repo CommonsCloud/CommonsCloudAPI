@@ -25,15 +25,12 @@ class CSV(FormatContent):
     this_filepath  = ('%s%s%s') % (this_directory, '/', this_filename)
     this_content   = self.serialize_object()
 
-    """
-    Create the CSV header
-    """
     with open(this_filepath, 'wb') as open_file:
 
-      headers = []
-
-      for column in this_content:
-        headers.append(column)
+      """
+      Create the header row for our CSV
+      """
+      headers = self.the_content.__mapper__.c.keys()
 
       dict_writer = csv.DictWriter(open_file, headers, lineterminator="\r\n", delimiter=",", doublequote=False, quoting=csv.QUOTE_NONNUMERIC, quotechar="'")
       dict_writer.writeheader()
