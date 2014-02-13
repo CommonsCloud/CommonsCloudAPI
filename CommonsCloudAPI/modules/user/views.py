@@ -16,12 +16,13 @@ Import Flask Dependencies
 """
 from flask import render_template
 from flask import request
+from flask import jsonify
 
 from flask.ext.security import current_user
 from flask.ext.security import login_required
 
 from CommonsCloudAPI.utilities.format_csv import CSV
-from CommonsCloudAPI.utilities.format_json import create_json_from_object
+from CommonsCloudAPI.utilities.format_json import JSON
 
 
 """
@@ -34,7 +35,12 @@ from . import module
 def user_me():
 
   if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):
-    return create_json_from_object(current_user), 200
+    
+    user_me = JSON()
+
+    user_me.the_content = current_user
+
+    return user_me.create(), 200
 
   elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
     

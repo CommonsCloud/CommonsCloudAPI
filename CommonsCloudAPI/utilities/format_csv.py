@@ -30,7 +30,7 @@ from .format import FormatContent
 
 
 """
-A class for formatting objects as comma separated value documents (.CSV)
+A class for formatting objects as comma separated value documents or CSV
 
 @requires ForamtContent
 

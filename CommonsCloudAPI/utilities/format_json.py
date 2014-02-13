@@ -10,12 +10,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+
+"""
+Import Flask Dependencies
+"""
 from flask import jsonify
 
-# from . import serialize_object
 
-def create_json_from_object(object):
+"""
+Import CommonsCloudAPI Dependencies
+"""
+from .format import FormatContent
 
-    # serialized_object = serialize_object(object)
 
-    return jsonify({})
+"""
+A class for formatting objects in Java Script Object Notation or JSON
+
+@requires ForamtContent
+
+@method create
+
+"""
+class JSON(FormatContent):
+    
+    def create(self):
+
+      this_content   = self.serialize_object()
+
+      return jsonify(this_content)
