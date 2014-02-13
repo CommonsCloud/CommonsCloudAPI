@@ -37,15 +37,12 @@ def user_me():
     return create_json_from_object(current_user), 200
 
   elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
-    # return create_csv_from_object(current_user), 200
     
-    me = CSV()
+    user_me = CSV()
 
-    me.the_content = current_user
+    user_me.the_content = current_user
 
-    me.create_csv()
-
-    return me.create_csv()
+    return user_me.create(), 200
 
 
 
