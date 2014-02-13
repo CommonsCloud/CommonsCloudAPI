@@ -14,16 +14,28 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-from flask.ext.security import Security
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.mail import Mail
-from flask.ext.oauthlib.provider import OAuth2Provider
+from flask import jsonify
+from flask import render_template
+
+from flask.ext.security import current_user
+from flask.ext.security import login_required
 
 
 """
-Flask Dependencies 
+Import Module Dependencies
 """
-db = SQLAlchemy()
-security = Security()
-mail = Mail()
-oauth2 = OAuth2Provider()
+from . import module
+
+
+"""
+The front page of the application for authenticated Unless
+"""
+@module.route('/')
+@login_required
+def index():
+  return render_template('dashboard/index.html', user=current_user), 200
+
+
+@module.route('/mapbox')
+def mapbox():
+	return render_template('mapbox.html'), 200

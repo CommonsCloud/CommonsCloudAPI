@@ -10,20 +10,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from flask import jsonify
 
-"""
-Import Flask Dependencies
-"""
-from flask.ext.security import Security
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.mail import Mail
-from flask.ext.oauthlib.provider import OAuth2Provider
+# from . import serialize_object
 
+def create_json_from_object(object):
 
-"""
-Flask Dependencies 
-"""
-db = SQLAlchemy()
-security = Security()
-mail = Mail()
-oauth2 = OAuth2Provider()
+    # serialized_object = serialize_object(object)
+
+    return jsonify({})

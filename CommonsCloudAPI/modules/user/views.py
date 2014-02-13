@@ -14,17 +14,44 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-from flask import jsonify
 from flask import render_template
+from flask import request
 
 from flask.ext.security import current_user
 from flask.ext.security import login_required
+
+from CommonsCloudAPI.utilities.format_csv import CSV
+from CommonsCloudAPI.utilities.format_json import create_json_from_object
 
 
 """
 Import Module Dependencies
 """
 from . import module
+
+
+@module.route('/user/me', methods=['GET'])
+def user_me():
+
+  if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):
+    return create_json_from_object(current_user), 200
+
+  elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
+    # return create_csv_from_object(current_user), 200
+    
+    me = CSV()
+
+    me.the_content = current_user
+
+    me.create_csv()
+
+    return me.create_csv()
+
+
+
+  return jsonify({'error': '415 Unsupported Media Type', 'status_code': '415', 'message': 'The server does not support the media type transmitted in the request.'}), 415
+
+
 
 
 @module.route('/user/profile')

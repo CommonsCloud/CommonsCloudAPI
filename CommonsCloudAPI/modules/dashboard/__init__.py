@@ -10,20 +10,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 """
-Import Flask Dependencies
+Import Flask dependencies
 """
-from flask.ext.security import Security
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.mail import Mail
-from flask.ext.oauthlib.provider import OAuth2Provider
+from flask import Blueprint
 
 
 """
-Flask Dependencies 
+Create a blueprint for the Dashboard module
 """
-db = SQLAlchemy()
-security = Security()
-mail = Mail()
-oauth2 = OAuth2Provider()
+module = Blueprint('dashbaord', __name__, template_folder='templates')
+
+
+"""
+Import Dashboard Dependencies
+"""
+from . import views
+
