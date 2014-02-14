@@ -58,6 +58,11 @@ def user_me():
     user_me = CSV(current_user)
     return user_me.create(), 200
 
+
+  """
+  If the user hasn't requested a specific content type then we should
+  tell them that, by directing them to an "Unsupported Media Type"
+  """
   return status.status_415(), 415
 
 

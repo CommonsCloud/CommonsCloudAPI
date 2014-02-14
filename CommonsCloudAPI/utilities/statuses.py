@@ -60,9 +60,10 @@ class Status():
   def status_401(self):
 
     message = {
-      'error': '401 Unauthorized',
-      'status_code': '401',
-      'message': 'The request requires user authentication.'
+      'status': '401 Unauthorized',
+      'code': '401',
+      'problem': 'The request requires user authentication.',
+      'solution': 'You probably just need to login or authenticate via OAuth before accessing this endpoint.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -84,9 +85,10 @@ class Status():
   def status_415(self):
 
     message = {
-      'error': '415 Unsupported Media Type',
-      'status_code': '415',
-      'message': 'The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method.'
+      'status': '415 Unsupported Media Type',
+      'code': '415',
+      'problem': 'The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method.',
+      'solution': 'This normally happens when you forget to append a \'Content-Type\' header to the request or when you ask for a format that we don\'t support. CommonsCloud currently supports text/csv and application/json Content-Types and can also support the \'format\' URL parameter with either json or csv as the value'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
