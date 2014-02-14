@@ -40,20 +40,6 @@ A class for formatting objects as comma separated value documents or CSV
 class CSV(FormatContent):
 
   """
-  Define our default variables
-
-  @param (object) self
-      The object we are acting on behalf of
-
-  @param (object) content
-      The actual content we'll be converting
-  """
-  def __init__(self, content):
-
-    self.the_content = content
-
-
-  """
   Creates a CSV file based on user requested content
 
   @requires

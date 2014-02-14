@@ -32,20 +32,6 @@ A class for formatting objects in Java Script Object Notation or JSON
 
 """
 class JSON(FormatContent):
-    
-  """
-  Define our default variables
-
-  @param (object) self
-      The object we are acting on behalf of
-
-  @param (object) content
-      The actual content we'll be converting
-  """
-  def __init__(self, content):
-
-    self.the_content = content
-
 
   """
   Creates a JSON file based on user requested content
