@@ -110,7 +110,6 @@ class FormatContent:
       result = OrderedDict()
 
       for key in self.the_content.__mapper__.c.keys():
-
           result[key] = getattr(self.the_content, key)
 
       return result
