@@ -67,7 +67,7 @@ class CSV(FormatContent):
     this_directory = self.get_directory_name()
     this_filename  = self.get_file_name()
     this_filepath  = ('%s%s%s') % (this_directory, '/', this_filename)
-    this_content   = self.serialize_object()
+    this_content   = self.serialize_object() if self.serialize is True else self.the_content
 
     """
     With the current file open, begin writing our content

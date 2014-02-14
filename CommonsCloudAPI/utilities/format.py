@@ -46,12 +46,16 @@ class FormatContent:
   @param (object) self
       The object we are acting on behalf of
 
-  @param (object) content
+  @param (object) data
       The actual content we'll be converting
-  """
-  def __init__(self, content=[]):
 
-    self.the_content = content
+  @param (boolean) serialize
+      A flag to identify whether or not the content needs to be serialized
+      before it is processed by our formatting tasks
+  """
+  def __init__(self, data, serialize=False):
+    self.the_content = data
+    self.serialize = serialize
 
 
   """
@@ -103,13 +107,13 @@ class FormatContent:
   """
   def serialize_object(self):
 
-    result = OrderedDict()
+      result = OrderedDict()
 
-    for key in self.the_content.__mapper__.c.keys():
+      for key in self.the_content.__mapper__.c.keys():
 
-        result[key] = getattr(self.the_content, key)
+          result[key] = getattr(self.the_content, key)
 
-    return result
+      return result
 
 
   """

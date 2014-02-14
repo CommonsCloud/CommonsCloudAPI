@@ -19,7 +19,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail
 from flask.ext.oauthlib.provider import OAuth2Provider
 
-from CommonsCloudAPI.utilities.statuses import Status
+from CommonsCloudAPI.utilities.statuses import CommonsStatus
 
 
 """
@@ -29,4 +29,4 @@ db = SQLAlchemy()
 security = Security()
 mail = Mail()
 oauth2 = OAuth2Provider()
-status = Status()
+status = CommonsStatus()

@@ -14,7 +14,6 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-from flask import current_app
 from flask import jsonify
 
 
@@ -22,13 +21,16 @@ from flask import jsonify
 A Base Class for centralizing the information regarding HTTP messages to the
 end user, to give them a better idea of what's going on
 
+@see RFC 2616
+    http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
 @variable (string) return_type
 
 @method status_401
 @method status_415
 
 """
-class Status():
+class CommonsStatus():
 
   """
   Define our default variables

@@ -47,5 +47,8 @@ class JSON(FormatContent):
 
   """
   def create(self):
-    this_content = self.serialize_object()
-    return jsonify(this_content)
+
+    if self.serialize is True:
+      self.the_content = self.serialize_object()
+
+    return jsonify(self.the_content)

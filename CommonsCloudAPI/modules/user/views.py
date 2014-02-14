@@ -42,7 +42,7 @@ Basic route for currently logged in user
 """
 @module.route('/user/me', methods=['GET'])
 def user_me():
-  
+
   if not current_user.is_authenticated():
       return status.status_401(), 401
 
@@ -51,12 +51,12 @@ def user_me():
   have requests a type of content we serve
   """
   if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):    
-    user_me = JSON(current_user)
-    return user_me.create(), 200
+    this_data = JSON(current_user, serialize=True)
+    return this_data.create(), 200
 
   elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
-    user_me = CSV(current_user)
-    return user_me.create(), 200
+    this_data = CSV(current_user, serialize=True)
+    return this_data.create(), 200
 
 
   """
@@ -64,6 +64,25 @@ def user_me():
   tell them that, by directing them to an "Unsupported Media Type"
   """
   return status.status_415(), 415
+
+
+
+"""
+Basic route for currently logged in user
+"""
+@module.route('/user/app', methods=['GET'])
+def user_app():
+
+  app = {
+    'blah': 'blah',
+    'foo': 'format_json',
+    'grr': {
+        'blah': 'blah',
+        'foo': 'format_json'
+    }
+  }
+
+  return test(app)
 
 
 
