@@ -83,3 +83,5 @@ Session.vim
 ##
 .sass-cache
 .sass-cache/*
+
+uploads/*
