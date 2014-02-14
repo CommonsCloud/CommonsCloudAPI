@@ -33,8 +33,33 @@ A class for formatting objects in Java Script Object Notation or JSON
 """
 class JSON(FormatContent):
     
-    def create(self):
+  """
+  Define our default variables
 
-      this_content   = self.serialize_object()
+  @param (object) self
+      The object we are acting on behalf of
 
-      return jsonify(this_content)
+  @param (object) content
+      The actual content we'll be converting
+  """
+  def __init__(self, content):
+
+    self.the_content = content
+
+
+  """
+  Creates a JSON file based on user requested content
+
+  @requires
+      from flask import jsonify
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify
+  	  A jsonified object ready for displayin the browser as JSON
+
+  """
+  def create(self):
+    this_content = self.serialize_object()
+    return jsonify(this_content)

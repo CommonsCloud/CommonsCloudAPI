@@ -33,26 +33,25 @@ from . import module
 
 @module.route('/user/me', methods=['GET'])
 def user_me():
+   
+  if not current_user.is_authenticated():
+    error = {
+      'error': '415 Unsupported Media Type',
+      'status_code': '415',
+      'message': 'The server does not support the media type transmitted in the request.'
+    }
+    return jsonify(error), 415
 
   if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):
     
     user_me = JSON()
-
     user_me.the_content = current_user
-
     return user_me.create(), 200
 
   elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
     
-    user_me = CSV()
-
-    user_me.the_content = current_user
-
+    user_me = CSV(current_user)
     return user_me.create(), 200
-
-
-
-  return jsonify({'error': '415 Unsupported Media Type', 'status_code': '415', 'message': 'The server does not support the media type transmitted in the request.'}), 415
 
 
 

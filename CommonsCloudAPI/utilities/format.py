@@ -41,9 +41,17 @@ to exist regardless of the type of document we are generating
 class FormatContent:
 
   """
-  Setup our baseline variables that the user will have access to
+  Define our default variables
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @param (object) content
+      The actual content we'll be converting
   """
-  the_content = []
+  def __init__(self, content=[]):
+
+    self.the_content = content
 
 
   """
