@@ -23,20 +23,6 @@ Import Commons Cloud Dependencies
 from .extensions import db
 
 
-"""
-Defines association tables to enable many to many relationships
-"""
-application_templates = db.Table('application_templates',
-    db.Column('application', db.Integer, db.ForeignKey('application.id')),
-    db.Column('template', db.Integer, db.ForeignKey('template.id'))
-)
-
-template_fields = db.Table('template_fields',
-  db.Column('template', db.Integer, db.ForeignKey('template.id')),
-  db.Column('field', db.Integer, db.ForeignKey('field.id'))
-)
-
-
 class Client(db.Model):
   
     client_id = db.Column(db.String(40), primary_key=True)
@@ -129,28 +115,10 @@ class Token(db.Model):
             return self._scopes.split()
         return []
 
-
-"""
-Define our individual models
-"""
-class Application(db.Model):
-
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(60))
-  description = db.Column(db.String(255))
-  owner = db.Column(db.Integer)
-  created = db.Column(db.DateTime)
-  status = db.Column(db.Boolean)
-  templates = db.relationship("Template", secondary=application_templates, backref=db.backref('applications'))
-
-  def __init__(self, name, owner, description=None, templates=[]):
-      self.name = name
-      self.description = description
-      self.owner = owner
-      self.created = datetime.utcnow()
-      self.status = True
-      self.templates = templates
-
+template_fields = db.Table('template_fields',
+  db.Column('template', db.Integer, db.ForeignKey('template.id')),
+  db.Column('field', db.Integer, db.ForeignKey('field.id'))
+)
 
 class Template(db.Model):
   

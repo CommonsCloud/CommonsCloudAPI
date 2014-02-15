@@ -41,12 +41,7 @@ def create_application(name = __name__, env = 'testing'):
 
     # Load our default configuration
     load_configuration(app, env)
-    
-    # Initialize our database and create tables
-    db.init_app(app)
-    db.app = app
-    db.create_all()
-        
+            
     # Setup Mail
     mail.init_app(app)
     
@@ -65,6 +60,11 @@ def create_application(name = __name__, env = 'testing'):
     from user.models import user_datastore
     security.init_app(app, user_datastore)
     
+    # Initialize our database and create tables
+    db.init_app(app)
+    db.app = app
+    db.create_all()
+
     # Load default application routes/paths
     load_errorhandlers(app)
 

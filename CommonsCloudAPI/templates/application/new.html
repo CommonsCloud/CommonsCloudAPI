@@ -1,0 +1,21 @@
+{% extends "default.html" %}
+
+{% block content %}
+
+      <h1>Create new application</h1>
+
+      <form method="POST" action="{{ url_for('application.application_create') }}" id="application_create_form" name="application_create_form">
+
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input class="text form-control" id="name" name="name" type="text" tabindex="1" />
+        </div>
+
+        <hr />
+
+        <div class="form-actions">
+          <input type="submit" id="submit" name="submit" class="button large" value="Save Application" tabindex="2" />
+        </div>
+      </form>
+
+{% endblock %}

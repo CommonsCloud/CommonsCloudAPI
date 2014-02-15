@@ -30,17 +30,9 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 
 
-"""
-Defines association tables to enable many to many relationships
-"""
 user_roles = db.Table('user_roles',
-    db.Column('user', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role', db.Integer(), db.ForeignKey('role.id'))
-)
-
-user_permissions = db.Table('user_permissions',
-    db.Column('user', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('permission', db.Integer, db.ForeignKey('permission.id'))
+  db.Column('user', db.Integer(), db.ForeignKey('user.id')),
+  db.Column('role', db.Integer(), db.ForeignKey('role.id'))
 )
 
 
@@ -49,6 +41,8 @@ This defines our basic Role model, we have to have this becasue of the
 Flask-Security module. If you remove it Flask-Security gets fussy.
 """
 class Role(db.Model, RoleMixin):
+
+  __tablename__ = 'role'
 
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(80), unique=True)
@@ -60,6 +54,8 @@ This defines our basic User model, we have to have this becasue of the
 Flask-Security module. If you remove it Flask-Security gets fussy.
 """
 class User(db.Model, UserMixin):
+
+  __tablename__ = 'user'
 
   """
   Define the fields that we will use to create the User table in our
@@ -73,13 +69,14 @@ class User(db.Model, UserMixin):
   password = db.Column(db.String(255))
   active = db.Column(db.Boolean())
   confirmed_at = db.Column(db.DateTime())
-  roles = db.relationship('Role', secondary=user_roles, backref=db.backref('user'))
-  permissions = db.relationship('Permission', secondary=user_permissions, backref=db.backref('user'))
+  roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users'))
+  applications = db.relationship('UserApplications', backref=db.backref('users'))
 
-  def __init__(self, firstname="", lastname="", email="", bio="", active=True, roles=[], permissions=[]):
+  def __init__(self, firstname="", lastname="", email="", password="", bio="", active=True, roles=[], permissions=[]):
     self.firstname = firstname
     self.lastname = lastname
     self.email = email
+    self.password = password
     self.bio = bio
     self.active = active
     self.roles = roles
@@ -123,8 +120,8 @@ class User(db.Model, UserMixin):
       The object of the current user, not to be confused with current_user
 
   """
-  def user_get(self):
-    user_ = User.query.get(current_user.id)
+  def user_get(self, user_id):
+    user_ = User.query.get(user_id)
     return user_
 
 

@@ -45,7 +45,7 @@ from . import module
 """
 Basic route for currently logged in user
 """
-@module.route('/api/v2/user/me', methods=['GET'])
+@module.route('/api/v2/user/me/', methods=['GET'])
 def user_me():
 
   if not current_user.is_authenticated():
@@ -71,13 +71,15 @@ def user_me():
   return status_.status_415(), 415
 
 
-@module.route('/user/profile', methods=['GET'])
+@module.route('/user/profile/', methods=['GET'])
 @login_required
 def user_profile_get():
-  return render_template('user/profile.html', user=current_user), 200
+  user_ = User()
+  this_user = user_.user_get(current_user.id)
+  return render_template('user/profile.html', user=this_user), 200
 
 
-@module.route('/user/profile', methods=['POST'])
+@module.route('/user/profile/', methods=['POST'])
 @login_required
 def user_profile_post():
 

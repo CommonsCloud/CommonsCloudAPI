@@ -1,0 +1,12 @@
+{% extends "default.html" %}
+
+{% block content %}
+
+      <h1>Applications</h1>
+
+      {% for application in applications %}
+        <p>{{ application.application }}</p>
+      {% endfor %}
+
+{% endblock %}
+
