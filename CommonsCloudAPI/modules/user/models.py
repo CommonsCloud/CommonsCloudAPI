@@ -88,11 +88,28 @@ class User(db.Model, UserMixin):
   def __repr__(self):
     return ('<User %r %r>') % (self.firstname, self.lastname)
   
+  """
+  Set the user password using the pbkdf2:sha1 method and a salt_length of 64
+  """
   def set_password(self, password):
     self.password = generate_password_hash(password, method='pbkdf2:sha1', salt_length=64)
 
+
+  """
+  Check to see if the password entered by the user matches the password saved
+  in the database associated with the acting user
+
+  @param (object) self
+  @param (string) password
+      The password to check against the database
+
+  @return (bool)
+      The boolean of whether or not the passwords match
+
+  """
   def check_password(self, password):
     return check_password_hash(self.password, password)
+
   
   """
   Get the SQLAlchemy User object for the current_user
@@ -166,7 +183,6 @@ class User(db.Model, UserMixin):
     db.session.commit()
 
     return user_
-
 
 
 """
