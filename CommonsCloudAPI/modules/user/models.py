@@ -145,14 +145,24 @@ class User(db.Model, UserMixin):
     """
     user_ = User.query.get(current_user.id)
 
+    """
+    Content that needs sanitized
+    """
     user_.firstname = sanitize.sanitize_string(user_object_.get('firstname', current_user.firstname))
     user_.lastname = sanitize.sanitize_string(user_object_.get('lastname', current_user.lastname))
     user_.bio = sanitize.sanitize_string(user_object_.get('bio', current_user.bio))
     user_.email = sanitize.sanitize_string(user_object_.get('email', current_user.email))
+
+    """
+    Booleans and Arrays are not sanitized right now ... they probably should be
+    """
     user_.active = user_object_.get('active', current_user.active)
     user_.roles = user_object_.get('roles', current_user.roles)
     user_.permissions = user_object_.get('permissions', current_user.permissions)
 
+    """
+    Save all of our updates to the database
+    """
     db.session.commit()
 
     return user_
@@ -161,7 +171,7 @@ class User(db.Model, UserMixin):
 
 """
 The last thing we need to do is actually hook these things up to the
-User Datastore provided by Mongo Engine's datastore that provides
+User Datastore provided by SQLAlchemy's Engine's datastore that provides
 Flask-Security with User/Role information so we can lock down access
 to the system and it's resources.
 """
