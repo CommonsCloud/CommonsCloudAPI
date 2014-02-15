@@ -31,7 +31,6 @@ from CommonsCloudAPI import oauth2
 
 from CommonsCloudAPI.models import Client
 from CommonsCloudAPI.models import Grant
-from CommonsCloudAPI.models import User
 
 
 @oauth2.clientgetter

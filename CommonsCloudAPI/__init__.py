@@ -27,8 +27,6 @@ from .extensions import oauth2
 
 from .errors import load_errorhandlers
 
-from .models import user_datastore
-
 from .utilities import load_blueprints
 from .utilities import load_configuration
 
@@ -52,14 +50,20 @@ def create_application(name = __name__, env = 'testing'):
     # Setup Mail
     mail.init_app(app)
     
-    # Setup Flask Security 
-    security.init_app(app, user_datastore)
-
     # Setup OAuth2 Provider
     oauth2.init_app(app)
 
     # Load our application's blueprints
     load_blueprints(app)
+
+    """
+    Setup Flask Security 
+    
+    We cannot load the security information until after our blueprints
+    have been loaded into our application.
+    """
+    from user.models import user_datastore
+    security.init_app(app, user_datastore)
     
     # Load default application routes/paths
     load_errorhandlers(app)

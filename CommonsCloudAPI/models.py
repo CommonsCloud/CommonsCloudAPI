@@ -18,17 +18,6 @@ from datetime import datetime
 
 
 """
-Import Flask Dependencies
-"""
-from flask import Module
-from flask.ext.security import UserMixin
-from flask.ext.security import RoleMixin
-from flask.ext.security import SQLAlchemyUserDatastore
-from werkzeug import generate_password_hash
-from werkzeug import check_password_hash
-
-
-"""
 Import Commons Cloud Dependencies
 """
 from .extensions import db
@@ -45,16 +34,6 @@ application_templates = db.Table('application_templates',
 template_fields = db.Table('template_fields',
   db.Column('template', db.Integer, db.ForeignKey('template.id')),
   db.Column('field', db.Integer, db.ForeignKey('field.id'))
-)
-
-user_roles = db.Table('user_roles',
-    db.Column('user', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role', db.Integer(), db.ForeignKey('role.id'))
-)
-
-user_permissions = db.Table('user_permissions',
-    db.Column('user', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('permission', db.Integer, db.ForeignKey('permission.id'))
 )
 
 
@@ -288,47 +267,3 @@ class Permission(db.Model):
     self.is_admin = is_admin
     self.is_moderator = is_moderator
 
-
-"""
-This defines our basic Role model, we have to have this becasue of the
-Flask-Security module. If you remove it Flask-Security gets fussy.
-"""
-class Role(db.Model, RoleMixin):
-
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(80), unique=True)
-  description = db.Column(db.String(255))
-
-
-"""
-This defines our basic User model, we have to have this becasue of the
-Flask-Security module. If you remove it Flask-Security gets fussy.
-"""
-class User(db.Model, UserMixin):
-
-  id = db.Column(db.Integer, primary_key=True)
-  firstname = db.Column(db.String(255))
-  lastname = db.Column(db.String(255))
-  title = db.Column(db.String(255))
-  bio = db.Column(db.String(255))
-  email = db.Column(db.String(255))
-  password = db.Column(db.String(255))
-  active = db.Column(db.Boolean())
-  confirmed_at = db.Column(db.DateTime())
-  roles = db.relationship('Role', secondary=user_roles, backref=db.backref('user'))
-  permissions = db.relationship('Permission', secondary=user_permissions, backref=db.backref('user'))
-  
-  def set_password(self, password):
-      self.password = generate_password_hash(password, method='pbkdf2:sha1', salt_length=64)
-
-  def check_password(self, password):
-      return check_password_hash(self.password, password)
-
-
-"""
-The last thing we need to do is actually hook these things up to the
-User Datastore provided by Mongo Engine's datastore that provides
-Flask-Security with User/Role information so we can lock down access
-to the system and it's resources.
-"""
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)

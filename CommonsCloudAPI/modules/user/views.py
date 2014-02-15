@@ -16,8 +16,10 @@ Import Flask Dependencies
 """
 from flask import current_app
 from flask import jsonify
+from flask import redirect
 from flask import render_template
 from flask import request
+from flask import url_for
 
 from flask.ext.security import current_user
 from flask.ext.security import login_required
@@ -25,7 +27,10 @@ from flask.ext.security import login_required
 """
 Import CommonsCloudAPI Dependencies
 """
-from CommonsCloudAPI.extensions import status
+from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import status as status_
+
+from .models import User
 
 from CommonsCloudAPI.utilities.format_csv import CSV
 from CommonsCloudAPI.utilities.format_json import JSON
@@ -40,11 +45,11 @@ from . import module
 """
 Basic route for currently logged in user
 """
-@module.route('/user/me', methods=['GET'])
+@module.route('/api/v2/user/me', methods=['GET'])
 def user_me():
 
   if not current_user.is_authenticated():
-      return status.status_401(), 401
+    return status_.status_401(), 401
 
   """
   If the user is properly authenticated, then proceed to see if they
@@ -63,32 +68,24 @@ def user_me():
   If the user hasn't requested a specific content type then we should
   tell them that, by directing them to an "Unsupported Media Type"
   """
-  return status.status_415(), 415
+  return status_.status_415(), 415
 
 
-
-"""
-Basic route for currently logged in user
-"""
-@module.route('/user/app', methods=['GET'])
-def user_app():
-
-  app = {
-    'blah': 'blah',
-    'foo': 'format_json',
-    'grr': {
-        'blah': 'blah',
-        'foo': 'format_json'
-    }
-  }
-
-  return test(app)
-
-
-
-
-@module.route('/user/profile')
+@module.route('/user/profile', methods=['GET'])
 @login_required
-def user_profile():
+def user_profile_get():
   return render_template('user/profile.html', user=current_user), 200
+
+
+@module.route('/user/profile', methods=['POST'])
+@login_required
+def user_profile_post():
+
+  if not current_user.is_authenticated():
+    return status_.status_401(), 401
+
+  user_ = User()
+  user_.user_update(request.form)
+
+  return redirect(url_for('user.user_profile_get'))
 
