@@ -27,6 +27,7 @@ from werkzeug import check_password_hash
 Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import sanitize
 
 
 """
@@ -144,10 +145,10 @@ class User(db.Model, UserMixin):
     """
     user_ = User.query.get(current_user.id)
 
-    user_.firstname = user_object_.get('firstname', current_user.firstname)
-    user_.lastname = user_object_.get('lastname', current_user.lastname)
-    user_.bio = user_object_.get('bio', current_user.bio)
-    user_.email = user_object_.get('email', current_user.email)
+    user_.firstname = sanitize.sanitize_string(user_object_.get('firstname', current_user.firstname))
+    user_.lastname = sanitize.sanitize_string(user_object_.get('lastname', current_user.lastname))
+    user_.bio = sanitize.sanitize_string(user_object_.get('bio', current_user.bio))
+    user_.email = sanitize.sanitize_string(user_object_.get('email', current_user.email))
     user_.active = user_object_.get('active', current_user.active)
     user_.roles = user_object_.get('roles', current_user.roles)
     user_.permissions = user_object_.get('permissions', current_user.permissions)
