@@ -14,9 +14,10 @@ limitations under the License.
 """
 Import System/Python Dependencies
 """
-from flask import Flask
+import os
+import unittest
 
-from flask.ext.testing import TestCase
+from CommonsCloudAPI import create_application
 
 
 """
@@ -24,16 +25,11 @@ Make sure that we can fire up the application, connect to the database,
 create all the necessary database tables, and run basic app loading functionality
 without any problems.
 """
-class CommonsCloudAPITest(TestCase):
-
-    def create_app(self):
-        app = Flask(__name__)
-        app.config['TESTING'] = True
-        return app
+class CommonsTestCase(unittest.TestCase):
 
     def setUp(self):
-        db.create_all()
+      self.app = create_application(__name__, env='testing')
 
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
+
+if __name__ == '__main__':
+    unittest.main()
