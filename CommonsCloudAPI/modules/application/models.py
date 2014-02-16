@@ -81,9 +81,15 @@ class Application(db.Model):
 
   @param (object) self
 
+  @param (dictionary) application_content
+      The content that is being submitted by the user
   """
   def application_create(self, application_content):
 
+
+    """
+    Part 1: Add the new application to the database
+    """
     new_application = {
       'name': sanitize.sanitize_string(application_content.get('name', '')),
       'description': sanitize.sanitize_string(application_content.get('description', '')),
@@ -95,6 +101,11 @@ class Application(db.Model):
     db.session.add(application_)
     db.session.commit()
 
+
+    """
+    Part 2: Tell the system what user should have permission to
+    access the newly created application
+    """
     permission = {
       'view': True,
       'edit': True,
@@ -103,9 +114,7 @@ class Application(db.Model):
 
     a = UserApplications(**permission)
     a.application_id = application_.id
-
     current_user.applications.append(a)
-
     db.session.commit()
 
     return application_
@@ -124,26 +133,6 @@ class Application(db.Model):
 
 
   """
-  Get a list of application ids from the current user and convert
-  them into a list of numbers so that our SQLAlchemy query can
-  understand what's going on
-
-  @param (object) self
-
-  @return (list) applications_
-      A list of applciations the current user has access to
-  """
-  def application_id_list(self):
-
-    applications_ = []
-
-    for application in current_user.applications:
-      applications_.append(application.application_id)
-
-    return applications_
-
-
-  """
   Get a list of existing Applications from the CommonsCloudAPI
 
   @param (object) self
@@ -158,7 +147,7 @@ class Application(db.Model):
     Get a list of the applications the current user has access to
     and load their information from the database
     """
-    application_id_list_ = self.application_id_list()
+    application_id_list_ = self._application_id_list()
     applications_ = Application.query.filter(Application.id.in_(application_id_list_)).all()
 
     
@@ -180,6 +169,25 @@ class Application(db.Model):
 
     return applications
 
+
+  """
+  Get a list of application ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+
+  @param (object) self
+
+  @return (list) applications_
+      A list of applciations the current user has access to
+  """
+  def _application_id_list(self):
+
+    applications_ = []
+
+    for application in current_user.applications:
+      applications_.append(application.application_id)
+
+    return applications_
 
 
 

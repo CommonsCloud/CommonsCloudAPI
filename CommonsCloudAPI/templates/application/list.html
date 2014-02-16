@@ -2,7 +2,9 @@
 
 {% block content %}
 
-      <h1>Applications</h1>      
+      <h1>Applications</h1>  
+
+      <a href="{{ url_for('application.application_create') }}">Create new application</a>    
 
       {% for application in applications %}
         <p>{{ application.name }} {% if application.permissions.can_edit %}<a href="#">edit</a>{% endif %} {% if application.permissions.can_delete %}<a href="#">delete</a>{% endif %}</p>
