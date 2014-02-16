@@ -27,8 +27,11 @@ from .extensions import oauth2
 
 from .errors import load_errorhandlers
 
+from .permissions import load_identities
+
 from .utilities import load_blueprints
 from .utilities import load_configuration
+
 
 
 """
@@ -67,5 +70,6 @@ def create_application(name = __name__, env = 'testing'):
 
     # Load default application routes/paths
     load_errorhandlers(app)
+    load_identities(app)
 
     return app

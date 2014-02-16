@@ -28,54 +28,54 @@ from flask.ext.security import current_user
 from flask.ext.principal import identity_loaded, Permission, RoleNeed, UserNeed
 
 
-ApplicationNeed = namedtuple('blog_post', ['method', 'value'])
+"""
+Import CommonsCloud Dependencies
+"""
+from CommonsCloudAPI.extensions import principal
+
+
+"""
+Define the most basic Principal need for our Application module
+""" 
+ApplicationNeed = namedtuple('application', ['method', 'value'])
 
 
 ViewApplicationNeed = partial(ApplicationNeed, 'view')
 class ViewApplicationPermission(Permission):
     def __init__(self, application_id):
-        need = ViewApplicationNeed(unicode(application_id))
+        need = ViewApplicationNeed(application_id)
         super(ViewApplicationPermission, self).__init__(need)
 
 
 EditApplicationNeed = partial(ApplicationNeed, 'edit')
 class EditApplicationPermission(Permission):
     def __init__(self, application_id):
-        need = EditApplicationNeed(unicode(application_id))
+        need = EditApplicationNeed(application_id)
         super(EditApplicationPermission, self).__init__(need)
 
 
 DeleteApplicationNeed = partial(ApplicationNeed, 'delete')
 class DeleteApplicationPermission(Permission):
-    def __init__(self, post_id):
-        need = DeleteApplicationNeed(unicode(application_id))
+    def __init__(self, application_id):
+        need = DeleteApplicationNeed(application_id)
         super(DeleteApplicationPermission, self).__init__(need)
 
 
-@identity_loaded.connect_via(current_app)
-def on_identity_loaded(sender, identity):
-    # Set the identity user object
-    identity.user = current_user
+"""
+Returns a list of possible permissions for the current application
 
-    # Add the UserNeed to the identity
-    if hasattr(current_user, 'id'):
-        identity.provides.add(UserNeed(current_user.id))
+@param (int) application_id
+    The application id that you wish to check against
 
-    # Assuming the User model has a list of roles, update the
-    # identity with the roles that the user provides
-    if hasattr(current_user, 'roles'):
-        for role in current_user.roles:
-            identity.provides.add(RoleNeed(role.name))
+@return (dict) <unnamed>
+    A dictionary of all the possible permissions that a user can have
 
-    # Assuming the User model has a list of posts the user
-    # has authored, add the needs to the identity
-    if hasattr(current_user, 'applications'):
-        for application in current_user.applications:
-          if application.view:
-            identity.provides.add(ViewApplicationNeed(unicode(application.application)))
-          if application.edit:
-            identity.provides.add(EditApplicationNeed(unicode(application.application)))
-          if application.delete:
-            identity.provides.add(DeleteApplicationNeed(unicode(application.application)))
+"""
+def check_permissions(application_id):
 
+  return {
+    'can_view': ViewApplicationPermission(application_id).can(),
+    'can_edit': EditApplicationPermission(application_id).can(),
+    'can_delete': DeleteApplicationPermission(application_id).can()
+  }
 

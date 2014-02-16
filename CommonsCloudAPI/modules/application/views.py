@@ -23,13 +23,16 @@ from flask.ext.security import current_user
 from flask.ext.security import login_required
 
 
+from CommonsCloudAPI.extensions import status
+
+
 """
 Import Application Module Dependencies
 """
 from . import module
 
 from .models import Application
-from .permissions import ViewApplicationPermission
+from .permissions import check_permissions
 
 
 @module.route('/application/', methods=['GET'])
@@ -37,25 +40,24 @@ from .permissions import ViewApplicationPermission
 def application_list():
 
   Application_ = Application()
-  applications_list = Application_.application_list()
+  applications = Application_.application_list()
 
-  return render_template('application/list.html', applications=applications_list), 200
+  return render_template('application/list.html', applications=applications), 200
 
 
 @module.route('/application/<int:application_id>/', methods=['GET'])
 @login_required
 def application_get(application_id):
 
-  permission = ViewApplicationPermission(application_id)
-  print 'permission.can()', permission.can()
+  permission = check_permissions(application_id)
 
-  if not current_user.is_authenticated():
-    return status_.status_401(), 401
+  if not permission.get('can_view', True):
+    return status.status_401(), 401
 
   Application_ = Application()
   this_application = Application_.application_get(application_id)
 
-  return render_template('application/single.html', application=this_application), 200
+  return render_template('application/single.html', application=this_application, permissions=permission), 200
 
 
 @module.route('/application/new/', methods=['GET'])

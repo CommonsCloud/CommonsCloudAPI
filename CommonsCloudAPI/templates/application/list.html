@@ -2,10 +2,10 @@
 
 {% block content %}
 
-      <h1>Applications</h1>
+      <h1>Applications</h1>      
 
       {% for application in applications %}
-        <p>{{ application.application }}</p>
+        <p>{{ application.name }} {% if application.permissions.can_edit %}<a href="#">edit</a>{% endif %} {% if application.permissions.can_delete %}<a href="#">delete</a>{% endif %}</p>
       {% endfor %}
 
 {% endblock %}

@@ -29,6 +29,13 @@ Import Commons Cloud Dependencies
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 
+
+"""
+Import Application Module Dependencies
+"""
+from .permissions import check_permissions
+
+
 application_templates = db.Table('application_templates',
     db.Column('application', db.Integer, db.ForeignKey('application.id')),
     db.Column('template', db.Integer, db.ForeignKey('template.id'))
@@ -38,8 +45,8 @@ class UserApplications(db.Model):
 
   __tablename__ = 'user_applications'
 
-  user = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
-  application = db.Column(db.Integer(), db.ForeignKey('application.id'), primary_key=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
+  application_id = db.Column(db.Integer(), db.ForeignKey('application.id'), primary_key=True)
   view = db.Column(db.Boolean())
   edit = db.Column(db.Boolean())
   delete = db.Column(db.Boolean())
@@ -56,15 +63,15 @@ class Application(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(60))
   description = db.Column(db.String(255))
-  owner = db.Column(db.Integer)
+  url = db.Column(db.String(255))
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
   templates = db.relationship("Template", secondary=application_templates, backref=db.backref('applications'))
 
-  def __init__(self, name="", owner="", description=None, created=datetime.utcnow(), status=True, templates=[]):
+  def __init__(self, name="", url="", description=None, created=datetime.utcnow(), status=True, templates=[]):
     self.name = name
     self.description = description
-    self.owner = owner
+    self.url = url
     self.created = created
     self.status = status
     self.templates = templates
@@ -95,7 +102,7 @@ class Application(db.Model):
     }
 
     a = UserApplications(**permission)
-    a.application = application_.id
+    a.application_id = application_.id
 
     current_user.applications.append(a)
 
@@ -117,13 +124,65 @@ class Application(db.Model):
 
 
   """
+  Get a list of application ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+
+  @param (object) self
+
+  @return (list) applications_
+      A list of applciations the current user has access to
+  """
+  def application_id_list(self):
+
+    applications_ = []
+
+    for application in current_user.applications:
+      applications_.append(application.application_id)
+
+    return applications_
+
+
+  """
   Get a list of existing Applications from the CommonsCloudAPI
 
   @param (object) self
 
+  @return (list) applications
+      A list of applications and their given permissions for the current user
+
   """
   def application_list(self):
 
-    current_user_applications_ = current_user.applications
+    """
+    Get a list of the applications the current user has access to
+    and load their information from the database
+    """
+    application_id_list_ = self.application_id_list()
+    applications_ = Application.query.filter(Application.id.in_(application_id_list_)).all()
 
-    return current_user_applications_
+    
+    """
+    Now we need to create a dictionary for each of our applications to
+    transfer the necessary fields and permissions
+    """
+    applications = []
+
+    for application in applications_:
+
+      a = {
+        'name': application.name,
+        'description': application.description,
+        'permissions': check_permissions(application.id)
+      }
+
+      applications.append(a)
+
+    return applications
+
+
+
+
+
+
+
