@@ -17,7 +17,7 @@ Import Flask Dependencies
 from flask.ext.security import Security
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail
-from flask.ext.oauthlib.oauth2.provider import OAuth2Provider
+from flask.ext.oauthlib.provider import OAuth2Provider
 from flask.ext.principal import Principal
 
 from CommonsCloudAPI.utilities.sanitize import CommonsSanitize

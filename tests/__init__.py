@@ -10,14 +10,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+"""
+Import Python Dependencies
+"""
+import urllib2
+
 
 """
-Import System/Python Dependencies
+Import Flask Dependencies
 """
-import os
-import unittest
+from flask.ext.testing import TestCase
 
+
+"""
+Import Application Dependencies
+"""
 from CommonsCloudAPI import create_application
+
+from CommonsCloudAPI.extensions import db
 
 
 """
@@ -25,11 +35,26 @@ Make sure that we can fire up the application, connect to the database,
 create all the necessary database tables, and run basic app loading functionality
 without any problems.
 """
-class CommonsTestCase(unittest.TestCase):
+class CommonsTest(TestCase):
 
-    def setUp(self):
-      self.app = create_application(__name__, env='testing')
+  def create_app(self):
+    app = create_application(__name__, env='testing')
+    app.config['TESTING'] = True
+    return app
+
+  def setUp(self):
+    self.app = self.create_app()
+    db.create_all()
+
+  def tearDown(self):
+    db.session.remove()
+    db.drop_all()
+
+  def test_dashboard(self):
+    response = self.client.get('/')
+    self.assertStatus(response, 302)
 
 
 if __name__ == '__main__':
     unittest.main()
+
