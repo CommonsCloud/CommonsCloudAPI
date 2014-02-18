@@ -83,6 +83,7 @@ class Application(db.Model):
     self.status = status
     self.templates = templates
 
+
   """
   Create a new application in the CommonsCloudAPI
 
@@ -119,13 +120,56 @@ class Application(db.Model):
       'delete': True
     }
 
-    a = UserApplications(**permission)
-    a.application_id = application_.id
-    current_user.applications.append(a)
-    db.session.commit()
+    self.set_user_application_permissions(application_, permission, current_user)
 
     return application_
 
+
+  """
+  Associate a user with a specific application
+
+  @param (object) self
+
+  @param (object) application
+      A fully qualified Application object to act on
+
+  @param (dict) permission
+      A dictionary containing boolean values for the `view`, `edit`, and `delete` properties
+
+      Example: 
+
+        permission = {
+          'view': True,
+          'edit': True,
+          'delete': True
+        }
+
+  @param (object) user
+      A fully qualified User object that we can act on
+
+  @return (object) new_permission
+      The permission object that was saved to the database
+
+  """
+  def set_user_application_permissions(self, application, permission, user):
+
+    """
+    Start a new Permission object
+    """
+    new_permission = UserApplications(**permission)
+
+    """
+    Set the ID of the Application to act upon
+    """
+    new_permission.application_id = application.id
+
+    """
+    Add the new permissions defined with the user defined
+    """
+    user.applications.append(new_permission)
+    db.session.commit()
+
+    return new_permission
 
   """
   Get an existing Applications from the CommonsCloudAPI
