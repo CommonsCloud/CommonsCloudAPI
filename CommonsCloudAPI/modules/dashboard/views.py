@@ -35,7 +35,6 @@ The front page of the application for authenticated Unless
 def index():
   return render_template('dashboard/index.html', user=current_user), 200
 
-
-@module.route('/mapbox')
+@module.route('/mapbox/', methods=['GET'])
 def mapbox():
 	return render_template('mapbox.html'), 200

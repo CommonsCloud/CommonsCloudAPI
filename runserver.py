@@ -14,7 +14,6 @@ limitations under the License.
 """
 Import System/Python level dependencies
 """
-import os
 import sys
 
 

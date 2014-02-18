@@ -19,6 +19,8 @@ Drone.io. The primary thing here is to make sure we aren't setting any specific 
 information, so that the continious integration testing suite can just use what it has.
 """
 
-DEBUG = True
+DEBUG = False
+
+USE_RELOADER = False
   
 SQLALCHEMY_DATABASE_URI = 'postgresql://127.0.0.1:5432/commonscloudapi_testing'

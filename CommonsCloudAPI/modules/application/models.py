@@ -38,12 +38,16 @@ from .permissions import check_permissions
 
 application_templates = db.Table('application_templates',
     db.Column('application', db.Integer, db.ForeignKey('application.id')),
-    db.Column('template', db.Integer, db.ForeignKey('template.id'))
+    db.Column('template', db.Integer, db.ForeignKey('template.id')),
+    extend_existing = True
 )
 
 class UserApplications(db.Model):
 
   __tablename__ = 'user_applications'
+  __table_args__ = {
+    'extend_existing': True
+  }
 
   user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
   application_id = db.Column(db.Integer(), db.ForeignKey('application.id'), primary_key=True)
@@ -59,6 +63,9 @@ Define our individual models
 class Application(db.Model):
 
   __tablename__ = 'application'
+  __table_args__ = {
+    'extend_existing': True
+  }
 
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(60))

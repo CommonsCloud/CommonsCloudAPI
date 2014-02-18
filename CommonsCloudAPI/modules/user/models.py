@@ -32,7 +32,8 @@ from CommonsCloudAPI.extensions import sanitize
 
 user_roles = db.Table('user_roles',
   db.Column('user', db.Integer(), db.ForeignKey('user.id')),
-  db.Column('role', db.Integer(), db.ForeignKey('role.id'))
+  db.Column('role', db.Integer(), db.ForeignKey('role.id')),
+  extend_existing = True
 )
 
 
@@ -43,6 +44,9 @@ Flask-Security module. If you remove it Flask-Security gets fussy.
 class Role(db.Model, RoleMixin):
 
   __tablename__ = 'role'
+  __table_args__ = {
+    'extend_existing': True
+  }
 
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(80), unique=True)
@@ -56,6 +60,9 @@ Flask-Security module. If you remove it Flask-Security gets fussy.
 class User(db.Model, UserMixin):
 
   __tablename__ = 'user'
+  __table_args__ = {
+    'extend_existing': True
+  }
 
   """
   Define the fields that we will use to create the User table in our
@@ -108,6 +115,15 @@ class User(db.Model, UserMixin):
     return check_password_hash(self.password, password)
 
   
+  def user_create(self, new_user):
+    new_user_ = User(**new_user)
+
+    db.session.add(new_user_)
+    db.session.commit()
+
+    return new_user_
+
+
   """
   Get the SQLAlchemy User object for the current_user
 

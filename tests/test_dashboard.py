@@ -45,3 +45,6 @@ class CommonsTest(TestCase):
     db.session.remove()
     db.drop_all()
 
+  def test_dashboard(self):
+    response = self.client.get('/')
+    self.assertStatus(response, 302)
