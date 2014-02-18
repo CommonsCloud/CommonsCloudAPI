@@ -53,10 +53,11 @@ class FormatContent:
       A flag to identify whether or not the content needs to be serialized
       before it is processed by our formatting tasks
   """
-  def __init__(self, data, serialize=False, exclude_fields=[]):
+  def __init__(self, data, serialize=False, exclude_fields=[], list_name=[]):
     self.the_content = data
     self.serialize = serialize
     self.exclude_fields = exclude_fields
+    self.list_name = list_name
 
 
   """

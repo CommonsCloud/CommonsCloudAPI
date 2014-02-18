@@ -52,7 +52,7 @@ def application_list():
   have requests a type of content we serve
   """
   if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):    
-    this_data = JSON(applications_, serialize=True)
+    this_data = JSON(applications_, serialize=True, list_name='applications')
     return this_data.create(), 200
 
   elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
