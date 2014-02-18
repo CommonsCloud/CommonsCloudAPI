@@ -171,10 +171,17 @@ class Application(db.Model):
 
     return new_permission
 
+
   """
   Get an existing Applications from the CommonsCloudAPI
 
   @param (object) self
+
+  @param (int) application_id
+      The unique ID of the Application to be retrieved from the system
+
+  @return (object) application_
+      A fully qualified Application object
 
   """
   def application_get(self, application_id):
