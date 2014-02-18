@@ -41,7 +41,7 @@ class CommonsTest(TestCase):
     self.app = self.create_app()
     db.create_all()
 
-  def tearDown(self):
-    db.session.remove()
-    db.drop_all()
+  # def tearDown(self):
+  #   db.session.remove()
+  #   db.drop_all()
 
