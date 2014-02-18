@@ -45,7 +45,7 @@ from . import module
 """
 Basic route for currently logged in user
 """
-@module.route('/api/v2/user/me/', methods=['GET'])
+@module.route('/user/me/', methods=['GET'])
 def user_me():
 
   if not current_user.is_authenticated():
@@ -55,12 +55,12 @@ def user_me():
   If the user is properly authenticated, then proceed to see if they
   have requests a type of content we serve
   """
-  if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):    
-    this_data = JSON(current_user, serialize=True)
+  if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):
+    this_data = JSON(current_user, serialize=True, exclude_fields=['password'])
     return this_data.create(), 200
 
   elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
-    this_data = CSV(current_user, serialize=True)
+    this_data = CSV(current_user, serialize=True, exclude_fields=['password'])
     return this_data.create(), 200
 
 

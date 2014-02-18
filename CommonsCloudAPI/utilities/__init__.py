@@ -56,3 +56,4 @@ def load_blueprints(app):
                 f, filename, descr = imp.find_module(name, [path])
                 mods[fname] = imp.load_module(name, f, filename, descr)
                 app.register_blueprint(getattr(mods[fname], 'module'))
+

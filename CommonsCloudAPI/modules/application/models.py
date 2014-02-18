@@ -187,6 +187,7 @@ class Application(db.Model):
   def application_get(self, application_id):
 
     application_ = Application.query.get(application_id)
+
     return application_
 
 
@@ -208,24 +209,7 @@ class Application(db.Model):
     application_id_list_ = self._application_id_list()
     applications_ = Application.query.filter(Application.id.in_(application_id_list_)).all()
 
-    
-    """
-    Now we need to create a dictionary for each of our applications to
-    transfer the necessary fields and permissions
-    """
-    applications = []
-
-    for application in applications_:
-
-      a = {
-        'name': application.name,
-        'description': application.description,
-        'permissions': check_permissions(application.id)
-      }
-
-      applications.append(a)
-
-    return applications
+    return applications_
 
 
   """

@@ -53,9 +53,10 @@ class FormatContent:
       A flag to identify whether or not the content needs to be serialized
       before it is processed by our formatting tasks
   """
-  def __init__(self, data, serialize=False):
+  def __init__(self, data, serialize=False, exclude_fields=[]):
     self.the_content = data
     self.serialize = serialize
+    self.exclude_fields = exclude_fields
 
 
   """
@@ -105,12 +106,41 @@ class FormatContent:
       A dictionary of the contents of our objects
 
   """
+  def serialize_list(self):
+
+      list_ = []
+
+      for object_ in self.the_content:
+        result = OrderedDict()
+        for key in object_.__mapper__.c.keys():
+          if not key in self.exclude_fields:
+            result[key] = getattr(object_, key)
+
+        list_.append(result)
+
+      return list_
+
+
+  """
+  In order to be able to work with an object it needs to be serialized,
+  otherwise we can turn it into any type of file
+
+  @requires
+      from collections import OrderedDict
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (dict) result
+      A dictionary of the contents of our objects
+
+  """
   def serialize_object(self):
 
       result = OrderedDict()
 
       for key in self.the_content.__mapper__.c.keys():
-
+        if not key in self.exclude_fields:
           result[key] = getattr(self.the_content, key)
 
       return result
