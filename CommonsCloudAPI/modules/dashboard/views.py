@@ -27,14 +27,6 @@ Import Module Dependencies
 from . import module
 
 
-"""
-The front page of the application for authenticated Unless
-"""
-@module.route('/')
-@login_required
-def index():
-  return render_template('dashboard/index.html', user=current_user), 200
-
 @module.route('/mapbox/', methods=['GET'])
 def mapbox():
 	return render_template('mapbox.html'), 200

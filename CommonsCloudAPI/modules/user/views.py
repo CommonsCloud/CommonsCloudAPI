@@ -45,7 +45,12 @@ from . import module
 """
 Basic route for currently logged in user
 """
+@module.route('/', methods=['GET'])
+def index():
+  return redirect('/user/me/?format=json')
+
 @module.route('/user/me/', methods=['GET'])
+@login_required
 def user_me():
 
   if not current_user.is_authenticated():

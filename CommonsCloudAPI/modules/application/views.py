@@ -70,13 +70,15 @@ def application_list():
 @login_required
 def application_post():
 
-  if not current_user.is_authenticated():
-    return status_.status_401(), 401
+  print request.data
 
-  Application_ = Application()
-  new_application = Application_.application_create(request.form)
+  # if not current_user.is_authenticated():
+  #   return status_.status_401(), 401
 
-  return redirect(url_for('application.application_get', application_id=new_application.id))
+  # Application_ = Application()
+  # new_application = Application_.application_create(request.form)
+
+  # return redirect(url_for('application.application_get', application_id=new_application.id))
 
 
 @module.route('/application/<int:application_id>/', methods=['GET'])
