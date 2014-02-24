@@ -20,6 +20,7 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
+from flask.ext.security import auth_token_required
 from flask.ext.security import current_user
 from flask.ext.security import login_required
 
@@ -67,23 +68,18 @@ def application_list():
 
 
 @module.route('/application/', methods=['POST'])
-@login_required
 def application_post():
-
-  print request.data
-  return jsonify({'response': request.data}), 200
 
   # if not current_user.is_authenticated():
   #   return status_.status_401(), 401
 
-  # Application_ = Application()
-  # new_application = Application_.application_create(request.form)
+  Application_ = Application()
+  new_application = Application_.application_create(request.form)
 
-  # return redirect(url_for('application.application_get', application_id=new_application.id))
+  return redirect(url_for('application.application_get', application_id=new_application.id))
 
 
 @module.route('/application/<int:application_id>/', methods=['GET'])
-@login_required
 def application_get(application_id):
 
   permission = check_permissions(application_id)

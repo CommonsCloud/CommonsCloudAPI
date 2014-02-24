@@ -43,6 +43,10 @@ SECURITY_EMAIL_SUBJECT_REGISTER = 'Welcome! CommonsCloud needs you to confirm yo
 SECURITY_EMAIL_SUBJECT_CONFIRM = 'CommonsCloud needs you to confirm your email address'
 
 
+OAUTH1_PROVIDER_ENFORCE_SSL = False
+OAUTH1_PROVIDER_KEY_LENGTH = (10, 100)
+
+
 # Flask-Mail
 MAIL_SERVER = 'smtp.mandrillapp.com'
 MAIL_PORT = 465

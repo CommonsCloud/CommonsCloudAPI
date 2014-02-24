@@ -26,81 +26,97 @@ from flask.ext.security import current_user
 """
 Import Application Dependencies
 """
-from CommonsCloudAPI import db
-from CommonsCloudAPI import oauth2
+from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import oauth
 
-from CommonsCloudAPI.models import Client
-from CommonsCloudAPI.models import Grant
-
-
-@oauth2.clientgetter
-def load_client(client_id):
-  return Client.query.filter_by(client_id=client_id).first()
-
-@oauth2.clientgetter
-def load_client(client_id):
-    return Client.query.filter_by(client_id=client_id).first()
+from .models import Client
+from .models import RequestToken
+from .models import Nonce
+from .models import AccessToken
 
 
-@oauth2.grantgetter
-def load_grant(client_id, code):
-    return Grant.query.filter_by(client_id=client_id, code=code).first()
+@oauth.clientgetter
+def load_client(client_key):
+    return Client.query.get(client_key)
 
 
-@oauth2.grantsetter
-def save_grant(client_id, code, request, *args, **kwargs):
+@oauth.grantgetter
+def load_request_token(token):
+    return RequestToken.query.filter_by(token=token).first()
 
-    # decide the expires time yourself
-    expires = datetime.utcnow() + timedelta(seconds=100)
 
-    this_user = current_user
-
-    grant = Grant(
-        client_id=client_id,
-        code=code['code'],
+@oauth.grantsetter
+def save_request_token(token, request):
+    if hasattr(oauth, 'realms') and oauth.realms:
+        realms = ' '.join(request.realms)
+    else:
+        realms = None
+    grant = RequestToken(
+        token=token['oauth_token'],
+        secret=token['oauth_token_secret'],
+        client=request.client,
         redirect_uri=request.redirect_uri,
-        _scopes=' '.join(request.scopes),
-        user=this_user,
-        expires=expires,
-        user_id=this_user.id
+        _realms=realms,
     )
-
     db.session.add(grant)
     db.session.commit()
-
     return grant
 
 
-@oauth2.tokengetter
-def load_token(access_token=None, refresh_token=None):
-    if access_token:
-        return Token.query.filter_by(access_token=access_token).first()
-    elif refresh_token:
-        return Token.query.filter_by(refresh_token=refresh_token).first()
+@oauth.verifiergetter
+def load_verifier(verifier, token):
+    return RequestToken.query.filter_by(
+        verifier=verifier, token=token
+    ).first()
 
 
-@oauth2.tokensetter
-def save_token(token, request, *args, **kwargs):
-    toks = Token.query.filter_by(
-        client_id=request.client.client_id,
-        user_id=request.user.id
-    )
-    # make sure that every client has only one token connected to a user
-    for t in toks:
-        db.session.delete(t)
-
-    expires_in = token.pop('expires_in')
-    expires = datetime.utcnow() + timedelta(seconds=expires_in)
-
-    tok = Token(
-        access_token=token['access_token'],
-        refresh_token=token['refresh_token'],
-        token_type=token['token_type'],
-        _scopes=token['scope'],
-        expires=expires,
-        client_id=request.client.client_id,
-        user_id=request.user.id,
-    )
+@oauth.verifiersetter
+def save_verifier(token, verifier, *args, **kwargs):
+    tok = RequestToken.query.filter_by(token=token).first()
+    tok.verifier = verifier['oauth_verifier']
+    tok.user = current_user
     db.session.add(tok)
     db.session.commit()
     return tok
+
+
+@oauth.noncegetter
+def load_nonce(client_key, timestamp, nonce, request_token, access_token):
+    return Nonce.query.filter_by(
+        client_key=client_key, timestamp=timestamp, nonce=nonce,
+        request_token=request_token, access_token=access_token,
+    ).first()
+
+
+@oauth.noncesetter
+def save_nonce(client_key, timestamp, nonce, request_token, access_token):
+    nonce = Nonce(
+        client_key=client_key,
+        timestamp=timestamp,
+        nonce=nonce,
+        request_token=request_token,
+        access_token=access_token,
+    )
+    db.session.add(nonce)
+    db.session.commit()
+    return nonce
+
+
+@oauth.tokengetter
+def load_access_token(client_key, token, *args, **kwargs):
+    return AccessToken.query.filter_by(
+        client_key=client_key, token=token
+    ).first()
+
+
+@oauth.tokensetter
+def save_access_token(token, request):
+    tok = AccessToken(
+        client=request.client,
+        user=request.user,
+        token=token['oauth_token'],
+        secret=token['oauth_token_secret'],
+        _realms=token['oauth_authorized_realms'],
+    )
+    db.session.add(tok)
+    db.session.commit()

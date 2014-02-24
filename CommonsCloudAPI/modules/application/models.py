@@ -36,11 +36,11 @@ Import Application Module Dependencies
 from .permissions import check_permissions
 
 
-application_templates = db.Table('application_templates',
-    db.Column('application', db.Integer, db.ForeignKey('application.id')),
-    db.Column('template', db.Integer, db.ForeignKey('template.id')),
-    extend_existing = True
-)
+# application_templates = db.Table('application_templates',
+#     db.Column('application', db.Integer, db.ForeignKey('application.id')),
+#     db.Column('template', db.Integer, db.ForeignKey('template.id')),
+#     extend_existing = True
+# )
 
 class UserApplications(db.Model):
 
@@ -73,7 +73,7 @@ class Application(db.Model):
   url = db.Column(db.String(255))
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
-  templates = db.relationship("Template", secondary=application_templates, backref=db.backref('applications'))
+  # templates = db.relationship("Template", secondary=application_templates, backref=db.backref('applications'))
 
   def __init__(self, name="", url="", description=None, created=datetime.utcnow(), status=True, templates=[]):
     self.name = name
@@ -81,7 +81,7 @@ class Application(db.Model):
     self.url = url
     self.created = created
     self.status = status
-    self.templates = templates
+    # self.templates = templates
 
 
   """

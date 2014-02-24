@@ -25,16 +25,16 @@ we're showing folks is a 404, 500, or the home page.
 """
 def load_errorhandlers(app):
 
-  """
-  If a user would happen to arrive at a deadend within the system, we should at least give
-  them a little feedback. These should get better over time, but for now we can at least make
-  it look like they aren't completely leaving the system and lost with default server error pages.
-  """
-  @app.errorhandler(404)
-  def internal_error(error):
-    return status_.status_404(), 404
+  # """
+  # If a user would happen to arrive at a deadend within the system, we should at least give
+  # them a little feedback. These should get better over time, but for now we can at least make
+  # it look like they aren't completely leaving the system and lost with default server error pages.
+  # """
+  # @app.errorhandler(404)
+  # def internal_error(error):
+  #   return status_.status_404(), 404
 
-  @app.errorhandler(500)
-  def internal_error(error):
-    return status_.status_500(), 500
+  # @app.errorhandler(500)
+  # def internal_error(error):
+  #   return status_.status_500(), 500
   

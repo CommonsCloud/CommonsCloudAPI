@@ -23,9 +23,9 @@ Import Application Dependencies
 from .extensions import db
 from .extensions import mail
 from .extensions import security
-from .extensions import oauth2
+from .extensions import oauth
 
-from .errors import load_errorhandlers
+# from .errors import load_errorhandlers
 
 from .permissions import load_identities
 
@@ -49,7 +49,7 @@ def create_application(name = __name__, env = 'testing'):
     mail.init_app(app)
     
     # Setup OAuth2 Provider
-    oauth2.init_app(app)
+    oauth.init_app(app)
 
     # Load our application's blueprints
     load_blueprints(app)
@@ -69,7 +69,16 @@ def create_application(name = __name__, env = 'testing'):
     db.create_all()
 
     # Load default application routes/paths
-    load_errorhandlers(app)
+    # load_errorhandlers(app)
     load_identities(app)
+
+    if not app.debug:
+        import logging
+        logger = logging.getLogger('myapp')
+        hdlr = logging.FileHandler('/Users/joshuaisaacpowell/Code/CommonsCloudAPI/error.log')
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        hdlr.setFormatter(formatter)
+        logger.addHandler(hdlr) 
+        logger.setLevel(logging.INFO)
 
     return app

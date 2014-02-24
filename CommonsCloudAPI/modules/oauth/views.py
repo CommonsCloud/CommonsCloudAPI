@@ -15,8 +15,10 @@ limitations under the License.
 Import Flask Dependencies
 """
 from flask import jsonify
-from flask import request
+from flask import redirect
 from flask import render_template
+from flask import request
+from flask import url_for
 
 from flask.ext.security import current_user
 from flask.ext.security import login_required
@@ -27,16 +29,20 @@ from werkzeug.security import gen_salt
 """
 Import Application Dependencies
 """
-from CommonsCloudAPI import db
-from CommonsCloudAPI import oauth2
-
-from CommonsCloudAPI.models import Client
+from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import oauth
 
 
 """
 Import Module Dependencies
 """
 from . import module
+
+from .models import Client
+from .models import RequestToken
+from .models import Nonce
+from .models import AccessToken
+
 from .utilities import *
 
 
@@ -73,10 +79,9 @@ def oauth_client():
   # actually just be a utility function
   #
   item = Client(
-    client_id=client_id,
+    client_key=client_id,
     client_secret=client_secret,
-    _redirect_uris='http://127.0.0.1:5001/profile',
-    _default_scopes='email',
+    _redirect_uris='http://localhost:8000/authorized',
     user_id=this_user.id,
   )
   #
@@ -93,25 +98,26 @@ def oauth_client():
   Return the client id and secret as a JSON object ... Why? Do we need to?
   """
   return jsonify(
-    client_id=client_id,
+    client_key=client_id,
     client_secret=client_secret,
-  )
+  ), 200
 
 
-@module.route('/api/me')
-@oauth2.require_oauth()
-def me(req):
-    return jsonify(username=req.user.username)
+@module.route('/oauth/request_token')
+@oauth.request_token_handler
+def request_token():
+    return {}
+
 
 @module.route('/oauth/access_token')
-@oauth2.token_handler
-def oauth_access_token():
-    return None
+@oauth.access_token_handler
+def access_token():
+    return {}
 
 
 @module.route('/oauth/authorize', methods=['GET', 'POST'])
-@oauth2.authorize_handler
-def oauth_authorize(*args, **kwargs):
+@oauth.authorize_handler
+def authorize(*args, **kwargs):
 
   if not current_user:
     return redirect('/')
@@ -123,11 +129,20 @@ def oauth_authorize(*args, **kwargs):
   this_user = current_user
 
   if request.method == 'GET':
-    client_id = kwargs.get('client_id')
-    client = Client.query.filter_by(client_id=client_id).first()
+    client_key = kwargs.get('resource_owner_key')
+    client = Client.query.filter_by(client_key=client_key).first()
     kwargs['client'] = client
     kwargs['user'] = this_user
     return render_template('oauth/authorize.html', **kwargs)
 
   confirm = request.form.get('confirm', 'no')
+
   return confirm == 'yes'
+
+
+@module.route('/api/me')
+@oauth.require_oauth()
+def me(req):
+    return jsonify(username='SUCCESS!')
+
+
