@@ -57,8 +57,10 @@ To access this endpoint the user must be logged in to the system
 @login_required
 def oauth_client():
 
-  if not current_user:
-    return redirect('/')
+  next_url = url_for('oauth.oauth_authorize', **request.args)
+
+  if not hasattr(current_user, 'id'):
+    return redirect(url_for('security.login', next=next_url))
 
   """
   Assign the current_user object to a variable so that we don't
@@ -119,9 +121,11 @@ def access_token():
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
 
-  if not current_user:
-    return redirect('/')
+  next_url = url_for('oauth.authorize', **request.args)
 
+  if not hasattr(current_user, 'id'):
+    return redirect(url_for('security.login', next=next_url))
+    
   """
   Assign the current_user object to a variable so that we don't
   accidently alter the object during this process.
