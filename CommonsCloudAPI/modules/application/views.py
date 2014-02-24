@@ -71,6 +71,7 @@ def application_list():
 def application_post():
 
   print request.data
+  return jsonify({'response': request.data}), 200
 
   # if not current_user.is_authenticated():
   #   return status_.status_401(), 401

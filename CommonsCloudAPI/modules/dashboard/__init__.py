@@ -19,7 +19,7 @@ from flask import Blueprint
 """
 Create a blueprint for the Dashboard module
 """
-module = Blueprint('dashbaord', __name__, template_folder='templates')
+module = Blueprint('dashbaord', __name__)
 
 
 """

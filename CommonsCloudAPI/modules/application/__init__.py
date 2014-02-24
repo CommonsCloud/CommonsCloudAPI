@@ -19,7 +19,7 @@ from flask import Blueprint
 """
 Create a blueprint for the OAuth module
 """
-module = Blueprint('application', __name__, template_folder='templates')
+module = Blueprint('application', __name__)
 
 
 """
