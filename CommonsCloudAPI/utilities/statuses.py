@@ -65,7 +65,32 @@ class CommonsStatus():
       'status': '401 Unauthorized',
       'code': '401',
       'problem': 'The request requires user authentication.',
-      'solution': 'You probably just need to login or authenticate via OAuth before accessing this endpoint.'
+      'solution': 'You probably just need to login or authenticate via OAuth before accessing this endpoint. Otherwise you do not have permission to access this resource.'
+    }
+
+    return jsonify(message) if self.return_type == 'json' else message
+
+
+  """
+  404 Not Found
+
+  @see
+      http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_404(self):
+
+    message = {
+      'status': '404 Not Found',
+      'code': '404',
+      'problem': 'The server has not found anything matching the Request-URI.',
+      'solution': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -95,4 +120,28 @@ class CommonsStatus():
 
     return jsonify(message) if self.return_type == 'json' else message
 
+
+  """
+  500 Internal Server Error
+
+  @see
+      http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_500(self):
+
+    message = {
+      'status': '500 Internal Server Error',
+      'code': '500',
+      'problem': 'The server has not found anything matching the Request-URI.',
+      'solution': 'You need to check the system, application, and proxy logs.'
+    }
+
+    return jsonify(message) if self.return_type == 'json' else message
 

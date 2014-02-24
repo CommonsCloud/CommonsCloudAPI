@@ -16,6 +16,8 @@ Import Flask dependencies
 """
 from flask import render_template
 
+from CommonsCloudAPI.extensions import status as status_
+
 
 """
 Setup some basic routes to get our application started, even if all
@@ -30,9 +32,9 @@ def load_errorhandlers(app):
   """
   @app.errorhandler(404)
   def internal_error(error):
-    return render_template('system/error_404.html'), 404
-  
+    return status_.status_404(), 404
+
   @app.errorhandler(500)
   def internal_error(error):
-      return render_template('system/error_500.html'), 500
+    return status_.status_500(), 500
   
