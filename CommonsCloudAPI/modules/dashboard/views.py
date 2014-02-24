@@ -15,10 +15,6 @@ limitations under the License.
 Import Flask Dependencies
 """
 from flask import jsonify
-from flask import render_template
-
-from flask.ext.security import current_user
-from flask.ext.security import login_required
 
 
 """
@@ -27,6 +23,6 @@ Import Module Dependencies
 from . import module
 
 
-@module.route('/mapbox/', methods=['GET'])
-def mapbox():
-	return render_template('mapbox.html'), 200
+@module.route('/', methods=['GET'])
+def index():
+	return jsonify({'message': 'Welcome to the CommonsCloudAPI'}), 200
