@@ -14,7 +14,7 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-from flask import jsonify
+from flask import redirect
 
 
 """
@@ -25,4 +25,4 @@ from . import module
 
 @module.route('/', methods=['GET'])
 def index():
-	return jsonify({'message': 'Welcome to the CommonsCloudAPI'}), 200
+	return redirect('/user/me?format=json'), 301
