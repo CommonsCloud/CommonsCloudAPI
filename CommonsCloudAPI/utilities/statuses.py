@@ -48,6 +48,30 @@ class CommonsStatus():
 
 
   """
+  204 No Content
+
+  @see
+      http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_204(self):
+
+    message = {
+      'status': '204 No Content',
+      'code': '204',
+      'problem': 'This content no longer exists'
+    }
+
+    return jsonify(message) if self.return_type == 'json' else message
+
+
+  """
   401 Unauthorized
 
   @see

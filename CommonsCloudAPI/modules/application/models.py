@@ -55,7 +55,7 @@ class UserApplications(db.Model):
   view = db.Column(db.Boolean())
   edit = db.Column(db.Boolean())
   delete = db.Column(db.Boolean())
-  applications = db.relationship('Application', backref='user_apps')
+  applications = db.relationship('Application', backref=db.backref("user_applications", cascade="all,delete"))
 
 
 """
@@ -230,6 +230,26 @@ class Application(db.Model):
 
     return application_
 
+
+  """
+  Get an existing Applications from the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (int) application_id
+      The unique ID of the Application to be retrieved from the system
+
+  @return (object) application_
+      A fully qualified Application object
+
+  """
+  def application_delete(self, application_id):
+
+    application_ = Application.query.get(application_id)
+    db.session.delete(application_)
+    db.session.commit()
+
+    return True
 
   """
   Get a list of existing Applications from the CommonsCloudAPI

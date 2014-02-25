@@ -82,7 +82,7 @@ def application_post():
   Application_ = Application()
   new_application = Application_.application_create(request)
 
-  return redirect(url_for('application.application_get', application_id=new_application.id, format='json'))
+  return redirect(url_for('application.application_get', application_id=new_application.id, format='json', _external=True)), 201
 
 
 """
@@ -118,12 +118,12 @@ def application_get(application_id):
 
 
 """
-EDIT
+PATCH
 
 User attempting to access this endpoint must have the `edit`
 permission associated with them in the `user_applications` table
 """
-@module.route('/application/<int:application_id>/', methods=['PATCH'])
+@module.route('/application/<int:application_id>/', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 @permission_required('can_edit')
 def application_update(application_id):
@@ -131,6 +131,23 @@ def application_update(application_id):
   Application_ = Application()
   new_application = Application_.application_update(application_id, request)
 
-  return redirect(url_for('application.application_get', application_id=new_application.id, format='json', _external=True))
+  return redirect(url_for('application.application_get', application_id=new_application.id, format='json', _external=True)), 200
+
+
+"""
+DELETE
+
+User attempting to access this endpoint must have the `delete`
+permission associated with them in the `user_applications` table
+"""
+@module.route('/application/<int:application_id>/', methods=['DELETE'])
+# @oauth.require_oauth()
+@permission_required('can_delete')
+def application_delete(application_id):
+
+  Application_ = Application()
+  new_application = Application_.application_delete(application_id)
+
+  return status_.status_204(), 204
 
 
