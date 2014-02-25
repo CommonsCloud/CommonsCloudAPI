@@ -123,6 +123,31 @@ class CommonsStatus():
 
 
   """
+  405 Method Not Allowed
+
+  @see
+      http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_405(self):
+
+    message = {
+      'status': '405 Method Not Allowed',
+      'code': '405',
+      'problem': 'The method is not allowed for the requested URL.',
+      'solution': 'Check the documentation to ensure the method you\'re attempting to use is one of GET, POST, PATCH, or DELETE'
+    }
+
+    return jsonify(message) if self.return_type == 'json' else message
+
+
+  """
   415 Unsupported Media Type
 
   @see

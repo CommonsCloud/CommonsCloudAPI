@@ -25,7 +25,7 @@ from .extensions import mail
 from .extensions import security
 from .extensions import oauth
 
-# from .errors import load_errorhandlers
+from .errors import load_errorhandlers
 
 from .permissions import load_identities
 
@@ -69,7 +69,7 @@ def create_application(name = __name__, env = 'testing'):
     db.create_all()
 
     # Load default application routes/paths
-    # load_errorhandlers(app)
+    load_errorhandlers(app)
     load_identities(app)
 
     if not app.debug:
