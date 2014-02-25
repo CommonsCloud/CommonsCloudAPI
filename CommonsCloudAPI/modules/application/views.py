@@ -39,14 +39,12 @@ from . import module
 
 from .models import Application
 from .permissions import check_permissions
+from .permissions import permission_required
 
 
 @module.route('/application/', methods=['GET'])
 @oauth.require_oauth()
 def application_list():
-
-  if not current_user.is_authenticated():
-    return status_.status_401(), 401
 
   applications_ = Application().application_list()
 
@@ -69,12 +67,15 @@ def application_list():
   return status_.status_415(), 415
 
 
+"""
+CREATE
+
+Everyone that has a user account can add new applications, however
+in the future we should figure out what the repercussions of that are.
+"""
 @module.route('/application/', methods=['POST'])
 @oauth.require_oauth()
 def application_post():
-
-  if not current_user.is_authenticated():
-    return status_.status_401(), 401
 
   Application_ = Application()
   new_application = Application_.application_create(request)
@@ -82,14 +83,33 @@ def application_post():
   return redirect(url_for('application.application_get', application_id=new_application.id, format='json'))
 
 
+"""
+EDIT
+
+User attempting to access this endpoint must have the `edit`
+permission associated with them in the `user_applications` table
+"""
+@module.route('/application/<int:application_id>/', methods=['PATCH'])
+# @oauth.require_oauth()
+@permission_required
+def application_update(application_id, permission_type='can_edit'):
+
+  Application_ = Application()
+  new_application = Application_.application_update(application_id, request)
+
+  return jsonify({'success':''})
+
+
+"""
+VIEW
+
+User attempting to access this endpoint must have the `view`
+permission associated with them in the `user_applications` table
+"""
 @module.route('/application/<int:application_id>/', methods=['GET'])
-@oauth.require_oauth()
-def application_get(application_id):
-
-  permission = check_permissions(application_id)
-
-  if not permission.get('can_view', True):
-    return status_.status_401(), 401
+# @oauth.require_oauth()
+@permission_required
+def application_get(application_id, permission_type='can_view'):
 
   this_application = Application().application_get(application_id)
 

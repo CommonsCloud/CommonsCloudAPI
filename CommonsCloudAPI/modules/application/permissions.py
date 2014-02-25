@@ -16,7 +16,7 @@ Import Python Dependencies
 """
 from collections import namedtuple
 from functools import partial
-
+from functools import wraps
 
 """
 Import Flask Dependencies
@@ -32,6 +32,20 @@ from flask.ext.principal import identity_loaded, Permission, RoleNeed, UserNeed
 Import CommonsCloud Dependencies
 """
 from CommonsCloudAPI.extensions import principal
+from CommonsCloudAPI.extensions import status as status_
+
+
+def permission_required(f, permission_type='can_view'):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+
+      permission = check_permissions(kwargs['application_id'])
+
+      if not permission.get(permission_type, True):
+        return status_.status_401(), 401
+      return f(*args, **kwargs)
+ 
+    return decorated_function
 
 
 """

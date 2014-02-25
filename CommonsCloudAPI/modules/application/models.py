@@ -131,6 +131,41 @@ class Application(db.Model):
 
 
   """
+  Create a new application in the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (dictionary) application_content
+      The content that is being submitted by the user
+  """
+  def application_update(self, application_id, request_object):
+
+    """
+    Part 1: Load the application we wish to make changes to
+    """
+    application_ = Application.query.get(application_id)
+    application_content = json.loads(request_object.data)
+
+
+    """
+    Part 2: Update the fields that we have data for
+    """
+    if hasattr(application_, 'name'):
+      application_.name = sanitize.sanitize_string(application_content.get('name', application_.name))
+
+    if hasattr(application_, 'description'):
+      application_.description = sanitize.sanitize_string(application_content.get('description', application_.description))
+
+    if hasattr(application_, 'url'):
+      application_.url = sanitize.sanitize_string(application_content.get('url', application_.url))
+
+
+    db.session.commit()
+
+    return application_
+
+
+  """
   Associate a user with a specific application
 
   @param (object) self
