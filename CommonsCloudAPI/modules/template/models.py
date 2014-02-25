@@ -53,3 +53,5 @@ class Template(db.Model):
     self.created = created
     self.status = status
 
+
+    
