@@ -17,7 +17,7 @@ remote = oauth.remote_app(
     'remote',
     consumer_key=CLIENT_KEY,
     consumer_secret=CLIENT_SECRET,
-    base_url='http://127.0.0.1:5000/api/',
+    base_url='http://127.0.0.1:5000/',
     request_token_url='http://127.0.0.1:5000/oauth/request_token',
     access_token_method='GET',
     access_token_url='http://127.0.0.1:5000/oauth/access_token',
@@ -28,8 +28,8 @@ remote = oauth.remote_app(
 @app.route('/')
 def home():
     if 'example_oauth' in session:
-        # resp = remote.get('/user/me')
-        return jsonify({'yes':'success'})
+        resp = remote.get('/user/me/?format=json')
+        return jsonify(resp.data)
     return remote.authorize(callback=url_for('authorized', _external=False))
 
 

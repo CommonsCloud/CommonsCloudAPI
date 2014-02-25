@@ -25,6 +25,7 @@ from flask.ext.security import current_user
 from flask.ext.security import login_required
 
 
+from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.utilities.format_csv import CSV
@@ -41,6 +42,7 @@ from .permissions import check_permissions
 
 
 @module.route('/application/', methods=['GET'])
+# @oauth.require_oauth()
 def application_list():
 
   if not current_user.is_authenticated():
@@ -70,13 +72,13 @@ def application_list():
 @module.route('/application/', methods=['POST'])
 def application_post():
 
-  # if not current_user.is_authenticated():
-  #   return status_.status_401(), 401
+  if not current_user.is_authenticated():
+    return status_.status_401(), 401
 
   Application_ = Application()
-  new_application = Application_.application_create(request.form)
+  new_application = Application_.application_create(request)
 
-  return redirect(url_for('application.application_get', application_id=new_application.id))
+  return redirect(url_for('application.application_get', application_id=new_application.id, format='json'))
 
 
 @module.route('/application/<int:application_id>/', methods=['GET'])

@@ -14,6 +14,7 @@ limitations under the License.
 """
 Import Python Dependencies
 """
+import json
 from datetime import datetime
 
 
@@ -92,8 +93,12 @@ class Application(db.Model):
   @param (dictionary) application_content
       The content that is being submitted by the user
   """
-  def application_create(self, application_content):
+  def application_create(self, request_object):
 
+    """
+    Make sure we can use the request data as json
+    """
+    application_content = json.loads(request_object.data)
 
     """
     Part 1: Add the new application to the database

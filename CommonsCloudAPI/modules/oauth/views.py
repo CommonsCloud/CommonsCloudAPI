@@ -125,7 +125,7 @@ def authorize(*args, **kwargs):
 
   if not hasattr(current_user, 'id'):
     return redirect(url_for('security.login', next=next_url))
-    
+
   """
   Assign the current_user object to a variable so that we don't
   accidently alter the object during this process.
@@ -142,11 +142,4 @@ def authorize(*args, **kwargs):
   confirm = request.form.get('confirm', 'no')
 
   return confirm == 'yes'
-
-
-@module.route('/api/me')
-@oauth.require_oauth()
-def me(req):
-    return jsonify(username='SUCCESS!')
-
 
