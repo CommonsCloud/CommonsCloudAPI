@@ -12,9 +12,46 @@ limitations under the License.
 
 
 """
-Import Application Dependencies
+Import Python Dependencies
+"""
+import json
+from datetime import datetime
+
+
+"""
+Import Flask Dependencies
+"""
+from flask import abort
+
+from flask.ext.security import current_user
+
+
+"""
+Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import sanitize
+
+
+"""
+Import Application Module Dependencies
+"""
+from .permissions import check_permissions
+
+
+class UserTempaltes(db.Model):
+
+  __tablename__ = 'user_templates'
+  __table_args__ = {
+    'extend_existing': True
+  }
+
+  user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
+  template_id = db.Column(db.Integer(), db.ForeignKey('template.id'), primary_key=True)
+  view = db.Column(db.Boolean())
+  edit = db.Column(db.Boolean())
+  delete = db.Column(db.Boolean())
+  templates = db.relationship('Template', backref=db.backref("user_templates", cascade="all,delete"))
 
 
 """
@@ -42,7 +79,7 @@ class Template(db.Model):
   # fields = db.relationship("Field", secondary=template_fields, backref=db.backref('templates'))
   # statistics = db.relationship("Statistic", backref=db.backref('statistics'))
 
-  def __init__(self, name="", help="", storage="", is_public="", is_crowdsourced="", is_moderated="", is_listed="", created=datetime.utcnow(), status=True):
+  def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, created=datetime.utcnow(), status=True):
     self.name = name
     self.help = help
     self.storage = storage
@@ -54,4 +91,66 @@ class Template(db.Model):
     self.status = status
 
 
-    
+  """
+  Create a new Template in the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (dictionary) application_content
+      The content that is being submitted by the user
+  """
+  def template_create(self, request_object):
+
+    """
+    Make sure we can use the request data as json
+    """
+    content_ = json.loads(request_object.data)
+
+    """
+    Part 1: Add the new application to the database
+    """
+    new_template = {
+      'name': sanitize.sanitize_string(content_.get('name', ''))
+    }
+
+    template_ = Template(**new_template)
+
+    db.session.add(template_)
+    db.session.commit()
+
+
+    """
+    Part 2: Tell the system what user should have permission to
+    access the newly created application
+    """
+    # permission = {
+    #   'view': True,
+    #   'edit': True,
+    #   'delete': True
+    # }
+
+    # self.set_user_application_permissions(application_, permission, current_user)
+
+    return template_
+
+
+  """
+  Get an existing Templates from the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (int) template_id
+      The unique ID of the Template to be retrieved from the system
+
+  @return (object) template_
+      A fully qualified Template object
+
+  """
+  def template_get(self, template_id):
+
+    template_ = Template.query.get(template_id)
+
+    return template_
+
+
+

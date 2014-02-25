@@ -14,8 +14,6 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-import requests
-
 from flask import jsonify
 from flask import redirect
 from flask import request
@@ -37,6 +35,7 @@ Import Application Module Dependencies
 from . import module
 
 from .models import Application
+
 from .permissions import check_permissions
 from .permissions import permission_required
 
