@@ -42,7 +42,7 @@ from .permissions import check_permissions
 
 
 @module.route('/application/', methods=['GET'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 def application_list():
 
   if not current_user.is_authenticated():
@@ -70,6 +70,7 @@ def application_list():
 
 
 @module.route('/application/', methods=['POST'])
+@oauth.require_oauth()
 def application_post():
 
   if not current_user.is_authenticated():
@@ -82,6 +83,7 @@ def application_post():
 
 
 @module.route('/application/<int:application_id>/', methods=['GET'])
+@oauth.require_oauth()
 def application_get(application_id):
 
   permission = check_permissions(application_id)

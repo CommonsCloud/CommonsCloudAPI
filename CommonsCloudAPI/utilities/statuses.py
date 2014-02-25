@@ -73,6 +73,31 @@ class CommonsStatus():
 
 
   """
+  403 Not Authorized
+
+  @see
+      http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_403(self):
+
+    message = {
+      'status': '403 Forbidden',
+      'code': '403',
+      'problem': 'The server has not found anything matching the Request-URI.',
+      'solution': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
+    }
+
+    return jsonify(message) if self.return_type == 'json' else message
+
+
+  """
   404 Not Found
 
   @see
