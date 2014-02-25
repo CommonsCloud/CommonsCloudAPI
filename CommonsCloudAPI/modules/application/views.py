@@ -131,7 +131,13 @@ def application_update(application_id):
   Application_ = Application()
   new_application = Application_.application_update(application_id, request)
 
-  return redirect(url_for('application.application_get', application_id=new_application.id, format='json', _external=True)), 200
+  url_options = {
+    'application_id': new_application.id,
+    'format': 'json',
+    '_external': True
+  }
+
+  return redirect(url_for('application.application_get', **url_options)), 200
 
 
 """
