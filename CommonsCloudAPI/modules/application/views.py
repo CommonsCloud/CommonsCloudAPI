@@ -76,7 +76,7 @@ Everyone that has a user account can add new applications, however
 in the future we should figure out what the repercussions of that are.
 """
 @module.route('/application/', methods=['POST'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 def application_post():
 
   Application_ = Application()
@@ -98,7 +98,7 @@ User attempting to access this endpoint must have the `view`
 permission associated with them in the `user_applications` table
 """
 @module.route('/application/<int:application_id>/', methods=['GET'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 @permission_required('can_view')
 def application_get(application_id):
 
@@ -134,7 +134,7 @@ User attempting to access this endpoint must have the `edit`
 permission associated with them in the `user_applications` table
 """
 @module.route('/application/<int:application_id>/', methods=['PUT', 'PATCH'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 @permission_required('can_edit')
 def application_update(application_id):
 
@@ -157,7 +157,7 @@ User attempting to access this endpoint must have the `delete`
 permission associated with them in the `user_applications` table
 """
 @module.route('/application/<int:application_id>/', methods=['DELETE'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 @permission_required('can_delete')
 def application_delete(application_id):
 

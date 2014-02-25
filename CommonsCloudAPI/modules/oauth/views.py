@@ -57,7 +57,7 @@ To access this endpoint the user must be logged in to the system
 @login_required
 def oauth_client():
 
-  next_url = url_for('oauth.oauth_authorize', **request.args)
+  next_url = url_for('oauth.oauth_client', **request.args)
 
   if not hasattr(current_user, 'id'):
     return redirect(url_for('security.login', next=next_url))

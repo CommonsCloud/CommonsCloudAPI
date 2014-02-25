@@ -9,8 +9,8 @@ app.debug = True
 app.secret_key = 'secret'
 
 # TODO: fill them
-CLIENT_KEY = 'EHbGDKlKwNrbwtuG3R8wGKBqH1Z0Os5mQPLoJb1f'
-CLIENT_SECRET = 'KlOfzQmOjfqj4dKoCGO5eddLIVshg8bgrudiJ9IjSWjBqOrkyR'
+CLIENT_KEY = 'PdXWzvHM7YRY5SSVF2U6e0ETMxUdsjoaVpSNil1t'
+CLIENT_SECRET = 'BRfQaHWJjk3ab1bItH3Kpq0xz0SsP6d3DuIOHf2WD5JQCPufzb'
 
 oauth = OAuth(app)
 remote = oauth.remote_app(
@@ -29,7 +29,7 @@ remote = oauth.remote_app(
 def home():
     if 'example_oauth' in session:
         resp = remote.get('/user/me/?format=json')
-        return jsonify(resp.data)
+        return resp.data
     return remote.authorize(callback=url_for('authorized', _external=False))
 
 

@@ -12,5 +12,36 @@ limitations under the License.
 
 
 """
-Import Flask Dependencies
+Import Application Dependencies
 """
+from CommonsCloudAPI.extensions import db
+
+
+class Template(db.Model):
+  
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.String(60))
+  help = db.Column(db.String(255))
+  storage = db.Column(db.String(255))
+  is_public = db.Column(db.Boolean)
+  crowd_sourcing = db.Column(db.Boolean)
+  moderate = db.Column(db.Boolean)
+  is_listed = db.Column(db.Boolean)
+  created = db.Column(db.DateTime)
+  status = db.Column(db.Boolean)
+  # fields = db.relationship("Field", secondary=template_fields, backref=db.backref('templates'))
+  # statistics = db.relationship("Statistic", backref=db.backref('statistics'))
+
+  def __init__(self, name, storage, owner, description="", publicly_viewable="", crowd_sourcing="", moderate="", applications=None):
+    self.name = name
+    self.description = description
+    self.storage = storage
+    self.owner = owner
+    self.publicly_viewable = publicly_viewable
+    self.crowd_sourcing = crowd_sourcing
+    self.moderate = moderate
+    self.created = datetime.utcnow()
+    self.applications = applications
+    self.is_listed = True
+    self.status = True
+
