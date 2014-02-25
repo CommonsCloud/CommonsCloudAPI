@@ -21,6 +21,8 @@ from datetime import datetime
 """
 Import Flask Dependencies
 """
+from flask import abort
+
 from flask.ext.security import current_user
 
 
@@ -285,6 +287,9 @@ class Application(db.Model):
   def _application_id_list(self):
 
     applications_ = []
+
+    if not hasattr(current_user, 'id'):
+      return abort(401)
 
     for application in current_user.applications:
       applications_.append(application.application_id)

@@ -133,10 +133,13 @@ def authorize(*args, **kwargs):
   this_user = current_user
 
   if request.method == 'GET':
-    client_key = kwargs.get('resource_owner_key')
-    client = Client.query.filter_by(client_key=client_key).first()
+    resource_owner_key = kwargs.get('resource_owner_key')
+    request_token = RequestToken.query.filter_by(token=resource_owner_key).first()
+
+    client = Client.query.filter_by(client_key=request_token.client_key).first()
     kwargs['client'] = client
     kwargs['user'] = this_user
+
     return render_template('oauth/authorize.html', **kwargs)
 
   confirm = request.form.get('confirm', 'no')

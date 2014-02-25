@@ -15,3 +15,5 @@ DEBUG = True
 SQLALCHEMY_DATABASE_URI = 'postgresql://127.0.0.1:5432/commonscloudapi_0umqtq3s2tyu9spz'
 
 FILE_ATTACHMENTS_DIRECTORY = '/Users/joshuaisaacpowell/Code/CommonsCloudAPI/CommonsCloudAPI/static/uploads'
+
+OAUTH1_PROVIDER_ENFORCE_SSL = False

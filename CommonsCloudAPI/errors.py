@@ -30,6 +30,10 @@ def load_errorhandlers(app):
   them a little feedback. These should get better over time, but for now we can at least make
   it look like they aren't completely leaving the system and lost with default server error pages.
   """
+  @app.errorhandler(401)
+  def internal_error(error):
+    return status_.status_401(), 401
+
   @app.errorhandler(403)
   def internal_error(error):
     return status_.status_403(), 403
