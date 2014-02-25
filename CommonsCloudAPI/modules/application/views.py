@@ -16,15 +16,11 @@ Import Flask Dependencies
 """
 import requests
 
-from flask import jsonify
 from flask import redirect
-from flask import render_template
 from flask import request
 from flask import url_for
 
-from flask.ext.security import auth_token_required
 from flask.ext.security import current_user
-from flask.ext.security import login_required
 
 
 from CommonsCloudAPI.extensions import oauth
@@ -54,11 +50,15 @@ def application_list():
   If the user is properly authenticated, then proceed to see if they
   have requests a type of content we serve
   """
-  if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):    
+  if request.headers['Content-Type'] == 'application/json' or
+    (hasattr(request.args, 'format') and request.args['format'] == 'json'):
+
     this_data = JSON(applications_, serialize=True, list_name='applications')
     return this_data.create(), 200
 
-  elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
+  elif request.headers['Content-Type'] == 'text/csv' or 
+    (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
+
     this_data = CSV(applications_, serialize=True)
     return this_data.create(), 200
 
@@ -82,7 +82,13 @@ def application_post():
   Application_ = Application()
   new_application = Application_.application_create(request)
 
-  return redirect(url_for('application.application_get', application_id=new_application.id, format='json', _external=True)), 201
+  url_arguments = {
+    'application_id': new_application.id,
+    'format': 'json',
+    '_external': True
+  }
+
+  return redirect(url_for('application.application_get', **url_arguments)), 201
 
 
 """
@@ -102,11 +108,15 @@ def application_get(application_id):
   If the user is properly authenticated, then proceed to see if they
   have requests a type of content we serve
   """
-  if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):    
+  if request.headers['Content-Type'] == 'application/json' or 
+    (hasattr(request.args, 'format') and request.args['format'] == 'json'):
+
     this_data = JSON(this_application, serialize=True)
     return this_data.create(), 200
 
-  elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
+  elif request.headers['Content-Type'] == 'text/csv' or
+    (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
+
     this_data = CSV(this_application, serialize=True)
     return this_data.create(), 200
 
