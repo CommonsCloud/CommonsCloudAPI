@@ -16,6 +16,7 @@ Import Flask Dependencies
 """
 import requests
 
+from flask import jsonify
 from flask import redirect
 from flask import request
 from flask import url_for
@@ -42,7 +43,7 @@ from .permissions import permission_required
 
 @module.route('/application/', methods=['GET'])
 @oauth.require_oauth()
-def application_list():
+def application_list(self):
 
   applications_ = Application().application_list()
 

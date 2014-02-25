@@ -1,5 +1,7 @@
 # coding: utf-8
 
+import os
+
 from flask import Flask, session, url_for, request, jsonify
 from flask_oauthlib.client import OAuth
 
@@ -28,8 +30,8 @@ remote = oauth.remote_app(
 @app.route('/')
 def home():
     if 'example_oauth' in session:
-        resp = remote.get('/user/me/?format=json')
-        return resp.data
+        resp = remote.get('application/')
+        return jsonify({"status":"success", "data": resp.data})
     return remote.authorize(callback=url_for('authorized', _external=False))
 
 
@@ -42,6 +44,7 @@ def authorized(resp):
         )
     if 'oauth_token' in resp:
         session['example_oauth'] = resp
+        print 'oauth_token'
         return jsonify(resp)
     return str(resp)
 
@@ -60,4 +63,7 @@ logger.setLevel(logging.DEBUG)
 
 
 if __name__ == '__main__':
+
+    os.environ['DEBUG'] = "1"
+
     app.run(host='localhost', port=8000)
