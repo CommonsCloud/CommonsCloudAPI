@@ -50,14 +50,14 @@ def application_list():
   If the user is properly authenticated, then proceed to see if they
   have requests a type of content we serve
   """
-  if request.headers['Content-Type'] == 'application/json' or
-    (hasattr(request.args, 'format') and request.args['format'] == 'json'):
+  if request.headers['Content-Type'] == 'application/json' or \
+      (hasattr(request.args, 'format') and request.args['format'] == 'json'):
 
     this_data = JSON(applications_, serialize=True, list_name='applications')
     return this_data.create(), 200
 
-  elif request.headers['Content-Type'] == 'text/csv' or 
-    (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
+  elif request.headers['Content-Type'] == 'text/csv' or \
+      (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
 
     this_data = CSV(applications_, serialize=True)
     return this_data.create(), 200
@@ -92,7 +92,7 @@ def application_post():
 
 
 """
-VIEW
+GET/VIEW
 
 User attempting to access this endpoint must have the `view`
 permission associated with them in the `user_applications` table
@@ -108,14 +108,14 @@ def application_get(application_id):
   If the user is properly authenticated, then proceed to see if they
   have requests a type of content we serve
   """
-  if request.headers['Content-Type'] == 'application/json' or 
-    (hasattr(request.args, 'format') and request.args['format'] == 'json'):
+  if request.headers['Content-Type'] == 'application/json' or \
+      (hasattr(request.args, 'format') and request.args['format'] == 'json'):
 
     this_data = JSON(this_application, serialize=True)
     return this_data.create(), 200
 
-  elif request.headers['Content-Type'] == 'text/csv' or
-    (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
+  elif request.headers['Content-Type'] == 'text/csv' or \
+      (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
 
     this_data = CSV(this_application, serialize=True)
     return this_data.create(), 200
@@ -128,7 +128,7 @@ def application_get(application_id):
 
 
 """
-PATCH
+PUT/PATCH
 
 User attempting to access this endpoint must have the `edit`
 permission associated with them in the `user_applications` table
