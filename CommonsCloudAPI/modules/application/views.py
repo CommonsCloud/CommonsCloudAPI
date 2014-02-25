@@ -14,6 +14,8 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
+import requests
+
 from flask import jsonify
 from flask import redirect
 from flask import render_template
@@ -74,30 +76,13 @@ Everyone that has a user account can add new applications, however
 in the future we should figure out what the repercussions of that are.
 """
 @module.route('/application/', methods=['POST'])
-@oauth.require_oauth()
+# @oauth.require_oauth()
 def application_post():
 
   Application_ = Application()
   new_application = Application_.application_create(request)
 
   return redirect(url_for('application.application_get', application_id=new_application.id, format='json'))
-
-
-"""
-EDIT
-
-User attempting to access this endpoint must have the `edit`
-permission associated with them in the `user_applications` table
-"""
-@module.route('/application/<int:application_id>/', methods=['PATCH'])
-# @oauth.require_oauth()
-@permission_required
-def application_update(application_id, permission_type='can_edit'):
-
-  Application_ = Application()
-  new_application = Application_.application_update(application_id, request)
-
-  return jsonify({'success':''})
 
 
 """
@@ -108,8 +93,8 @@ permission associated with them in the `user_applications` table
 """
 @module.route('/application/<int:application_id>/', methods=['GET'])
 # @oauth.require_oauth()
-@permission_required
-def application_get(application_id, permission_type='can_view'):
+@permission_required('can_view')
+def application_get(application_id):
 
   this_application = Application().application_get(application_id)
 
@@ -130,4 +115,22 @@ def application_get(application_id, permission_type='can_view'):
   tell them that, by directing them to an "Unsupported Media Type"
   """
   return status_.status_415(), 415
+
+
+"""
+EDIT
+
+User attempting to access this endpoint must have the `edit`
+permission associated with them in the `user_applications` table
+"""
+@module.route('/application/<int:application_id>/', methods=['PATCH'])
+# @oauth.require_oauth()
+@permission_required('can_edit')
+def application_update(application_id):
+
+  Application_ = Application()
+  new_application = Application_.application_update(application_id, request)
+
+  return redirect(url_for('application.application_get', application_id=new_application.id, format='json', _external=True))
+
 

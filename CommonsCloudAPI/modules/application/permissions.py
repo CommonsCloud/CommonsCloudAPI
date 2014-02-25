@@ -35,17 +35,25 @@ from CommonsCloudAPI.extensions import principal
 from CommonsCloudAPI.extensions import status as status_
 
 
-def permission_required(f, permission_type='can_view'):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
+class permission_required(object):
 
-      permission = check_permissions(kwargs['application_id'])
+    def __init__(self, permission_type='can_view'):
+        self.permission_type = permission_type
 
-      if not permission.get(permission_type, True):
-        return status_.status_401(), 401
-      return f(*args, **kwargs)
- 
-    return decorated_function
+    def __call__(self, f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+
+          print self.permission_type
+
+          permission = check_permissions(kwargs['application_id'])
+
+          if not permission.get(self.permission_type, True):
+            return status_.status_401(), 401
+     
+          return f(*args, **kwargs)
+     
+        return decorated_function
 
 
 """
