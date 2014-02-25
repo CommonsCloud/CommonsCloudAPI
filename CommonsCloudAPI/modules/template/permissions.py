@@ -42,7 +42,7 @@ class permission_required(object):
 
           print self.permission_type
 
-          permission = check_permissions(kwargs['application_id'])
+          permission = check_permissions(kwargs['template_id'])
 
           if not permission.get(self.permission_type, True):
             return status_.status_401(), 401
@@ -55,45 +55,45 @@ class permission_required(object):
 """
 Define the most basic Principal need for our Application module
 """ 
-ApplicationNeed = namedtuple('application', ['method', 'value'])
+TemplateNeed = namedtuple('template', ['method', 'value'])
 
 
-ViewApplicationNeed = partial(ApplicationNeed, 'view')
-class ViewApplicationPermission(Permission):
-    def __init__(self, application_id):
-        need = ViewApplicationNeed(application_id)
-        super(ViewApplicationPermission, self).__init__(need)
+ViewTemplateNeed = partial(TemplateNeed, 'view')
+class ViewTemplatePermission(Permission):
+    def __init__(self, template_id):
+        need = ViewTemplateNeed(template_id)
+        super(ViewTemplatePermission, self).__init__(need)
 
 
-EditApplicationNeed = partial(ApplicationNeed, 'edit')
-class EditApplicationPermission(Permission):
-    def __init__(self, application_id):
-        need = EditApplicationNeed(application_id)
-        super(EditApplicationPermission, self).__init__(need)
+EditTemplateNeed = partial(TemplateNeed, 'edit')
+class EditTemplatePermission(Permission):
+    def __init__(self, template_id):
+        need = EditTemplateNeed(template_id)
+        super(EditTemplatePermission, self).__init__(need)
 
 
-DeleteApplicationNeed = partial(ApplicationNeed, 'delete')
-class DeleteApplicationPermission(Permission):
-    def __init__(self, application_id):
-        need = DeleteApplicationNeed(application_id)
-        super(DeleteApplicationPermission, self).__init__(need)
+DeleteTemplateNeed = partial(TemplateNeed, 'delete')
+class DeleteTemplatePermission(Permission):
+    def __init__(self, template_id):
+        need = DeleteTemplateNeed(template_id)
+        super(DeleteTemplatePermission, self).__init__(need)
 
 
 """
-Returns a list of possible permissions for the current application
+Returns a list of possible permissions for the current template
 
-@param (int) application_id
-    The application id that you wish to check against
+@param (int) template_id
+    The template id that you wish to check against
 
 @return (dict) <unnamed>
     A dictionary of all the possible permissions that a user can have
 
 """
-def check_permissions(application_id):
+def check_permissions(template_id):
 
   return {
-    'can_view': ViewApplicationPermission(application_id).can(),
-    'can_edit': EditApplicationPermission(application_id).can(),
-    'can_delete': DeleteApplicationPermission(application_id).can()
+    'can_view': ViewTemplatePermission(template_id).can(),
+    'can_edit': EditTemplatePermission(template_id).can(),
+    'can_delete': DeleteTemplatePermission(template_id).can()
   }
 
