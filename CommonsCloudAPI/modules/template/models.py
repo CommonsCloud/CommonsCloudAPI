@@ -29,6 +29,8 @@ from flask.ext.security import current_user
 """
 Import Commons Cloud Dependencies
 """
+from CommonsCloudAPI.models import CommonsModel
+
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
@@ -62,7 +64,7 @@ the system.
 @param (object) db.Model
     The model is the Base we use to define our database structure
 """
-class Template(db.Model):
+class Template(db.Model, CommonsModel):
   
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(60))
