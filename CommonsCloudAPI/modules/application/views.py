@@ -36,8 +36,6 @@ from .models import Application
 from .permissions import check_permissions
 from .permissions import permission_required
 
-from .utilities import application_response
-
 
 @module.route('/application/', methods=['GET'])
 # @oauth.require_oauth()
@@ -52,7 +50,7 @@ def application_list():
     'list_name': 'applications'
   }
 
-  return Application_.application_response(**arguments)
+  return Application_.endpoint_response(**arguments)
 
 """
 CREATE
@@ -67,7 +65,7 @@ def application_post():
   Application_ = Application()
   new_application = Application_.application_create(request)
 
-  return Application_.application_response(new_application)
+  return Application_.endpoint_response(new_application)
 
 
 """
@@ -84,7 +82,7 @@ def application_get(application_id):
   Application_ = Application()
   this_application = Application_.application_get(application_id)
 
-  return Application_.application_response(this_application)
+  return Application_.endpoint_response(this_application)
 
 
 """
@@ -101,7 +99,7 @@ def application_update(application_id):
   Application_ = Application()
   updated_application = Application_.application_update(application_id, request)
 
-  return Application_.application_response(updated_application)
+  return Application_.endpoint_response(updated_application)
 
 
 """

@@ -29,6 +29,8 @@ from flask.ext.security import current_user
 """
 Import Commons Cloud Dependencies
 """
+from CommonsCloudAPI.models import CommonsModel
+
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
@@ -55,7 +57,7 @@ class UserApplications(db.Model):
 """
 Define our individual models
 """
-class Application(db.Model):
+class Application(db.Model, CommonsModel):
 
   __tablename__ = 'application'
   __table_args__ = {
@@ -288,44 +290,3 @@ class Application(db.Model):
 
     return applications_
 
-
-  """
-  Create a valid response to be served to the user
-
-  @param (object) self
-
-  @param (object)/(list) the_content
-      A list of applciations or a single application object to be delivered
-
-  @param (str) list_name
-      If the application_object is really a list then we should give int
-      a name for the list to be keyed as in the returned JSON object
-
-  @return (object) 
-      An JSON object either contianing the formatted content or an error
-      message describing why the content couldn't be delivered
-
-  """
-  def application_response(self, the_content, list_name=''):
-
-    """
-    If the user is properly authenticated, then proceed to see if they
-    have requests a type of content we serve
-    """
-    if request.headers['Content-Type'] == 'application/json' or \
-        (hasattr(request.args, 'format') and request.args['format'] == 'json'):
-
-      this_data = JSON(the_content, serialize=True, list_name=list_name)
-      return this_data.create(), 200
-
-    elif request.headers['Content-Type'] == 'text/csv' or \
-        (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
-
-      this_data = CSV(the_content, serialize=True)
-      return this_data.create(), 200
-
-    """
-    If the user hasn't requested a specific content type then we should
-    tell them that, by directing them to an "Unsupported Media Type"
-    """
-    return status_.status_415(), 415
