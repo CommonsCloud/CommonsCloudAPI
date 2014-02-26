@@ -16,7 +16,10 @@ Import Flask dependencies
 """
 from flask.ext.security import current_user
 
-from flask.ext.principal import identity_loaded, Permission, RoleNeed, UserNeed
+from flask.ext.principal import identity_loaded
+from flask.ext.principal import Permission
+from flask.ext.principal import RoleNeed
+from flask.ext.principal import UserNeed
 
 
 """
@@ -26,6 +29,7 @@ we're showing folks is a 404, 500, or the home page.
 def load_identities(app):
 
   from application.permissions import ViewApplicationNeed, EditApplicationNeed, DeleteApplicationNeed
+  from template.permissions import ViewTemplateNeed, EditTemplateNeed, DeleteTemplateNeed
 
   @identity_loaded.connect_via(app)
   def on_identity_loaded(sender, identity):
@@ -53,3 +57,14 @@ def load_identities(app):
             identity.provides.add(EditApplicationNeed(application.application_id))
           if application.delete:
             identity.provides.add(DeleteApplicationNeed(application.application_id))  
+
+    # Assuming the User model has a list of posts the user
+    # has authored, add the needs to the identity
+    if hasattr(current_user, 'templates'):
+        for template in current_user.templates:
+          if template.view:
+            identity.provides.add(ViewTemplateNeed(template.template_id))
+          if template.edit:
+            identity.provides.add(EditTemplateNeed(template.template_id))
+          if template.delete:
+            identity.provides.add(DeleteTemplateNeed(template.template_id))  

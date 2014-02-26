@@ -21,7 +21,6 @@ from datetime import datetime
 """
 Import Flask Dependencies
 """
-from flask import abort
 from flask import request
 
 from flask.ext.security import current_user
@@ -36,12 +35,6 @@ from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.utilities.format_csv import CSV
 from CommonsCloudAPI.utilities.format_json import JSON
-
-
-"""
-Import Application Module Dependencies
-"""
-from .permissions import check_permissions
 
 
 class UserApplications(db.Model):

@@ -21,7 +21,7 @@ from datetime import datetime
 """
 Import Flask Dependencies
 """
-from flask import abort
+from flask import request
 
 from flask.ext.security import current_user
 
@@ -31,12 +31,10 @@ Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
+from CommonsCloudAPI.extensions import status as status_
 
-
-"""
-Import Application Module Dependencies
-"""
-from .permissions import check_permissions
+from CommonsCloudAPI.utilities.format_csv import CSV
+from CommonsCloudAPI.utilities.format_json import JSON
 
 
 class UserTemplates(db.Model):
@@ -198,3 +196,46 @@ class Template(db.Model):
     db.session.commit()
 
     return new_permission
+
+
+  """
+  Create a valid response to be served to the user
+
+  @param (object) self
+
+  @param (object)/(list) the_content
+      A list of templates or a single template object to be delivered
+
+  @param (str) list_name
+      If the `the_content` is really a list then we should give int
+      a name for the list to be keyed as in the returned JSON object
+
+  @return (object) 
+      An JSON object either contianing the formatted content or an error
+      message describing why the content couldn't be delivered
+
+  """
+  def template_response(self, the_content, list_name=''):
+
+    """
+    If the user is properly authenticated, then proceed to see if they
+    have requests a type of content we serve
+    """
+    if request.headers['Content-Type'] == 'application/json' or \
+        (hasattr(request.args, 'format') and request.args['format'] == 'json'):
+
+      this_data = JSON(the_content, serialize=True, list_name=list_name)
+      return this_data.create(), 200
+
+    elif request.headers['Content-Type'] == 'text/csv' or \
+        (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
+
+      this_data = CSV(the_content, serialize=True)
+      return this_data.create(), 200
+
+    """
+    If the user hasn't requested a specific content type then we should
+    tell them that, by directing them to an "Unsupported Media Type"
+    """
+    return status_.status_415(), 415
+
