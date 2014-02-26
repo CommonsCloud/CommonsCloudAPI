@@ -72,13 +72,4 @@ def create_application(name = __name__, env = 'testing'):
     load_errorhandlers(app)
     load_identities(app)
 
-    if not app.debug:
-        import logging
-        logger = logging.getLogger('myapp')
-        hdlr = logging.FileHandler('/Users/joshuaisaacpowell/Code/CommonsCloudAPI/error.log')
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-        hdlr.setFormatter(formatter)
-        logger.addHandler(hdlr) 
-        logger.setLevel(logging.INFO)
-
     return app

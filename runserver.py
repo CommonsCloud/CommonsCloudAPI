@@ -35,7 +35,8 @@ method provided so comply with the Application Factory pattern
 if __name__ == "__main__":
   if len(sys.argv) > 1 and sys.argv[1]:
 
-    os.environ['DEBUG'] = 'true'
+    if sys.argv[1] == 'development':
+      os.environ['DEBUG'] = 'true'
 
     CommonsCloudAPI = create_application(__name__, env=sys.argv[1])
     CommonsCloudAPI.run()
