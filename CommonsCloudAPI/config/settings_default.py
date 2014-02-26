@@ -42,19 +42,9 @@ SECURITY_EMAIL_SENDER = 'CommonsCloud Support <support@commonscloud.org>'
 SECURITY_EMAIL_SUBJECT_REGISTER = 'Welcome! CommonsCloud needs you to confirm your email address'
 SECURITY_EMAIL_SUBJECT_CONFIRM = 'CommonsCloud needs you to confirm your email address'
 
-
-OAUTH1_PROVIDER_ENFORCE_SSL = False
+# OAUTH 1
+OAUTH1_PROVIDER_ENFORCE_SSL = True
 OAUTH1_PROVIDER_KEY_LENGTH = (10, 100)
-
-
-# Flask-Mail
-MAIL_SERVER = 'smtp.mandrillapp.com'
-MAIL_PORT = 465
-MAIL_USE_SSL = True
-MAIL_USERNAME = 'joshua@viableindustries.com'
-MAIL_PASSWORD = 'MPzhKRLr1FQLUUD9Szufgw'
-DEFAULT_MAIL_SENDER = 'support@commonscloud.org'
-
 
 # File Attachments
 FILE_ATTACHMENTS_ALLOWED_EXTENSIONS = set([

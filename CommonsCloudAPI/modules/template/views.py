@@ -14,7 +14,6 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-from flask import jsonify
 from flask import redirect
 from flask import request
 from flask import url_for
@@ -22,6 +21,9 @@ from flask import url_for
 from flask.ext.security import current_user
 
 
+"""
+Import Application Dependencies
+"""
 from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
@@ -81,11 +83,12 @@ def template_post():
 
   url_arguments = {
     'template_id': new_template.id,
-    'format': 'json',
+    # 'format': 'json',
     '_external': True
   }
 
-  return redirect(url_for('template.template_get', **url_arguments)), 201
+  return redirect(url_for('template.template_get', **url_arguments), code=307), 201
+  # return jsonify({"status":"success","template":new_template.id})
 
 
 """
