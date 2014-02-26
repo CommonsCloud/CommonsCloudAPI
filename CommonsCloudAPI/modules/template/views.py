@@ -41,31 +41,17 @@ from .models import Template
 
 @module.route('/template/', methods=['GET'])
 # @oauth.require_oauth()
-def template_list(self):
+def template_list():
 
-  templates_ = Template().template_list()
+  Template_ = Template()
+  templates_ = Template_.template_list()
 
-  """
-  If the user is properly authenticated, then proceed to see if they
-  have requests a type of content we serve
-  """
-  if request.headers['Content-Type'] == 'application/json' or \
-      (hasattr(request.args, 'format') and request.args['format'] == 'json'):
+  arguments = {
+    'the_content': templates_,
+    'list_name': 'templates'
+  }
 
-    this_data = JSON(templates_, serialize=True, list_name='templates')
-    return this_data.create(), 200
-
-  elif request.headers['Content-Type'] == 'text/csv' or \
-      (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
-
-    this_data = CSV(templates_, serialize=True)
-    return this_data.create(), 200
-
-  """
-  If the user hasn't requested a specific content type then we should
-  tell them that, by directing them to an "Unsupported Media Type"
-  """
-  return status_.status_415(), 415
+  return Template_.endpoint_response(**arguments)
 
 
 """
@@ -81,14 +67,7 @@ def template_post():
   Template_ = Template()
   new_template = Template_.template_create(request)
 
-  url_arguments = {
-    'template_id': new_template.id,
-    # 'format': 'json',
-    '_external': True
-  }
-
-  return redirect(url_for('template.template_get', **url_arguments), code=307), 201
-  # return jsonify({"status":"success","template":new_template.id})
+  return Template_.endpoint_response(new_template)
 
 
 """
@@ -102,26 +81,8 @@ permission associated with them in the `user_templates` table
 # @permission_required('can_view')
 def template_get(template_id):
 
-  this_template = Template().template_get(template_id)
+  Template_ = Template()
+  this_template = Template_.template_get(template_id)
 
-  """
-  If the user is properly authenticated, then proceed to see if they
-  have requests a type of content we serve
-  """
-  if request.headers['Content-Type'] == 'application/json' or \
-      (hasattr(request.args, 'format') and request.args['format'] == 'json'):
+  return Template_.endpoint_response(this_template)
 
-    this_data = JSON(this_template, serialize=True)
-    return this_data.create(), 200
-
-  elif request.headers['Content-Type'] == 'text/csv' or \
-      (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
-
-    this_data = CSV(this_template, serialize=True)
-    return this_data.create(), 200
-
-  """
-  If the user hasn't requested a specific content type then we should
-  tell them that, by directing them to an "Unsupported Media Type"
-  """
-  return status_.status_415(), 415
