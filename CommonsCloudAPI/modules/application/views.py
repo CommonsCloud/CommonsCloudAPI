@@ -43,14 +43,16 @@ from .utilities import application_response
 # @oauth.require_oauth()
 def application_list():
 
-  applications_ = Application().application_list()
+  Application_ = Application()
+
+  applications_ = Application_.application_list()
 
   arguments = {
-    'application_object': applications_,
+    'the_content': applications_,
     'list_name': 'applications'
   }
 
-  return application_response(**arguments)
+  return Application_.application_response(**arguments)
 
 """
 CREATE
@@ -65,7 +67,7 @@ def application_post():
   Application_ = Application()
   new_application = Application_.application_create(request)
 
-  return application_response(new_application)
+  return Application_.application_response(new_application)
 
 
 """
@@ -79,9 +81,10 @@ permission associated with them in the `user_applications` table
 @permission_required('can_view')
 def application_get(application_id):
 
-  this_application = Application().application_get(application_id)
+  Application_ = Application()
+  this_application = Application_.application_get(application_id)
 
-  return application_response(this_application)
+  return Application_.application_response(this_application)
 
 
 """
@@ -95,9 +98,10 @@ permission associated with them in the `user_applications` table
 @permission_required('can_edit')
 def application_update(application_id):
 
-  updated_application = Application().application_update(application_id, request)
+  Application_ = Application()
+  updated_application = Application_.application_update(application_id, request)
 
-  return application_response(updated_application)
+  return Application_.application_response(updated_application)
 
 
 """
