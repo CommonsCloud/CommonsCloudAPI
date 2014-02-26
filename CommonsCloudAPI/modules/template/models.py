@@ -39,7 +39,7 @@ Import Application Module Dependencies
 from .permissions import check_permissions
 
 
-class UserTempaltes(db.Model):
+class UserTemplates(db.Model):
 
   __tablename__ = 'user_templates'
   __table_args__ = {
@@ -123,13 +123,13 @@ class Template(db.Model):
     Part 2: Tell the system what user should have permission to
     access the newly created application
     """
-    # permission = {
-    #   'view': True,
-    #   'edit': True,
-    #   'delete': True
-    # }
+    permission = {
+      'view': True,
+      'edit': True,
+      'delete': True
+    }
 
-    # self.set_user_application_permissions(application_, permission, current_user)
+    self.set_user_template_permissions(template_, permission, current_user)
 
     return template_
 
@@ -153,4 +153,48 @@ class Template(db.Model):
     return template_
 
 
+  """
+  Associate a user with a specific template
 
+  @param (object) self
+
+  @param (object) template
+      A fully qualified Template object to act on
+
+  @param (dict) permission
+      A dictionary containing boolean values for the `view`, `edit`, and `delete` properties
+
+      Example: 
+
+        permission = {
+          'view': True,
+          'edit': True,
+          'delete': True
+        }
+
+  @param (object) user
+      A fully qualified User object that we can act on
+
+  @return (object) new_permission
+      The permission object that was saved to the database
+
+  """
+  def set_user_template_permissions(self, template, permission, user):
+
+    """
+    Start a new Permission object
+    """
+    new_permission = UserTemplates(**permission)
+
+    """
+    Set the ID of the Template to act upon
+    """
+    new_permission.template_id = template.id
+
+    """
+    Add the new permissions defined with the user defined
+    """
+    user.templates.append(new_permission)
+    db.session.commit()
+
+    return new_permission
