@@ -21,6 +21,7 @@ from datetime import datetime
 """
 Import Flask Dependencies
 """
+from flask import abort
 from flask import request
 
 from flask.ext.security import current_user
@@ -144,8 +145,7 @@ class Application(db.Model, CommonsModel):
     application_ = Application.query.get(application_id)
 
     if not hasattr(application_, 'id'):
-      print 'Aint no shit to print yo'
-      return status_.status_404()
+      return abort(404)
 
     return application_
 
