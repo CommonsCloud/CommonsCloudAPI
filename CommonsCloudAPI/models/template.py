@@ -136,9 +136,12 @@ class Template(db.Model, CommonsModel):
   """
   def template_create(self, request_object):
 
+<<<<<<< HEAD
     if not hasattr(current_user, 'id'):
       return abort(401)
 
+=======
+>>>>>>> e230a61c64770eac5d07173238975d5a416b2253
     """
     Part 1: Make sure we can use the request data as json
     """
@@ -153,6 +156,10 @@ class Template(db.Model, CommonsModel):
       return abort(400)
 
     application_id = int(content_.get('application_id', 0))
+<<<<<<< HEAD
+=======
+    print application_id
+>>>>>>> e230a61c64770eac5d07173238975d5a416b2253
 
     """
     Part 3: Make sure we have a table that has been created in the database
