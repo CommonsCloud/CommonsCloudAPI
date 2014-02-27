@@ -128,6 +128,73 @@ class Application(db.Model, CommonsModel):
 
 
   """
+  Get an existing Applications from the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (int) application_id
+      The unique ID of the Application to be retrieved from the system
+
+  @return (object) application_
+      A fully qualified Application object
+
+  """
+  def application_get(self, application_id):
+
+    application_ = Application.query.get(application_id)
+
+    if not hasattr(application_, 'id'):
+      print 'Aint no shit to print yo'
+      return status_.status_404()
+
+    return application_
+
+
+  """
+  Get a list of existing Applications from the CommonsCloudAPI
+
+  @param (object) self
+
+  @return (list) applications
+      A list of applications and their given permissions for the current user
+
+  """
+  def application_list(self):
+
+    """
+    Get a list of the applications the current user has access to
+    and load their information from the database
+    """
+    application_id_list_ = self._application_id_list()
+    applications_ = Application.query.filter(Application.id.in_(application_id_list_)).all()
+
+    return applications_
+
+
+  """
+  Get a list of application ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+
+  @param (object) self
+
+  @return (list) applications_
+      A list of applciations the current user has access to
+  """
+  def _application_id_list(self):
+
+    applications_ = []
+
+    if not hasattr(current_user, 'id'):
+      return abort(401)
+
+    for application in current_user.applications:
+      applications_.append(application.application_id)
+
+    return applications_
+
+
+  """
   Create a new application in the CommonsCloudAPI
 
   @param (object) self
@@ -221,29 +288,6 @@ class Application(db.Model, CommonsModel):
       A fully qualified Application object
 
   """
-  def application_get(self, application_id):
-
-    application_ = Application.query.get(application_id)
-
-    if not hasattr(application_, 'id'):
-      print 'Aint no shit to print yo'
-      return status_.status_404()
-
-    return application_
-
-
-  """
-  Get an existing Applications from the CommonsCloudAPI
-
-  @param (object) self
-
-  @param (int) application_id
-      The unique ID of the Application to be retrieved from the system
-
-  @return (object) application_
-      A fully qualified Application object
-
-  """
   def application_delete(self, application_id):
 
     application_ = Application.query.get(application_id)
@@ -251,47 +295,3 @@ class Application(db.Model, CommonsModel):
     db.session.commit()
 
     return True
-
-  """
-  Get a list of existing Applications from the CommonsCloudAPI
-
-  @param (object) self
-
-  @return (list) applications
-      A list of applications and their given permissions for the current user
-
-  """
-  def application_list(self):
-
-    """
-    Get a list of the applications the current user has access to
-    and load their information from the database
-    """
-    application_id_list_ = self._application_id_list()
-    applications_ = Application.query.filter(Application.id.in_(application_id_list_)).all()
-
-    return applications_
-
-
-  """
-  Get a list of application ids from the current user and convert
-  them into a list of numbers so that our SQLAlchemy query can
-  understand what's going on
-
-  @param (object) self
-
-  @return (list) applications_
-      A list of applciations the current user has access to
-  """
-  def _application_id_list(self):
-
-    applications_ = []
-
-    if not hasattr(current_user, 'id'):
-      return abort(401)
-
-    for application in current_user.applications:
-      applications_.append(application.application_id)
-
-    return applications_
-
