@@ -310,17 +310,40 @@ class Template(db.Model, CommonsModel):
 
   @param (object) self
 
-  @return (list) applications
-      A list of applications and their given permissions for the current user
+  @return (list) templates
+      A list of templates and their given permissions for the current user
 
   """
   def application_list(self):
 
     """
-    Get a list of the applications the current user has access to
+    Get a list of the templates the current user has access to
     and load their information from the database
     """
-    application_id_list_ = self._application_id_list()
-    applications_ = Application.query.filter(Application.id.in_(application_id_list_)).all()
+    template_id_list_ = self._template_id_list()
+    templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
 
-    return applications_
+    return templates_
+
+
+  """
+  Get a list of template ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+
+  @param (object) self
+
+  @return (list) templates_
+      A list of templates the current user has access to
+  """
+  def _template_id_list(self):
+
+    templates_ = []
+
+    if not hasattr(current_user, 'id'):
+      return abort(401)
+
+    for template in current_user.templates:
+      templates_.append(template.template_id)
+
+    return templates_
