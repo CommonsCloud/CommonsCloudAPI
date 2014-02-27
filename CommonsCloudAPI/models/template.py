@@ -38,6 +38,8 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
+from CommonsCloudAPI.models.application import Application
+
 from CommonsCloudAPI.utilities.format_csv import CSV
 from CommonsCloudAPI.utilities.format_json import JSON
 
@@ -148,6 +150,7 @@ class Template(db.Model, CommonsModel):
       return abort(400)
 
     application_id = int(content_.get('application_id', 0))
+    print application_id
 
     """
     Part 3: Make sure we have a table that has been created in the database
@@ -190,14 +193,12 @@ class Template(db.Model, CommonsModel):
 
     """
     """
-    from CommonsCloudAPI.modules.application.models import Application
+    application_ = Application().query.get(application_id)
 
-    Application_ = Application()
-    this_application = Application_.query.get(application_id)
+    if not hasattr(application_, 'id'):
+      return abort(400)
 
-    print this_application
-    print this_application.id
-    # self.set_user_template_permissions(template_, application_)
+    self.set_application_template_relationship(template_, application_)
 
     return template_
 
@@ -300,9 +301,7 @@ class Template(db.Model, CommonsModel):
     application.templates.append(new_template)
     db.session.commit()
 
-    return new_permission
-
-    pass
+    return new_template
 
 
   """
