@@ -219,6 +219,9 @@ class Template(db.Model, CommonsModel):
 
     template_ = Template.query.get(template_id)
 
+    if not hasattr(template_, 'id'):
+      return abort(404)
+
     return template_
 
 
