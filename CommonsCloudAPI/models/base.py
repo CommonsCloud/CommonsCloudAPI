@@ -120,13 +120,13 @@ class CommonsModel(object):
     have requests a type of content we serve
     """
     if request.headers['Content-Type'] == 'application/json' or \
-        (hasattr(request.args, 'format') and request.args['format'] == 'json'):
+        ('format' in request.args and request.args['format'] == 'json'):
 
       this_data = JSON(the_content, serialize=True, list_name=list_name)
       return this_data.create(), code
 
     elif request.headers['Content-Type'] == 'text/csv' or \
-        (hasattr(request.args, 'format') and request.args['format'] == 'csv'):
+        ('format' in request.args and request.args['format'] == 'csv'):
 
       this_data = CSV(the_content, serialize=True)
       return this_data.create(), code

@@ -70,7 +70,8 @@ class Application(db.Model, CommonsModel):
   url = db.Column(db.String(255))
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
-  # templates = db.relationship("Template", secondary=application_templates, backref=db.backref('applications'))
+  templates = db.relationship('ApplicationTemplates', backref=db.backref('application'))
+
 
   def __init__(self, name="", url="", description=None, created=datetime.utcnow(), status=True, templates=[]):
     self.name = name
@@ -78,7 +79,7 @@ class Application(db.Model, CommonsModel):
     self.url = url
     self.created = created
     self.status = status
-    # self.templates = templates
+    self.templates = templates
 
 
   """
