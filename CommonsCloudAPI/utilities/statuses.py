@@ -65,7 +65,32 @@ class CommonsStatus():
     message = {
       'status': '204 No Content',
       'code': '204',
-      'problem': 'This content no longer exists'
+      'message': 'This content no longer exists'
+    }
+
+    return jsonify(message) if self.return_type == 'json' else message
+
+
+  """
+  400 Bad Request
+
+  @see
+      http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_400(self):
+
+    message = {
+      'status': '400 Bad Request',
+      'code': '400',
+      'message': 'The request could not be understood by the server due to malformed syntax. You SHOULD NOT repeat the request without modifications.',
+      'details': 'Chances are you forgot to include one of the required variables needed to create a new resource.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -89,8 +114,8 @@ class CommonsStatus():
     message = {
       'status': '401 Unauthorized',
       'code': '401',
-      'problem': 'The request requires user authentication.',
-      'solution': 'You probably just need to login or authenticate via OAuth before accessing this endpoint. Otherwise you do not have permission to access this resource.'
+      'message': 'The request requires user authentication.',
+      'details': 'You probably just need to login or authenticate via OAuth before accessing this endpoint. Otherwise you do not have permission to access this resource.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -114,8 +139,8 @@ class CommonsStatus():
     message = {
       'status': '403 Forbidden',
       'code': '403',
-      'problem': 'The server has not found anything matching the Request-URI.',
-      'solution': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
+      'message': 'The server has not found anything matching the Request-URI.',
+      'details': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -139,8 +164,8 @@ class CommonsStatus():
     message = {
       'status': '404 Not Found',
       'code': '404',
-      'problem': 'The server has not found anything matching the Request-URI.',
-      'solution': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
+      'message': 'The server has not found anything matching the Request-URI.',
+      'details': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -164,8 +189,8 @@ class CommonsStatus():
     message = {
       'status': '405 Method Not Allowed',
       'code': '405',
-      'problem': 'The method is not allowed for the requested URL.',
-      'solution': 'Check the documentation to ensure the method you\'re attempting to use is one of GET, POST, PATCH, or DELETE'
+      'message': 'The method is not allowed for the requested URL.',
+      'details': 'Check the documentation to ensure the method you\'re attempting to use is one of GET, POST, PATCH, or DELETE'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -189,8 +214,8 @@ class CommonsStatus():
     message = {
       'status': '415 Unsupported Media Type',
       'code': '415',
-      'problem': 'The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method.',
-      'solution': 'This normally happens when you forget to append a \'Content-Type\' header to the request or when you ask for a format that we don\'t support. CommonsCloud currently supports text/csv and application/json Content-Types and can also support the \'format\' URL parameter with either json or csv as the value'
+      'message': 'The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method.',
+      'details': 'This normally happens when you forget to append a \'Content-Type\' header to the request or when you ask for a format that we don\'t support. CommonsCloud currently supports text/csv and application/json Content-Types and can also support the \'format\' URL parameter with either json or csv as the value'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -214,8 +239,8 @@ class CommonsStatus():
     message = {
       'status': '500 Internal Server Error',
       'code': '500',
-      'problem': 'The server has not found anything matching the Request-URI.',
-      'solution': 'You need to check the system, application, and proxy logs.'
+      'message': 'The server has not found anything matching the Request-URI.',
+      'details': 'You need to check the system, application, and proxy logs.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message

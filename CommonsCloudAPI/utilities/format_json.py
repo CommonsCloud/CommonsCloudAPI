@@ -12,6 +12,13 @@ limitations under the License.
 
 
 """
+Import Python Dependencies
+"""
+from datetime import datetime
+from datetime import timedelta
+
+
+"""
 Import Flask Dependencies
 """
 from flask import jsonify
@@ -48,7 +55,8 @@ class JSON(FormatContent):
   """
   def create(self):
 
-    print type(self.the_content)
+    today = datetime.utcnow()
+    expires =  today + timedelta(+30)
 
     if type(self.the_content) is list and self.serialize is True:
       self.the_content = {
@@ -57,8 +65,18 @@ class JSON(FormatContent):
     elif self.serialize is True:
       self.the_content = self.serialize_object()
 
-    return_ = {
+    response = jsonify({
       "response": self.the_content
-    }
+    })
 
-    return jsonify(return_)
+
+    """
+    Make sure we're caching the responses for 30 days to speed things up,
+    then setting modification and expiration dates appropriately
+    """
+    response.headers.add('Last-Modified', today)
+    response.headers.add('Expires', expires)
+    response.headers.add('Pragma', 'max-age=2592000')
+    response.headers.add('Cache-Control', 'max-age=2592000')
+
+    return response

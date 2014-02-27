@@ -36,7 +36,9 @@ Import Module Dependencies
 """
 from . import module
 
-from .models import Template
+from CommonsCloudAPI.models.template import Template
+
+from .permissions import permission_required
 
 
 @module.route('/template/', methods=['GET'])
@@ -67,7 +69,7 @@ def template_post():
   Template_ = Template()
   new_template = Template_.template_create(request)
 
-  return Template_.endpoint_response(new_template)
+  return Template_.endpoint_response(new_template, code=201)
 
 
 """
@@ -78,7 +80,7 @@ permission associated with them in the `user_templates` table
 """
 @module.route('/template/<int:template_id>/', methods=['GET'])
 # @oauth.require_oauth()
-# @permission_required('can_view')
+@permission_required('can_view')
 def template_get(template_id):
 
   Template_ = Template()

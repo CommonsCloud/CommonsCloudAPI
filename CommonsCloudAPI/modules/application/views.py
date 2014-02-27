@@ -31,9 +31,8 @@ Import Application Module Dependencies
 """
 from . import module
 
-from .models import Application
+from CommonsCloudAPI.models.application import Application
 
-from .permissions import check_permissions
 from .permissions import permission_required
 
 
@@ -81,6 +80,9 @@ def application_get(application_id):
 
   Application_ = Application()
   this_application = Application_.application_get(application_id)
+
+  if type(this_application) is 'Response':
+    return this_application, this_application.code
 
   return Application_.endpoint_response(this_application)
 
