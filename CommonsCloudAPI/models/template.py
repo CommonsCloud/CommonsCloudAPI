@@ -223,6 +223,125 @@ class Template(db.Model, CommonsModel):
 
 
   """
+  Get a list of existing Templates from the CommonsCloudAPI
+
+  @param (object) self
+
+  @return (list) templates
+      A list of templates and their given permissions for the current user
+
+  """
+  def template_list(self):
+
+    """
+    Get a list of the templates the current user has access to
+    and load their information from the database
+    """
+    template_id_list_ = self._template_id_list()
+    templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
+
+    return templates_
+
+
+  """
+  Get a list of template ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+
+  @param (object) self
+
+  @return (list) templates_
+      A list of templates the current user has access to
+  """
+  def _template_id_list(self):
+
+    templates_ = []
+
+    if not hasattr(current_user, 'id'):
+      return abort(401)
+
+    for template in current_user.templates:
+      templates_.append(template.template_id)
+
+    return templates_
+
+
+  """
+  Create a new Template in the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (int) template_id
+      The ID of the Template to be updated
+
+  @param (dictionary) request_object
+      The request object as submitted by the user
+
+  @return (object) application_
+      A fully qualified Application object
+  """
+  def template_update(self, template_id, request_object):
+
+    """
+    Part 1: Load the application we wish to make changes to
+    """
+    template_ = Template.query.get(template_id)
+    template_content = json.loads(request_object.data)
+
+
+    """
+    Part 2: Update the fields that we have data for
+    """
+    if hasattr(template_, 'name'):
+      template_.name = sanitize.sanitize_string(template_content.get('name', template_.name))
+
+    if hasattr(template_, 'help'):
+      template_.help = sanitize.sanitize_string(template_content.get('help', template_.help))
+
+    if hasattr(template_, 'is_crowdsourced'):
+      template_.is_crowdsourced = template_content.get('is_crowdsourced', template_.is_crowdsourced)
+
+    if hasattr(template_, 'is_listed'):
+      template_.is_listed = template_content.get('is_listed', template_.is_listed)
+
+    if hasattr(template_, 'is_moderated'):
+      template_.is_moderated = template_content.get('is_moderated', template_.is_moderated)
+
+    if hasattr(template_, 'is_public'):
+      template_.is_public = template_content.get('is_public', template_.is_public)
+
+    if hasattr(template_, 'status'):
+      template_.status = template_content.get('status', template_.status)
+
+    print 'updated template_content', template_content, template_.name
+
+    db.session.commit()
+
+    return template_
+
+
+  """
+  Delete an existing Template from the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (int) template_id
+      The unique ID of the Template to be retrieved from the system
+
+  @return (bool)
+      A boolean to indicate if the deletion was succesful
+
+  """
+  def template_delete(self, template_id):
+
+    template_ = Template.query.get(template_id)
+    db.session.delete(template_)
+    db.session.commit()
+
+    return True
+
+
+  """
   Associate a user with a specific template
 
   @param (object) self
@@ -268,6 +387,7 @@ class Template(db.Model, CommonsModel):
 
     return new_permission
 
+
   """
   Associate a user with a specific template
 
@@ -302,47 +422,3 @@ class Template(db.Model, CommonsModel):
     db.session.commit()
 
     return new_template
-
-
-  """
-  Get a list of existing Templates from the CommonsCloudAPI
-
-  @param (object) self
-
-  @return (list) templates
-      A list of templates and their given permissions for the current user
-
-  """
-  def template_list(self):
-
-    """
-    Get a list of the templates the current user has access to
-    and load their information from the database
-    """
-    template_id_list_ = self._template_id_list()
-    templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
-
-    return templates_
-
-
-  """
-  Get a list of template ids from the current user and convert
-  them into a list of numbers so that our SQLAlchemy query can
-  understand what's going on
-
-  @param (object) self
-
-  @return (list) templates_
-      A list of templates the current user has access to
-  """
-  def _template_id_list(self):
-
-    templates_ = []
-
-    if not hasattr(current_user, 'id'):
-      return abort(401)
-
-    for template in current_user.templates:
-      templates_.append(template.template_id)
-
-    return templates_

@@ -88,3 +88,35 @@ def template_get(template_id):
 
   return Template_.endpoint_response(this_template)
 
+
+"""
+PUT/PATCH
+
+User attempting to access this endpoint must have the `edit`
+permission associated with them in the `user_templates` table
+"""
+@module.route('/template/<int:template_id>/', methods=['PUT', 'PATCH'])
+# @oauth.require_oauth()
+@permission_required('can_edit')
+def application_update(template_id):
+
+  Template_ = Template()
+  updated_template = Template_.template_update(template_id, request)
+
+  return Template_.endpoint_response(updated_template)
+
+
+"""
+DELETE
+
+User attempting to access this endpoint must have the `delete`
+permission associated with them in the `user_applications` table
+"""
+@module.route('/template/<int:template_id>/', methods=['DELETE'])
+# @oauth.require_oauth()
+@permission_required('can_delete')
+def template_delete(template_id):
+
+  Template().template_delete(template_id)
+
+  return status_.status_204(), 204
