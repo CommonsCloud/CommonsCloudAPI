@@ -314,7 +314,7 @@ class Template(db.Model, CommonsModel):
       A list of templates and their given permissions for the current user
 
   """
-  def application_list(self):
+  def template_list(self):
 
     """
     Get a list of the templates the current user has access to
