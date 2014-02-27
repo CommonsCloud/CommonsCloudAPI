@@ -93,6 +93,9 @@ class Application(db.Model, CommonsModel):
   """
   def application_create(self, request_object):
 
+    if not hasattr(current_user, 'id'):
+      return abort(401)
+
     """
     Make sure we can use the request data as json
     """

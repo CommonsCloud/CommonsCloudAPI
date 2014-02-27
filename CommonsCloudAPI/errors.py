@@ -34,6 +34,7 @@ def load_errorhandlers(app):
   def internal_error(error):
     return status_.status_400(), 400
 
+  @app.errorhandler(401)
   def internal_error(error):
     return status_.status_401(), 401
 
