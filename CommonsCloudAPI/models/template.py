@@ -100,6 +100,11 @@ the system.
     The model is the Base we use to define our database structure
 """
 class Template(db.Model, CommonsModel):
+
+  __tablename__ = 'template'
+  __table_args__ = {
+    'extend_existing': True
+  }
   
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(60))
@@ -111,8 +116,7 @@ class Template(db.Model, CommonsModel):
   is_listed = db.Column(db.Boolean)
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
-  # fields = db.relationship("Field", secondary=template_fields, backref=db.backref('templates'))
-  # statistics = db.relationship("Statistic", backref=db.backref('statistics'))
+  fields = db.relationship('TemplateFields', backref=db.backref('template'))
 
   def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, created=datetime.now(), status=True):
     self.name = name
@@ -135,9 +139,6 @@ class Template(db.Model, CommonsModel):
       The content that is being submitted by the user
   """
   def template_create(self, request_object):
-
-    if not hasattr(current_user, 'id'):
-      return abort(401)
 
     """
     Part 1: Make sure we can use the request data as json

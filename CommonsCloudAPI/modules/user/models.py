@@ -79,6 +79,7 @@ class User(db.Model, UserMixin):
   roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users'))
   applications = db.relationship('UserApplications', backref=db.backref('users'))
   templates = db.relationship('UserTemplates', backref=db.backref('users'))
+  fields = db.relationship('UserFields', backref=db.backref('users'))
 
   def __init__(self, firstname="", lastname="", email="", password="", bio="", active=True, roles=[], permissions=[]):
     self.firstname = firstname
