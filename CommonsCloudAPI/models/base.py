@@ -102,14 +102,12 @@ class CommonsModel(object):
       "polygon": Geometry('POLYGON'),
       "linestring": Geometry('LINESTRING'),
       "geometry": Geometry('GEOMETRY'),
-      "relationship": self.generate_relationship_field(field, template)
+      "relationship": self.generate_relationship_field(field, template),
+      "file": self.generate_attachment_field(field, template)
     }
 
 
-    if this_field_type == 'file':
-      data_type = generate_file_field(field)
-    else:
-      data_type = fields[field.data_type]
+    data_type = fields[field.data_type]
 
     return data_type
 
@@ -149,6 +147,38 @@ class CommonsModel(object):
       'name': field.relationship,
       'relationship': template.storage
     }
+
+  def generate_attachment_field(self, field, template):
+
+    """
+    Before we can create a relationship between Attachments and a Template
+    we need to create a Table in the database to retain our attachments
+    """
+    attachment_table_name = self.generate_template_hash(_prefix='attachment_')
+
+    new_table = db.Table(attachment_table_name, db.metadata,
+      db.Column('filename', db.String(255)),
+      db.Column('filepath', db.String(255)),
+      db.Column('filetype', db.String(255)),
+      db.Column('filesize', db.Integer())
+    )
+
+    db.metadata.bind = db.engine
+
+    db.create_all()
+
+    """
+    Next we update the relationship field
+    """
+    field.relationship = attachment_table_name
+
+    """
+    Finally we can create the actual relationship
+    """
+    self.generate_relationship_field(field, template)
+
+    return new_table
+
 
   """
   Create a table in the database that contains a base line of defaults
@@ -210,6 +240,9 @@ class CommonsModel(object):
     field_type = self.generate_field_type(field, template)
 
     if field.data_type == 'relationship':
+      return field_type
+
+    if field.data_type == 'file':
       return field_type
 
     """

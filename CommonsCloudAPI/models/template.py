@@ -114,11 +114,12 @@ class Template(db.Model, CommonsModel):
   is_crowdsourced = db.Column(db.Boolean)
   is_moderated = db.Column(db.Boolean)
   is_listed = db.Column(db.Boolean)
+  is_system = db.Column(db.Boolean)
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
   fields = db.relationship('TemplateFields', backref=db.backref('template'))
 
-  def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, created=datetime.now(), status=True):
+  def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, is_system=True, created=datetime.now(), status=True):
     self.name = name
     self.help = help
     self.storage = storage
@@ -126,6 +127,7 @@ class Template(db.Model, CommonsModel):
     self.is_crowdsourced = is_crowdsourced
     self.is_moderated = is_moderated
     self.is_listed = is_listed
+    self.is_system = is_system
     self.created = created
     self.status = status
 
@@ -172,6 +174,7 @@ class Template(db.Model, CommonsModel):
       'is_crowdsourced': content_.get('is_crowdsourced', False),
       'is_moderated': content_.get('is_moderated', True),
       'is_listed': content_.get('is_listed', True),
+      'is_system': content_.get('is_system', True),
       'created': content_.get('created', datetime.now()),
       'status': content_.get('status', True)
     }
