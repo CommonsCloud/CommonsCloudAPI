@@ -28,12 +28,16 @@ Import Python Dependencies
 import re
 import uuid
 
+from migrate.changeset import *
+
 
 """
 Import Flask Dependencies
 """
+from flask import abort
 from flask import request
 
+from geoalchemy2.types import Geometry
 
 """
 Import Commons Cloud Dependencies
@@ -72,6 +76,68 @@ class CommonsModel(object):
 
 
   """
+  Generate a PostgreSQL data type based off of a list of known strings. The
+  reason we do this is to abstract away some details from the user making it
+  easier for them to create new fields
+
+  @param (object) field
+      A fully qualified Field object
+  """
+  def generate_field_type(self, field, template):
+
+    this_field_type = field.data_type
+
+    fields = {
+      "float": db.Float(),
+      "whole_number": db.Integer(),
+      "text": db.String(255),
+      "email": db.String(255),
+      "phone": db.String(255),
+      "url": db.String(255),
+      "textarea": db.Text(),
+      "boolean": db.Boolean(),
+      "date": db.Date(),
+      "time": db.Time(),
+      "point": Geometry('POINT'),
+      "polygon": Geometry('POLYGON'),
+      "linestring": Geometry('LINESTRING'),
+      "geometry": Geometry('GEOMETRY'),
+      "relationship": self.generate_relationship_field(field, template)
+    }
+
+
+    if this_field_type == 'file':
+      data_type = generate_file_field(field)
+    else:
+      data_type = fields[field.data_type]
+
+    return data_type
+
+  def generate_relationship_field(self, field, template):
+
+    table_name = self.generate_template_hash(_prefix='ref_')
+
+    parent_foreign_key_id = ('%s.%s') % (template.storage,'id')
+    child_foreign_key_id = ('%s.%s') % (field.relationship,'id')
+
+    new_table = db.Table(table_name, db.metadata,
+      db.Column('parent_id', db.Integer, db.ForeignKey(parent_foreign_key_id), primary_key=True),
+      db.Column('child_id', db.Integer, db.ForeignKey(child_foreign_key_id), primary_key=True)
+    )
+
+    db.metadata.bind = db.engine
+    
+    """
+    Make sure everything commits to the database
+    """
+    db.create_all()
+    
+    return {
+      'name': field.relationship,
+      'relationship': template.storage
+    }
+
+  """
   Create a table in the database that contains a base line of defaults
   """
   def create_storage(self, table_name=""):
@@ -94,6 +160,59 @@ class CommonsModel(object):
     db.create_all()
     
     return table_name
+
+
+  """
+  Create a table in the database that contains a base line of defaults
+
+  @param (object) template
+      A fully qualified Template object
+
+  @param (object) field
+      A fully qualfied Field object
+
+  @see Documentation on the db.Column.create() functionality
+      https://sqlalchemy-migrate.readthedocs.org/en/latest/changeset.html#column-create
+  """
+  def create_storage_field(self, template, field):
+
+    if not template.storage or not hasattr(field, 'data_type'):
+      return abort(404)
+    
+    """
+    Create a new custom table for a Feature Type
+    """
+    exisitng_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+
+    """
+    We must bind the engine to the metadata here in order for our fields to
+    recognize the existing Table we have loaded in the following steps
+    """
+    db.metadata.bind = db.engine
+
+    """
+    Retrieve the appropriate field data type that we'll be using to create the
+    field in our database table
+    """
+    field_type = self.generate_field_type(field, template)
+
+    if field.data_type == 'relationship':
+      return field_type
+
+    """
+    Create the new column just like we would if we were hard coding the model
+    """
+    new_column = db.Column(field.name, field_type)
+    new_column.create(exisitng_table)
+
+    """
+    Finally we need to make sure that the existing table knows that we've have
+    just added a new column, otherwise we won't be able to use it until we
+    restart the application, which would be very bad
+    """
+    assert new_column is exisitng_table.c[field.name]
+    
+    return new_column
 
 
   """

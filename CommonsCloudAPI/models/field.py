@@ -100,7 +100,6 @@ class Field(db.Model, CommonsModel):
     name = db.Column(db.String(100))
     help = db.Column(db.String(255))
     data_type = db.Column(db.String(100))
-    field_type = db.Column(db.String(100))
     relationship = db.Column(db.String(255))
     is_listed = db.Column(db.Boolean)
     is_searchable = db.Column(db.Boolean)
@@ -108,12 +107,11 @@ class Field(db.Model, CommonsModel):
     weight = db.Column(db.Integer)
     status = db.Column(db.Boolean)
 
-    def __init__(self, label="", name="", help="", data_type="", field_type="", relationship="", is_listed=True, is_searchable=False, is_required=False, weight="", status=True):
+    def __init__(self, label="", name="", help="", data_type="", relationship="", is_listed=True, is_searchable=False, is_required=False, weight="", status=True):
         self.label = label
         self.name = name
         self.help = help
         self.data_type = data_type
-        self.field_type = field_type
         self.relationship = relationship
         self.is_listed = is_listed
         self.is_searchable = is_searchable
@@ -162,8 +160,7 @@ class Field(db.Model, CommonsModel):
           'label': user_defined_label,
           'name': self.generate_machine_name(user_defined_label),
           'help': sanitize.sanitize_string(content_.get('help', '')),
-          'data_type': sanitize.sanitize_string(content_.get('data_type', 'varchar(255)')),
-          'field_type': sanitize.sanitize_string(content_.get('field_type', 'varchar(255)')),
+          'data_type': sanitize.sanitize_string(content_.get('data_type', 'text')),
           'relationship': sanitize.sanitize_string(content_.get('relationship', None)),
           'is_listed': content_.get('is_listed', False),
           'is_searchable': content_.get('is_searchable', True),
@@ -191,6 +188,12 @@ class Field(db.Model, CommonsModel):
         
         self.set_template_field_relationship(field_, Template_)
 
+
+        """
+        Section 3: Create the Field in the Template Storage
+        """
+        self.create_storage_field(Template_, field_)
+
         """
         Before attempting to return the field as a JSON object, we need to
         make sure that we have a saved field to display, otherwise we'll
@@ -198,6 +201,7 @@ class Field(db.Model, CommonsModel):
         """
         if not hasattr(field_, 'id'):
             return abort(404)
+
 
         return field_
 
