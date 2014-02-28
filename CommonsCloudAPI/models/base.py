@@ -115,8 +115,21 @@ class CommonsModel(object):
 
   def generate_relationship_field(self, field, template):
 
+    """
+    Make sure that the table we need to use for creating the relationship is loaded
+    into our db.metadata, otherwise the whole process will fail
+    """
+    exisitng_table = db.Table(field.relationship, db.metadata, autoload=True, autoload_with=db.engine)
+
+    """
+    Create a name for our new field relationship table
+    """
     table_name = self.generate_template_hash(_prefix='ref_')
 
+    """
+    Create a new Association Table in our database, based up the two existing Tables
+    we've previously created
+    """
     parent_foreign_key_id = ('%s.%s') % (template.storage,'id')
     child_foreign_key_id = ('%s.%s') % (field.relationship,'id')
 
@@ -126,7 +139,7 @@ class CommonsModel(object):
     )
 
     db.metadata.bind = db.engine
-    
+
     """
     Make sure everything commits to the database
     """
