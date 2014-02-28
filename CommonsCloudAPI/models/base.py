@@ -85,8 +85,6 @@ class CommonsModel(object):
   """
   def generate_field_type(self, field, template):
 
-    this_field_type = field.data_type
-
     fields = {
       "float": db.Float(),
       "whole_number": db.Integer(),
@@ -101,15 +99,15 @@ class CommonsModel(object):
       "point": Geometry('POINT'),
       "polygon": Geometry('POLYGON'),
       "linestring": Geometry('LINESTRING'),
-      "geometry": Geometry('GEOMETRY'),
-      "relationship": self.generate_relationship_field(field, template),
-      "file": self.generate_attachment_field(field, template)
+      "geometry": Geometry('GEOMETRY')
     }
 
+    if field.data_type == 'relationship':
+      return self.generate_relationship_field(field, template)
+    elif field.data_type == 'file':
+      return self.generate_attachment_field(field, template)
 
-    data_type = fields[field.data_type]
-
-    return data_type
+    return fields[field.data_type]
 
   def generate_relationship_field(self, field, template):
 
@@ -144,8 +142,8 @@ class CommonsModel(object):
     db.create_all()
     
     return {
-      'name': field.relationship,
-      'relationship': template.storage
+      'type': 'relationship',
+      'storage': table_name
     }
 
   def generate_attachment_field(self, field, template):
@@ -157,10 +155,13 @@ class CommonsModel(object):
     attachment_table_name = self.generate_template_hash(_prefix='attachment_')
 
     new_table = db.Table(attachment_table_name, db.metadata,
+      db.Column('id', db.Integer, primary_key=True),
       db.Column('filename', db.String(255)),
       db.Column('filepath', db.String(255)),
       db.Column('filetype', db.String(255)),
-      db.Column('filesize', db.Integer())
+      db.Column('filesize', db.Integer()),
+      db.Column('created', db.DateTime()),
+      db.Column('status', db.String(24), nullable=False)
     )
 
     db.metadata.bind = db.engine
@@ -172,12 +173,16 @@ class CommonsModel(object):
     """
     field.relationship = attachment_table_name
 
+
     """
     Finally we can create the actual relationship
     """
     self.generate_relationship_field(field, template)
 
-    return new_table
+    return {
+      'type': 'file',
+      'storage': attachment_table_name
+    }
 
 
   """
@@ -240,10 +245,10 @@ class CommonsModel(object):
     field_type = self.generate_field_type(field, template)
 
     if field.data_type == 'relationship':
-      return field_type
+      return
 
     if field.data_type == 'file':
-      return field_type
+      return
 
     """
     Create the new column just like we would if we were hard coding the model

@@ -192,7 +192,7 @@ class Field(db.Model, CommonsModel):
         """
         Section 3: Create the Field in the Template Storage
         """
-        self.create_storage_field(Template_, field_)
+        field_storage = self.create_storage_field(Template_, field_)
 
         """
         Before attempting to return the field as a JSON object, we need to
