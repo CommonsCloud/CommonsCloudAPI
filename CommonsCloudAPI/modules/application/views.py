@@ -64,7 +64,7 @@ def application_post():
   Application_ = Application()
   new_application = Application_.application_create(request)
 
-  return Application_.endpoint_response(new_application)
+  return Application_.endpoint_response(new_application, 201)
 
 
 """
