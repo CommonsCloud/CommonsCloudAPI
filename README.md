@@ -51,6 +51,7 @@ All API endpoints are based on the assumed base url of https://api.commonscloud.
 From time to time you'll run into an error message within the system, below we've outlined what you may encounter. In the future we'll add possible solutions for each of these.
 
 | Code | Status | Solution
+| --- | --- | ---
 | 415 | 415 Unsupported Media Type | This normally happens when you forget to append a 'Content-Type' header to the request or when you ask for a format that we don't support. CommonsCloud currently supports text/csv and application/json Content-Types and can also support the 'format' URL parameter with either json or csv as the value
 
 ### Version
