@@ -7,9 +7,9 @@ All API endpoints are based on the assumed base url of https://api.commonscloud.
 
 #### /application
 
-| Method | URL | Description | Return | Example
+| Method | URL | Description | Response | Example
 | --- | --- | --- | --- | ---
-| GET | /application/ | Show a list of my applications | (array) | [example](#get-application)
+| GET | /application/ | Show a list of my applications | Array | [example](#get-application)
 
 
 ###### [GET] /application
@@ -38,15 +38,29 @@ All API endpoints are based on the assumed base url of https://api.commonscloud.
 | GET | /application/<application_id>/ | Show a single application | ggg
 
 
-##### /template
+#### /template
 
-##### /field
+#### /field
 
-##### /statistic
+#### /statistic
 
-##### /feature
+#### /feature
 
-##### errors
+#### errors
+
+From time to time you'll run into an error message within the system, below we've outlined what you may encounter. In the future we'll add possible solutions for each of these.
+
+###### 415 Unsupported Media Type
+```javascript
+{
+    "code": "415",
+    "details": "This normally happens when you forget to append a 'Content-Type' header to the request or when you ask for a format that we don't support. CommonsCloud currently supports text/csv and application/json Content-Types and can also support the 'format' URL parameter with either json or csv as the value",
+    "message": "The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method.",
+    "status": "415 Unsupported Media Type"
+}
+```
+
+This normally happens when you forget to append a 'Content-Type' header to the request or when you ask for a format that we don't support. CommonsCloud currently supports text/csv and application/json Content-Types and can also support the 'format' URL parameter with either json or csv as the value.
 
 
 ### Version
