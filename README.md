@@ -1,9 +1,9 @@
 # CommonsCloudAPI
 
 
-### API Documentation
+## API Documentation
 
-##### /application
+#### /application
 
 *Show All Active Applications*
 
