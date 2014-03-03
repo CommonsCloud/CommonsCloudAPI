@@ -12,6 +12,9 @@ All API endpoints are based on the assumed base url of https://api.commonscloud.
 | GET | /application/ | Show a list of my applications | [example](#get-application)
 | GET | /application/&lt;int:application_id&gt; | Show an existing application | [example](#get-application1)
 | POST | /application/ | Create a new application |
+| PUT | /application/&lt;int:application_id&gt; | Update an existing application |
+| PATCH | /application/&lt;int:application_id&gt; | Update an existing application |
+| DELETE | /application/&lt;int:application_id&gt; | Delete an existing application | 
 
 
 ###### [GET] /application
