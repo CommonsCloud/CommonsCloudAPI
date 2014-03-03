@@ -3,23 +3,14 @@
 
 ## API Documentation
 
+All API endpoints are based on the assumed base url of https://api.commonscloud.org/v2/<endpoint::details>
+
 #### /application
 
-*Show All Active Applications*
-
-This method returns all active applications that are active in your account. All available API information is presented for each application.
-
-###### Request URL:
-```
-https://api.commonscloud.org/v1/application/
-```
-
-###### Available Methods:
-```
-GET
-HEAD
-OPTIONS
-```
+| Method | URL | Description
+| --- | --- | --- |
+| GET | /application/ | Show a list of my applications
+| GET | /application/<application_id>/ | Show a single application
 
 ###### Sample Response:
 ```
@@ -33,15 +24,6 @@ OPTIONS
         "name": "My Project Name",
         "status": true,
         "url": "http://www.mycommonscloud.com/"
-      },
-      {
-        ...
-      },
-      {
-        ...
-      },
-      {
-        ...
       }
     ]
   }
