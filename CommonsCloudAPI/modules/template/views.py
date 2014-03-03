@@ -57,6 +57,27 @@ def template_list():
 
 
 """
+A list of templates that belongs to a specific application
+"""
+@module.route('/application/<int:application_id>/templates/', methods=['GET'])
+# @oauth.require_oauth()
+def application_templates_get(application_id):
+
+  Template_ = Template()
+  these_templates = Template_.application_templates_get(application_id)
+
+  if type(these_templates) is 'Response':
+    return these_templates, these_templates.code
+
+  arguments = {
+    'the_content': these_templates,
+    'list_name': 'templates'
+  }
+
+  return Template_.endpoint_response(**arguments)
+
+
+"""
 CREATE
 
 Everyone that has a user account can add new applications, however

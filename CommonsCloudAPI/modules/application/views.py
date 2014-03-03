@@ -51,6 +51,7 @@ def application_list():
 
   return Application_.endpoint_response(**arguments)
 
+
 """
 CREATE
 
@@ -77,25 +78,6 @@ permission associated with them in the `user_applications` table
 # @oauth.require_oauth()
 @permission_required('can_view')
 def application_get(application_id):
-
-  Application_ = Application()
-  this_application = Application_.application_get(application_id)
-
-  if type(this_application) is 'Response':
-    return this_application, this_application.code
-
-  return Application_.endpoint_response(this_application)
-
-
-"""
-GET/VIEW
-
-User attempting to access this endpoint must have the `view`
-permission associated with them in the `user_applications` table
-"""
-@module.route('/application/<int:application_id>/templates/', methods=['GET'])
-# @oauth.require_oauth()
-def application_templates_get(application_id):
 
   Application_ = Application()
   this_application = Application_.application_get(application_id)

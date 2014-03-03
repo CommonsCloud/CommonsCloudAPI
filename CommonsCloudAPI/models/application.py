@@ -303,16 +303,4 @@ class Application(db.Model, CommonsModel):
     return True
 
 
-  """
-  Get a list of Templates that belong to this Application
-
-  """
-  def application_templates_get(self):
-
-    templates_ = []
-
-    templates_ = Template.query.filter_by(Template.application_id == 2)
-
-    return templates_
-
 

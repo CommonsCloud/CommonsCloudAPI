@@ -431,3 +431,37 @@ class Template(db.Model, CommonsModel):
 
     return new_template
 
+
+  """
+  Get a list of templates ids for the current application and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+
+  @param (object) self
+
+  @return (list) templates_
+      A list of applciations the current user has access to
+  """
+  def _application_templates_id_list(self, application_id):
+
+    application_ = Application.query.get(application_id)
+
+    templates_ = []
+
+    for template in application_.templates:
+      templates_.append(template.template_id)
+
+    return templates_
+
+
+  """
+  Get a list of Templates that belong to this Application
+
+  """
+  def application_templates_get(self, application_id):
+  
+
+    template_id_list = self._application_templates_id_list(application_id)
+    templates_ = Template.query.filter(Template.id.in_(template_id_list)).all()
+
+    return templates_
