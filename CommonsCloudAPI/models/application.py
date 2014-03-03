@@ -15,6 +15,8 @@ limitations under the License.
 Import Python Dependencies
 """
 import json
+from json import JSONEncoder
+
 from datetime import datetime
 
 
@@ -40,7 +42,7 @@ from CommonsCloudAPI.utilities.format_csv import CSV
 from CommonsCloudAPI.utilities.format_json import JSON
 
 
-class UserApplications(db.Model):
+class UserApplications(db.Model, CommonsModel):
 
   __tablename__ = 'user_applications'
   __table_args__ = {
@@ -60,6 +62,7 @@ Define our individual models
 """
 class Application(db.Model, CommonsModel):
 
+  __public__ = ['id', 'name', 'description', 'url', 'created', 'status', 'templates']
   __tablename__ = 'application'
   __table_args__ = {
     'extend_existing': True
@@ -150,7 +153,7 @@ class Application(db.Model, CommonsModel):
     if not hasattr(application_, 'id'):
       return abort(404)
 
-    return application_
+    return application_.convert_to_dict(deep={'templates': {}})
 
 
   """

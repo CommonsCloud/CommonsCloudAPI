@@ -59,7 +59,7 @@ Since it is very possible that we'll have more attributes than just the ID for
 the Application and associated Template, we're going with AssociationTables by
 default
 """
-class ApplicationTemplates(db.Model):
+class ApplicationTemplates(db.Model, CommonsModel):
 
   __tablename__ = 'application_templates'
   __table_args__ = {
@@ -68,13 +68,13 @@ class ApplicationTemplates(db.Model):
 
   application_id = db.Column(db.Integer(), db.ForeignKey('application.id'), primary_key=True)
   template_id = db.Column(db.Integer(), db.ForeignKey('template.id'), primary_key=True)
-  templates = db.relationship('Template', backref=db.backref("application_templates", cascade="all,delete"))
+  templates = db.relationship('Template', backref=db.backref("application_templates", cascade="all,delete", uselist=False))
 
 
 """
 User to Template Association
 """
-class UserTemplates(db.Model):
+class UserTemplates(db.Model, CommonsModel):
 
   __tablename__ = 'user_templates'
   __table_args__ = {
@@ -100,6 +100,8 @@ the system.
     The model is the Base we use to define our database structure
 """
 class Template(db.Model, CommonsModel):
+
+  __public__ = ['id', 'name', 'help', 'storage', 'is_public', 'is_crowdsourced', 'is_moderated', 'is_listed', 'created', 'status', 'fields']
 
   __tablename__ = 'template'
   __table_args__ = {

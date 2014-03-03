@@ -38,7 +38,7 @@ to exist regardless of the type of document we are generating
 @method get_file_name
 
 """
-class FormatContent:
+class FormatContent(object):
 
   """
   Define our default variables

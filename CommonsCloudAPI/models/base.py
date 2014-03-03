@@ -39,6 +39,8 @@ from flask import request
 
 from geoalchemy2.types import Geometry
 
+from sqlalchemy.orm import ColumnProperty
+
 """
 Import Commons Cloud Dependencies
 """
@@ -48,12 +50,62 @@ from CommonsCloudAPI.extensions import status as status_
 from CommonsCloudAPI.utilities.format_csv import CSV
 from CommonsCloudAPI.utilities.format_json import JSON
 
-
 class CommonsModel(object):
+
+  __public__ = None
 
   def __init__(self):
     pass
 
+  def convert_to_dict(self, deep={}, exclude=[]):
+
+    print 'convert_to_dict'
+
+    """Generate a JSON-style nested dict/list structure from an object."""
+    col_prop_names = [p.key for p in self.__mapper__.iterate_properties \
+                                  if isinstance(p, ColumnProperty)]
+    data = dict([(name, getattr(self, name))
+                 for name in col_prop_names if name not in exclude])
+    for rname, rdeep in deep.iteritems():
+        dbdata = getattr(self, rname)
+        print 'loop', rname, rdeep
+        #FIXME: use attribute names (ie coltoprop) instead of column names
+        fks = self.__mapper__.get_property(rname).remote_side
+        exclude = [c.name for c in fks]
+        if dbdata is None:
+            print 'if', rname, rdeep
+            data[rname] = None
+        elif isinstance(dbdata, list):
+            for o in dbdata:
+              data[rname] = o.convert_to_dict(rdeep, exclude)
+        else:
+            print 'else', rname, rdeep
+            data[rname] = dbdata.convert_to_dict(rdeep, exclude)
+
+    return data
+
+  # def to_dict(self):
+
+  #     data = {}
+
+  #     for key in self.__table__.columns.keys():
+  #       print 'keys', key
+  #       data[key] = getattr(self, key)
+              
+  #     for key in self.__mapper__.relationships.keys():
+  #       if self.__mapper__.relationships[key].uselist:
+  #         print 'recusive start from uselist', key
+  #         data[key] = []
+  #         for item in getattr(self, key):
+  #           print type(item.to_dict())
+  #           data[key].append(item.to_dict())
+  #       else:
+  #         print 'recusive start from else', key
+  #         print type(getattr(self, key))
+  #         data[key] = getattr(self, key)
+
+  #     return data
+ 
   """
   Remove all characters except for spaces and alpha-numeric characters,
   replace all spaces in a string with underscores, change all uppercase
@@ -292,7 +344,7 @@ class CommonsModel(object):
     if request.headers['Content-Type'] == 'application/json' or \
         ('format' in request.args and request.args['format'] == 'json'):
 
-      this_data = JSON(the_content, serialize=True, list_name=list_name)
+      this_data = JSON(the_content, serialize=False, list_name=list_name)
       return this_data.create(), code
 
     elif request.headers['Content-Type'] == 'text/csv' or \
