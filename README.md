@@ -3,7 +3,7 @@
 
 ## API Documentation
 
-All API endpoints are based on the assumed base url of https://api.commonscloud.org/v2/<endpoint::details>
+All API endpoints are based on the assumed base url of https://api.commonscloud.org/v2/[endpoint]
 
 #### /application
 
