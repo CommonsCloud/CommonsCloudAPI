@@ -9,20 +9,7 @@ All API endpoints are based on the assumed base url of https://api.commonscloud.
 
 | Method | URL | Description | Sample Response
 | --- | --- | --- | ---
-| GET | /application/ | Show a list of my applications | ```{```
-  "response": {
-    "applications": [
-      {
-        "created": "Mon, 03 Mar 2014 14:41:15 GMT",
-        "description": "",
-        "id": 1,
-        "name": "My Project Name",
-        "status": true,
-        "url": "http://www.mycommonscloud.com/"
-      }
-    ]
-  }
-}```
+| GET | /application/ | Show a list of my applications | ```{  \r\n    ""response": {  \r\n  } }```
 
 
 
