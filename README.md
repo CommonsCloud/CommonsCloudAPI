@@ -23,7 +23,7 @@ All API endpoints are based on the assumed base url of https://api.commonscloud.
       }
     ]
   }
-}```
+}
 | GET | /application/<application_id>/ | Show a single application
 
 
