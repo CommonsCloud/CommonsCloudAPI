@@ -144,6 +144,17 @@ class FormatContent(object):
         if not key in self.exclude_fields:
           result[key] = getattr(self.the_content, key)
 
+      for key in self.the_content.__mapper__.relationships.keys():
+        print key
+        # if self.__mapper__.relationships[key].uselist:
+        #   print 'display relationship [uselist]', key, self.__mapper__.relationships[key].uselist, getattr(self, key)
+        #   data[key] = []
+        #   for item in getattr(self, key):
+        #     data[key].append(item.to_dict())
+        # else:
+        #   print 'display relationship', key, self.__mapper__.relationships[key].uselist, getattr(self, key)
+        #   data[key] = getattr(self, key)
+            
       return result
 
 

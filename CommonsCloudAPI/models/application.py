@@ -15,7 +15,6 @@ limitations under the License.
 Import Python Dependencies
 """
 import json
-from json import JSONEncoder
 
 from datetime import datetime
 
@@ -62,7 +61,9 @@ Define our individual models
 """
 class Application(db.Model, CommonsModel):
 
-  __public__ = ['id', 'name', 'description', 'url', 'created', 'status', 'templates']
+  __public__ = ['id', 'name', 'description', 'url', 'created', 'status']
+  __public_relationships__ = ['templates']
+
   __tablename__ = 'application'
   __table_args__ = {
     'extend_existing': True
@@ -153,7 +154,7 @@ class Application(db.Model, CommonsModel):
     if not hasattr(application_, 'id'):
       return abort(404)
 
-    return application_.convert_to_dict(deep={'templates': {}})
+    return application_.serialize_object()
 
 
   """
@@ -301,3 +302,18 @@ class Application(db.Model, CommonsModel):
     db.session.commit()
 
     return True
+
+
+  """
+  Get a list of Templates that belong to this Application
+
+  """
+  def application_templates_get(self):
+
+    templates_ = []
+
+    templates_ = Template.query.filter_by(Template.application_id == 2)
+
+    return templates_
+
+

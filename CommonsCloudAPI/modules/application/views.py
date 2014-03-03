@@ -88,6 +88,30 @@ def application_get(application_id):
 
 
 """
+GET/VIEW
+
+User attempting to access this endpoint must have the `view`
+permission associated with them in the `user_applications` table
+"""
+@module.route('/application/<int:application_id>/templates/', methods=['GET'])
+# @oauth.require_oauth()
+def application_templates_get(application_id):
+
+  Application_ = Application()
+  this_application = Application_.application_get(application_id)
+
+  # print this_application.get('templates', [])
+
+  # for key in this_application.keys():
+  #   print key
+
+  if type(this_application) is 'Response':
+    return this_application, this_application.code
+
+  return Application_.endpoint_response(this_application)
+
+
+"""
 PUT/PATCH
 
 User attempting to access this endpoint must have the `edit`

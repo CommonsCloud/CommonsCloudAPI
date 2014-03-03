@@ -430,3 +430,4 @@ class Template(db.Model, CommonsModel):
     db.session.commit()
 
     return new_template
+

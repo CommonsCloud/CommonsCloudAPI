@@ -74,9 +74,12 @@ class JSON(FormatContent):
     Make sure we're caching the responses for 30 days to speed things up,
     then setting modification and expiration dates appropriately
     """
-    response.headers.add('Last-Modified', today)
-    response.headers.add('Expires', expires)
-    response.headers.add('Pragma', 'max-age=2592000')
-    response.headers.add('Cache-Control', 'max-age=2592000')
+    # response.headers.add('Last-Modified', today)
+    # response.headers.add('Expires', expires)
+    # response.headers.add('Pragma', 'max-age=2592000')
+    # response.headers.add('Cache-Control', 'max-age=2592000')
+
+    response.headers.add('Pragma', 'no-cache')
+    response.headers.add('Cache-Control', 'no-cache')
 
     return response

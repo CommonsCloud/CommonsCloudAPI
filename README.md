@@ -1,6 +1,59 @@
 # CommonsCloudAPI
 
 
+### API Documentation
+
+##### /application
+
+*Show All Active Applications*
+
+This method returns all active applications that are active in your account. All available API information is presented for each application.
+
+###### Request URL:
+
+```
+https://api.commonscloud.org/v1/application/
+```
+
+###### Sample Response:
+
+```
+{
+  "response": {
+    "applications": [
+      {
+        "created": "Mon, 03 Mar 2014 14:41:15 GMT",
+        "description": "",
+        "id": 1,
+        "name": "My Project Name",
+        "status": true,
+        "url": "http://www.mycommonscloud.com/"
+      },
+      {
+        ...
+      },
+      {
+        ...
+      },
+      {
+        ...
+      }
+    ]
+  }
+}
+```
+
+##### /template
+
+##### /field
+
+##### /statistic
+
+##### /feature
+
+##### errors
+
+
 ### Version
 
 We are currently in a "development" state, anything may change at any time. The public API should not be considered stable. We are attempting to conform to Semantic Versioning 2.0.0 for our releases. If you see anything that does not align with this protocol of versioning, [please submit an Issue via Github](https://github.com/CommonsCloud/CommonsCloudAPI/issues) or you may submit a pull request as well.
