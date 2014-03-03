@@ -10,13 +10,22 @@
 This method returns all active applications that are active in your account. All available API information is presented for each application.
 
 ###### Request URL:
-
 ```
 https://api.commonscloud.org/v1/application/
 ```
 
-###### Sample Response:
+###### Available Methods:
+```
+DELETE
+GET
+HEAD
+OPTIONS
+PATCH
+POST
+PUT
+```
 
+###### Sample Response:
 ```
 {
   "response": {
