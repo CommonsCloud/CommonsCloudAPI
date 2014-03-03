@@ -27,7 +27,8 @@ All API endpoints are based on the assumed base url of https://api.commonscloud.
       }
     ]
   }
-}```
+}
+```
 
 
 
