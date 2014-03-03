@@ -16,13 +16,9 @@ https://api.commonscloud.org/v1/application/
 
 ###### Available Methods:
 ```
-DELETE
 GET
 HEAD
 OPTIONS
-PATCH
-POST
-PUT
 ```
 
 ###### Sample Response:
