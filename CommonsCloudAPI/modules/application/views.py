@@ -100,11 +100,6 @@ def application_templates_get(application_id):
   Application_ = Application()
   this_application = Application_.application_get(application_id)
 
-  # print this_application.get('templates', [])
-
-  # for key in this_application.keys():
-  #   print key
-
   if type(this_application) is 'Response':
     return this_application, this_application.code
 

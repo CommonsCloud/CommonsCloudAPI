@@ -74,21 +74,56 @@ class CommonsModel(object):
       A dictionary of the contents of our objects
 
   """
-  def serialize_object(self):
+  def serialize_object(self, _content):
 
       result = OrderedDict()
 
-      for key in self.__mapper__.c.keys():
+      for key in _content.__mapper__.c.keys():
         if key in self.__public__:
-          result[key] = getattr(self, key)
+          result[key] = getattr(_content, key)
 
-      for key in self.__mapper__.relationships.keys():
-        if key in self.__public_relationships__ and self.__mapper__.relationships[key].uselist:
-          result[key] = []
-          for item in getattr(self, key):
-            result[key].append(item.template_id)
+      #
+      # @todo This needs some work, it's really close, but not quite there
+      #       `result[key].append(item.template_id)` is the only thing that
+      #       needs to be wrapped to make this thing complete.
+      #
+      
+      # for key in _content.__mapper__.relationships.keys():
+      #   if key in self.__public_relationships__ and _content.__mapper__.relationships[key].uselist:
+      #     result[key] = []
+      #     for item in getattr(_content, key):
+      #       result[key].append(item.template_id)
             
       return result
+
+
+
+  """
+  In order to be able to work with an object it needs to be serialized,
+  otherwise we can turn it into any type of file
+
+  @requires
+      from collections import OrderedDict
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (dict) result
+      A dictionary of the contents of our objects
+
+  """
+  def serialize_list(self, _content):
+
+      list_ = []
+
+      for object_ in _content:
+        result = OrderedDict()
+        for key in object_.__mapper__.c.keys():
+          result[key] = getattr(object_, key)
+
+        list_.append(result)
+
+      return list_
 
 
   """
@@ -323,19 +358,29 @@ class CommonsModel(object):
   def endpoint_response(self, the_content, list_name='', code=200):
 
     """
+    Make sure the content is ready to be served
+    """
+    if type(the_content) is list:
+      the_content = {
+        list_name: self.serialize_list(the_content)
+      }
+    else:
+      the_content = self.serialize_object(the_content)
+
+    """
     If the user is properly authenticated, then proceed to see if they
     have requests a type of content we serve
     """
     if request.headers['Content-Type'] == 'application/json' or \
         ('format' in request.args and request.args['format'] == 'json'):
 
-      this_data = JSON(the_content, serialize=True, list_name=list_name)
+      this_data = JSON(the_content, list_name=list_name)
       return this_data.create(), code
 
     elif request.headers['Content-Type'] == 'text/csv' or \
         ('format' in request.args and request.args['format'] == 'csv'):
 
-      this_data = CSV(the_content, serialize=True)
+      this_data = CSV(the_content_)
       return this_data.create(), code
 
     """

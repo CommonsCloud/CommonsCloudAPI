@@ -62,7 +62,6 @@ Define our individual models
 class Application(db.Model, CommonsModel):
 
   __public__ = ['id', 'name', 'description', 'url', 'created', 'status']
-  __public_relationships__ = ['templates']
 
   __tablename__ = 'application'
   __table_args__ = {
@@ -154,7 +153,7 @@ class Application(db.Model, CommonsModel):
     if not hasattr(application_, 'id'):
       return abort(404)
 
-    return application_.serialize_object()
+    return application_
 
 
   """

@@ -58,13 +58,6 @@ class JSON(FormatContent):
     today = datetime.utcnow()
     expires =  today + timedelta(+30)
 
-    if type(self.the_content) is list and self.serialize is True:
-      self.the_content = {
-        self.list_name: self.serialize_list()
-      }
-    elif self.serialize is True:
-      self.the_content = self.serialize_object()
-
     response = jsonify({
       "response": self.the_content
     })
