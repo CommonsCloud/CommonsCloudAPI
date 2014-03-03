@@ -7,9 +7,9 @@ All API endpoints are based on the assumed base url of https://api.commonscloud.
 
 #### /application
 
-| Method | URL | Description | Return | Sample Response
+| Method | URL | Description | Return | Example
 | --- | --- | --- | --- | ---
-| GET | /application/ | Show a list of my applications | (array) | [response](#get-application)
+| GET | /application/ | Show a list of my applications | (array) | [example](#get-application)
 
 
 ###### [GET] /application
