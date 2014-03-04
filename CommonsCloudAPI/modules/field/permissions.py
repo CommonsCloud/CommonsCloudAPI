@@ -72,8 +72,8 @@ class EditFieldPermission(Permission):
         super(EditFieldPermission, self).__init__(need)
 
 
-DeleteTemplateNeed = partial(FieldNeed, 'delete')
-class DeleteTemplatePermission(Permission):
+DeleteFieldNeed = partial(FieldNeed, 'delete')
+class DeleteFieldPermission(Permission):
     def __init__(self, field_id):
         need = DeleteFieldNeed(field_id)
         super(DeleteFieldPermission, self).__init__(need)
@@ -94,6 +94,6 @@ def check_permissions(field_id):
   return {
     'can_view': ViewFieldPermission(field_id).can(),
     'can_edit': EditFieldPermission(field_id).can(),
-    'can_delete': DeleteTemplatePermission(field_id).can()
+    'can_delete': DeleteFieldPermission(field_id).can()
   }
 

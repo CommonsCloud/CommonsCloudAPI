@@ -338,3 +338,23 @@ class Field(db.Model, CommonsModel):
 
         return fields_
 
+
+    """
+    Delete an existing Field from the CommonsCloudAPI
+
+    @param (object) self
+
+    @param (int) field_id
+        The unique ID of the Field to be retrieved from the system
+
+    @return (bool)
+        A boolean to indicate if the deletion was succesful
+
+    """
+    def field_delete(self, field_id):
+
+        field_ = Field.query.get(field_id)
+        db.session.delete(field_)
+        db.session.commit()
+
+        return True

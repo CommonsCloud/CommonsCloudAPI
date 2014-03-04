@@ -45,7 +45,7 @@ from .permissions import permission_required
 """
 A list of templates that belongs to a specific application
 """
-@module.route('/template/<int:template_id>/fields/', methods=['GET'])
+@module.route('/template/<int:template_id>/field/', methods=['GET'])
 # @oauth.require_oauth()
 def template_fields_get(template_id):
 
@@ -73,3 +73,12 @@ def field_post(template_id):
 
   return Field_.endpoint_response(new_field, code=201)
 
+
+@module.route('/template/<int:template_id>/field/<int:field_id>/', methods=['DELETE'])
+# @oauth.require_oauth()
+@permission_required('can_delete')
+def field_delete(template_id, field_id):
+
+  Field().field_delete(field_id)
+
+  return status_.status_204(), 204
