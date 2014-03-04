@@ -42,6 +42,23 @@ from CommonsCloudAPI.models.field import Field
 from .permissions import permission_required
 
 
+@module.route('/template/<int:template_id>/field/<int:field_id>/', methods=['GET'])
+# @oauth.require_oauth()
+def field_get(template_id, field_id):
+
+  Field_ = Field()
+  this_field = Field_.field_get(field_id)
+
+  if type(this_field) is 'Response':
+    return this_field, this_field.code
+
+  arguments = {
+    'the_content': this_field
+  }
+
+  return Field_.endpoint_response(**arguments)
+
+
 """
 A list of templates that belongs to a specific application
 """

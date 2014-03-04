@@ -220,7 +220,14 @@ class Field(db.Model, CommonsModel):
 
     """
     def field_get(self, field_id):
-        pass
+        
+        field_ = Field.query.get(field_id)
+
+        if not hasattr(field_, 'id'):
+            return abort(404)
+
+        return field_
+
 
 
     """
@@ -332,6 +339,11 @@ class Field(db.Model, CommonsModel):
 
     """
     def template_fields_get(self, template_id):
+
+        template_ = Template.query.get(template_id)
+
+        if not hasattr(template_, 'id'):
+          return abort(404)
     
         field_id_list = self._template_fields_id_list(template_id)
         fields_ = Field.query.filter(Field.id.in_(field_id_list)).all()

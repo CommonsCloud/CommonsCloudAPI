@@ -45,20 +45,9 @@ from .permissions import permission_required
 # @oauth.require_oauth()
 def template_list():
 
-  Template_ = Template()
-  templates_ = Template_.template_list()
-
-  arguments = {
-    'the_content': templates_,
-    'list_name': 'templates'
-  }
-
-  return Template_.endpoint_response(**arguments)
+  return status_.status_303(), 303
 
 
-"""
-A list of templates that belongs to a specific application
-"""
 @module.route('/application/<int:application_id>/templates/', methods=['GET'])
 # @oauth.require_oauth()
 def application_templates_get(application_id):

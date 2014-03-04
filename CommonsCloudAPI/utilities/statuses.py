@@ -72,6 +72,30 @@ class CommonsStatus():
 
 
   """
+  303 See Other
+
+  @see
+      http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.4
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_303(self):
+
+    message = {
+      'status': '303 See Other',
+      'code': '303',
+      'message': 'Please check the API documentation, as there is a different way you need to request your desired data.'
+    }
+
+    return jsonify(message) if self.return_type == 'json' else message
+
+
+  """
   400 Bad Request
 
   @see

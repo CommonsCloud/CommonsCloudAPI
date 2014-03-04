@@ -347,7 +347,11 @@ class CommonsModel(object):
 
   @see Documentation on the db.Column.drop() functionality
       https://sqlalchemy-migrate.readthedocs.org/en/latest/api.html \
-        #migrate.changeset.schema.ChangesetColumn.drop
+          #migrate.changeset.schema.ChangesetColumn.drop
+
+      Documentation on selecting the existing column
+      http://docs.sqlalchemy.org/en/rel_0_8/orm/mapper_config.html \
+          #naming-columns-distinctly-from-attribute-names
   """
   def delete_storage_field(self, template, field):
 
@@ -362,18 +366,9 @@ class CommonsModel(object):
     """
     db.metadata.bind = db.engine
 
-    print dir(exisitng_table.c)
-
-    # """
-    # Retrieve the appropriate field data type that we'll be using to create the
-    # field in our database table
-    # """
-    # field_type = self.generate_field_type(field, template)
-
-    # """
-    # Create the new column just like we would if we were hard coding the model
-    # """
-    # existing_column = db.Column(field.name, field_type)
+    """
+    Delete the new column just like we would if we were hard coding the model
+    """
     exisitng_table.c[field.name].drop()
     
     return True
