@@ -48,6 +48,27 @@ class CommonsStatus():
 
 
   """
+  200 OK
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_200(self):
+
+    message = {
+      'status': '200 OK',
+      'code': '200',
+      'message': 'Looking good McFly'
+    }
+
+    return jsonify(message) if self.return_type == 'json' else message
+
+
+  """
   204 No Content
 
   @see
@@ -258,13 +279,14 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_500(self):
+  def status_500(self, message=""):
 
     message = {
       'status': '500 Internal Server Error',
       'code': '500',
       'message': 'The server has not found anything matching the Request-URI.',
-      'details': 'You need to check the system, application, and proxy logs.'
+      'details': 'You need to check the system, application, and proxy logs.',
+      'error': str(message)
     }
 
     return jsonify(message) if self.return_type == 'json' else message

@@ -338,6 +338,34 @@ class CommonsModel(object):
     return new_column
 
 
+  def get_storage(self, template):
+
+    """
+    Load an existing table into our metadata
+    """
+    Table_ = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+
+    """
+    We must bind the engine to the metadata here in order for our fields to
+    recognize the existing Table we have loaded in the following steps
+    """
+    db.metadata.bind = db.engine
+
+    class_name = str(template.storage)
+
+    arguments = {
+        "__table__": Table_,
+        "__tablename__": class_name,
+        "__table_args__": {
+            "extend_existing": True
+        }
+    }
+
+
+    Model = type(class_name, (db.Model,), arguments)
+
+    return Model
+
 
   """
   Delete a column from a table in the database
