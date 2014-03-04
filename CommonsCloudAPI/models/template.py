@@ -321,7 +321,6 @@ class Template(db.Model, CommonsModel):
     if hasattr(template_, 'status'):
       template_.status = template_content.get('status', template_.status)
 
-    print 'updated template_content', template_content, template_.name
 
     db.session.commit()
 

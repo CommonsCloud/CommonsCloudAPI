@@ -91,6 +91,23 @@ def field_post(template_id):
   return Field_.endpoint_response(new_field, code=201)
 
 
+"""
+PUT/PATCH
+
+User attempting to access this endpoint must have the `edit`
+permission associated with them in the `user_templates` table
+"""
+@module.route('/template/<int:template_id>/field/<int:field_id>/', methods=['PUT', 'PATCH'])
+# @oauth.require_oauth()
+@permission_required('can_edit')
+def field_update(template_id, field_id):
+
+  Field_ = Field()
+  updated_field = Field_.field_update(request, template_id, field_id)
+
+  return Field_.endpoint_response(updated_field)
+
+
 @module.route('/template/<int:template_id>/field/<int:field_id>/', methods=['DELETE'])
 # @oauth.require_oauth()
 @permission_required('can_delete')

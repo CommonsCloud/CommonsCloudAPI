@@ -208,6 +208,86 @@ class Field(db.Model, CommonsModel):
         return field_
 
     """
+    Update an existing Field in the CommonsCloudAPI
+
+    @param (object) self
+
+    @param (dictionary) request_object
+      The content that is being submitted by the user
+    """
+    def field_update(self, request_object, template_id, field_id):
+
+        """
+        Before attempting to return the field as a JSON object, we need to
+        make sure that we have a saved field to display, otherwise we'll
+        start throwing errors
+        """
+        if not field_id:
+            return abort(404)
+
+
+        """
+        Convert our request object into usable data
+        """
+        field_content = json.loads(request_object.data)
+
+
+        """
+        Fields are directly tied to Templates and really have no life of their
+        own outside of Templates. Because of that we need to instantiate a 
+        Template object that we can work with
+        """
+        field_ = Field().query.get(field_id)
+
+
+        """
+        Part 2: Update the fields that we have data for
+        """
+        if hasattr(field_, 'label'):
+          field_.label = sanitize.sanitize_string(field_content.get('label', field_.label))
+
+        if hasattr(field_, 'help'):
+          field_.help = sanitize.sanitize_string(field_content.get('help', field_.help))
+
+        if hasattr(field_, 'is_listed'):
+          field_.is_listed = field_content.get('is_listed', field_.is_listed)
+
+        if hasattr(field_, 'is_searchable'):
+          field_.is_searchable = field_content.get('is_searchable', field_.is_searchable)
+
+        if hasattr(field_, 'is_required'):
+          field_.is_required = field_content.get('is_required', field_.is_required)
+
+        if hasattr(field_, 'weight'):
+          field_.weight = field_content.get('weight', field_.weight)
+
+        if hasattr(field_, 'status'):
+          field_.status = field_content.get('status', field_.status)
+
+
+        #
+        # @todo
+        #    We should probably make the 'name' of the field change if the
+        #    user can change the label ... but I'm not sure at the same time.
+        #    Could that mess up existing applications? Does it matter?
+        #
+
+        #
+        # @todo
+        #    We probably need to make the API capable of changing
+        #    data_types, after all, PostgreSQL does it out of the box
+        #
+        # @see
+        #    http://www.postgresql.org/docs/9.3/static/sql-altertable.html
+        #
+
+
+        db.session.commit()
+
+        return field_
+
+
+    """
     Retrieve an existing Field from the CommonsCloudAPI
 
     @param (object) self
