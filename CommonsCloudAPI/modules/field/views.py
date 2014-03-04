@@ -42,6 +42,28 @@ from CommonsCloudAPI.models.field import Field
 from .permissions import permission_required
 
 
+"""
+A list of templates that belongs to a specific application
+"""
+@module.route('/template/<int:template_id>/fields/', methods=['GET'])
+# @oauth.require_oauth()
+def template_fields_get(template_id):
+
+  Field_ = Field()
+  these_fields = Field_.template_fields_get(template_id)
+
+  if type(these_fields) is 'Response':
+    return these_fields, these_fields.code
+
+  arguments = {
+    'the_content': these_fields,
+    'list_name': 'fields'
+  }
+
+  return Field_.endpoint_response(**arguments)
+
+
+
 @module.route('/template/<int:template_id>/field/', methods=['POST'])
 # @oauth.require_oauth()
 def field_post(template_id):
@@ -50,3 +72,4 @@ def field_post(template_id):
   new_field = Field_.field_create(request, template_id)
 
   return Field_.endpoint_response(new_field, code=201)
+

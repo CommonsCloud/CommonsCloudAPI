@@ -90,6 +90,8 @@ A field that helps make up a Template within CommonsCloudAPI
 """
 class Field(db.Model, CommonsModel):
   
+    __public__ = ['id', 'label', 'name', 'help', 'data_type', 'relationship', 'is_listed', 'is_searchable', 'is_required', 'weight', 'status']
+
     __tablename__ = 'field'
     __table_args__ = {
         'extend_existing': True
@@ -302,4 +304,37 @@ class Field(db.Model, CommonsModel):
         db.session.commit()
 
         return new_field
+
+    """
+    Get a list of field ids for the current template and convert
+    them into a list of numbers so that our SQLAlchemy query can
+    understand what's going on
+
+    @param (object) self
+
+    @return (list) field
+        A list of fields the current user has access to
+    """
+    def _template_fields_id_list(self, template_id):
+
+        template_ = Template.query.get(template_id)
+
+        fields_ = []
+
+        for field in template_.fields:
+            fields_.append(field.field_id)
+
+        return fields_
+
+
+    """
+    Get a list of Fields that belong to this Template
+
+    """
+    def template_fields_get(self, template_id):
+    
+        field_id_list = self._template_fields_id_list(template_id)
+        fields_ = Field.query.filter(Field.id.in_(field_id_list)).all()
+
+        return fields_
 
