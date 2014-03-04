@@ -351,10 +351,15 @@ class Field(db.Model, CommonsModel):
         A boolean to indicate if the deletion was succesful
 
     """
-    def field_delete(self, field_id):
+    def field_delete(self, template_id, field_id):
 
+        template_ = Template.query.get(template_id)
         field_ = Field.query.get(field_id)
+
+        self.delete_storage_field(template_, field_)
+
         db.session.delete(field_)
         db.session.commit()
 
         return True
+

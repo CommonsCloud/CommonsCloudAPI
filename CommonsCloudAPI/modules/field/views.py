@@ -79,6 +79,6 @@ def field_post(template_id):
 @permission_required('can_delete')
 def field_delete(template_id, field_id):
 
-  Field().field_delete(field_id)
+  Field().field_delete(template_id, field_id)
 
   return status_.status_204(), 204

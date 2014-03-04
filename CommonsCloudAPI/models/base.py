@@ -338,6 +338,47 @@ class CommonsModel(object):
     return new_column
 
 
+
+  """
+  Delete a column from a table in the database
+
+  @param (object) field
+      A fully qualfied Field object
+
+  @see Documentation on the db.Column.drop() functionality
+      https://sqlalchemy-migrate.readthedocs.org/en/latest/api.html \
+        #migrate.changeset.schema.ChangesetColumn.drop
+  """
+  def delete_storage_field(self, template, field):
+
+    """
+    Create a new custom table for a Feature Type
+    """
+    exisitng_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+
+    """
+    We must bind the engine to the metadata here in order for our fields to
+    recognize the existing Table we have loaded in the following steps
+    """
+    db.metadata.bind = db.engine
+
+    print dir(exisitng_table.c)
+
+    # """
+    # Retrieve the appropriate field data type that we'll be using to create the
+    # field in our database table
+    # """
+    # field_type = self.generate_field_type(field, template)
+
+    # """
+    # Create the new column just like we would if we were hard coding the model
+    # """
+    # existing_column = db.Column(field.name, field_type)
+    exisitng_table.c[field.name].drop()
+    
+    return True
+
+
   """
   Create a valid response to be served to the user
 
