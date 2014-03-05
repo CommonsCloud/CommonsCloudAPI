@@ -265,9 +265,6 @@ class Template(db.Model, CommonsModel):
 
     templates_ = []
 
-    if not hasattr(current_user, 'id'):
-      return abort(401)
-
     for template in current_user.templates:
       templates_.append(template.template_id)
 
@@ -464,3 +461,6 @@ class Template(db.Model, CommonsModel):
     templates_ = Template.query.filter(Template.id.in_(template_id_list)).all()
 
     return templates_
+
+
+

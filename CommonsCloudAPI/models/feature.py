@@ -34,6 +34,7 @@ Import Commons Cloud Dependencies
 from CommonsCloudAPI.models.base import CommonsModel
 
 from CommonsCloudAPI.models.template import Template
+from CommonsCloudAPI.models.field import Field
 
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
@@ -59,8 +60,6 @@ class Feature(CommonsModel):
 
         Storage_ = self.get_storage(Template_)
 
-        print dir(Storage_)
-
         content_ = json.loads(request_object.data)
 
         content_['created'] = content_.get('created', datetime.now())
@@ -73,14 +72,45 @@ class Feature(CommonsModel):
 
         return new_feature
 
-    def feature_get(self, template_id, feature_id):
-        pass
+    def feature_get(self, storage, feature_id):
 
-    def feature_list(self):
-        pass
+        Template_ = Template()
+        Field_ = Field()
+
+        this_template = Template_.query.filter_by(storage=storage).first()
+        fields_ = Field_.template_fields_get(this_template.id)
+
+        Storage_ = self.get_storage(this_template, fields_)
+
+        feature = Storage_.query.get(feature_id)
+
+        return feature
+
+    def feature_list(self, storage):
+
+        Template_ = Template.query.filter_by(storage=storage).first()
+        Storage_ = self.get_storage(Template_)
+
+        features = Storage_.query.all()
+
+        return features
 
     def feature_update(self, request_object, template_id, feature_id):
         pass
 
-    def feature_delete(self, template_id, feature_id):
-        pass
+    def feature_delete(self, storage, feature_id):
+        
+        this_template = Template.query.filter_by(storage=storage).first()
+
+        Storage_ = self.get_storage(this_template)
+
+        feature = Storage_.query.get(feature_id)
+
+        if not hasattr(feature, 'id'):
+            return abort(404)
+
+        db.session.delete(feature)
+        db.session.commit()
+
+        return True
+

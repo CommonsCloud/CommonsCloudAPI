@@ -54,7 +54,7 @@ from CommonsCloudAPI.utilities.format_json import JSON
 
 class CommonsModel(object):
 
-  __public__ = None
+  __public__ = ['id', 'name', 'created', 'status']
   __public_relationships__ = None
 
   def __init__(self):
@@ -338,7 +338,7 @@ class CommonsModel(object):
     return new_column
 
 
-  def get_storage(self, template):
+  def get_storage(self, template, fields=[]):
 
     """
     Load an existing table into our metadata
@@ -363,6 +363,20 @@ class CommonsModel(object):
 
 
     Model = type(class_name, (db.Model,), arguments)
+
+    """
+    For the API to return items properly, we should check to see if the fields
+    we are attempting to call are marked as listed or not.
+    """
+    if fields:
+        
+      public_fields = self.__public__
+
+      for field in fields:
+        if field.is_listed:
+          public_fields.append(field.name)
+
+      self.__public__ = public_fields
 
     return Model
 
