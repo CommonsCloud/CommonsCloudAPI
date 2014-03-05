@@ -84,6 +84,9 @@ class Feature(CommonsModel):
 
         feature = Storage_.query.get(feature_id)
 
+        if not hasattr(feature, 'id'):
+            return abort(404)
+
         return feature
 
     def feature_list(self, storage):
