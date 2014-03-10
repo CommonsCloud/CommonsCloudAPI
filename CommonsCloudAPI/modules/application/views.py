@@ -14,24 +14,18 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-from flask import jsonify
-from flask import redirect
 from flask import request
-from flask import url_for
-
-from flask.ext.security import current_user
-
-
-from CommonsCloudAPI.extensions import oauth
-from CommonsCloudAPI.extensions import status as status_
 
 
 """
 Import Application Module Dependencies
 """
-from . import module
+from CommonsCloudAPI.extensions import oauth
+from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.application import Application
+
+from . import module
 
 from .permissions import permission_required
 
