@@ -40,9 +40,6 @@ from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.application import Application
 
-from CommonsCloudAPI.utilities.format_csv import CSV
-from CommonsCloudAPI.utilities.format_json import JSON
-
 
 """
 Application to Template Association

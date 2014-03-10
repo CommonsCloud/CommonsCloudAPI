@@ -37,9 +37,6 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
-from CommonsCloudAPI.utilities.format_csv import CSV
-from CommonsCloudAPI.utilities.format_json import JSON
-
 
 class UserApplications(db.Model, CommonsModel):
 
@@ -95,9 +92,6 @@ class Application(db.Model, CommonsModel):
       The content that is being submitted by the user
   """
   def application_create(self, request_object):
-
-    if not hasattr(current_user, 'id'):
-      return abort(401)
 
     """
     Make sure we can use the request data as json

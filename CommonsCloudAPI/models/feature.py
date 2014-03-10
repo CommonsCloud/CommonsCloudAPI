@@ -40,9 +40,6 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
-from CommonsCloudAPI.utilities.format_csv import CSV
-from CommonsCloudAPI.utilities.format_json import JSON
-
 
 """
 Define our individual models
