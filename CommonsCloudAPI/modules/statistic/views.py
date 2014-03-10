@@ -28,17 +28,33 @@ from CommonsCloudAPI.models.statistic import Statistic
 from . import module
 
 
-@module.route('/template/<int:template_id>/statistics/', methods=['GET'])
+"""
+CREATE
+
+Everyone that has a user account can add new applications, however
+in the future we should figure out what the repercussions of that are.
+"""
+@module.route('/statistic/', methods=['POST'])
 # @oauth.require_oauth()
-def statistic_list(template_id):
+def statistic_post():
 
   Statistic_ = Statistic()
+  new_statistic = Statistic_.statistic_create(request)
 
-  statistics_ = Statistic_.statistic_list()
+  return Statistic_.endpoint_response(new_statistic, 201)
 
-  arguments = {
-    'the_content': statistics_,
-    'list_name': 'statistics'
-  }
 
-  return Statistic_.endpoint_response(**arguments)
+# @module.route('/template/<int:template_id>/statistics/', methods=['GET'])
+# # @oauth.require_oauth()
+# def statistic_list(template_id):
+
+#   Statistic_ = Statistic()
+
+#   statistics_ = Statistic_.statistic_list()
+
+#   arguments = {
+#     'the_content': statistics_,
+#     'list_name': 'statistics'
+#   }
+
+#   return Statistic_.endpoint_response(**arguments)

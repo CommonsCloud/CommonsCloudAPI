@@ -14,6 +14,7 @@ limitations under the License.
 """
 Import Python Dependencies
 """
+import json
 from datetime import datetime
 
 
@@ -35,6 +36,23 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
+from CommonsCloudAPI.models.field import Field
+
+
+"""
+Field to Statistic Association
+"""
+class StatisticField(db.Model):
+
+    __tablename__ = 'statistic_field'
+    __table_args__ = {
+        'extend_existing': True
+    }
+
+    field_id = db.Column(db.Integer(), db.ForeignKey('field.id'), primary_key=True)
+    statistic_id = db.Column(db.Integer(), db.ForeignKey('statistic.id'), primary_key=True)
+    statistics = db.relationship('Field', backref=db.backref("statistic_field", cascade="all,delete"))
+
 
 """
 Define our individual models
@@ -53,14 +71,78 @@ class Statistic(db.Model, CommonsModel):
     function = db.Column(db.String(24))
     created = db.Column(db.DateTime)
     status = db.Column(db.Boolean)
-    templates = db.relationship('TemplateStatistics', backref=db.backref('template'))
-    field = db.relationship('StatisticField', backref=db.backref('field'))
+    field = db.relationship('StatisticField', backref=db.backref('statistic'))
 
-    def __init__(self, name="", units="", function="SUM", created=datetime.now(), status=True, templates=[], field=[]):
+    def __init__(self, name="", units="", function="SUM", created=datetime.now(), status=True, field=[]):
         self.name = name
         self.units = units
         self.function = function
         self.created = created
         self.status = status
-        self.templates = templates
         self.field = field
+
+
+    """
+    Create a new statistic in the CommonsCloudAPI
+
+    @param (object) self
+
+    @param (dictionary) request_object
+      The content that is being submitted by the user
+    """
+    def statistic_create(self, request_object):
+
+        """
+        Make sure we can use the request data as json
+        """
+        statistic_content = json.loads(request_object.data)
+
+
+        if not statistic_content.get('field_id', ''):
+            return abort(400, 'A Field ID is required to create a statistic')
+
+        """
+        Part 1: Add the new application to the database
+        """
+        new_statistic = {
+          'name': sanitize.sanitize_string(statistic_content.get('name', '')),
+          'units': sanitize.sanitize_string(statistic_content.get('units', '')),
+          'function': sanitize.sanitize_string(statistic_content.get('function', '')),
+        }
+
+        statistic_ = Statistic(**new_statistic)
+
+        db.session.add(statistic_)
+        db.session.commit()
+
+
+        self.set_statistic_field_relationship(statistic_, statistic_content.get('field_id', ''))
+
+        return statistic_
+
+
+    def set_statistic_field_relationship(self, statistic, field_id):
+
+        """
+        Start a new Permission object
+        """
+        new_statistic = StatisticField()
+
+        """
+        Set the ID of the Application to act upon
+        """
+        field_ = Field.query.get(field_id)
+
+        if not hasattr(field_, 'id'):
+            return abort(404)
+
+        new_statistic.field_id = field_.id
+
+        """
+        Add the new permissions defined with the user defined
+        """
+        statistic.field.append(new_statistic)
+        db.session.commit()
+
+        return new_statistic
+
