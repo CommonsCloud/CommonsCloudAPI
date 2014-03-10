@@ -14,15 +14,12 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-from flask import current_app
-from flask import jsonify
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
 
 from flask.ext.security import current_user
-from flask.ext.security import login_required
 
 """
 Import CommonsCloudAPI Dependencies
@@ -32,13 +29,6 @@ from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.user import User
 
-from CommonsCloudAPI.utilities.format_csv import CSV
-from CommonsCloudAPI.utilities.format_json import JSON
-
-
-"""
-Import Module Dependencies
-"""
 from . import module
 
 
@@ -51,7 +41,6 @@ def index():
 
 
 @module.route('/user/me/', methods=['GET'])
-@login_required
 def user_me():
 
   if not current_user.is_authenticated():
@@ -67,15 +56,17 @@ def user_me():
 
 
 @module.route('/user/profile/', methods=['GET'])
-@login_required
 def user_profile_get():
+
+  if not current_user.is_authenticated():
+    return status_.status_401(), 401
+
   user_ = User()
   this_user = user_.user_get(current_user.id)
   return render_template('user/profile.html', user=this_user), 200
 
 
 @module.route('/user/profile/', methods=['POST'])
-@login_required
 def user_profile_post():
 
   if not current_user.is_authenticated():
