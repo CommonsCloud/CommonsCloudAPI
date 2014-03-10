@@ -30,7 +30,7 @@ Import CommonsCloudAPI Dependencies
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import status as status_
 
-from .models import User
+from CommonsCloudAPI.models.user import User
 
 from CommonsCloudAPI.utilities.format_csv import CSV
 from CommonsCloudAPI.utilities.format_json import JSON
@@ -49,6 +49,7 @@ Basic route for currently logged in user
 def index():
   return redirect('/user/me/?format=json')
 
+
 @module.route('/user/me/', methods=['GET'])
 @login_required
 def user_me():
@@ -56,24 +57,13 @@ def user_me():
   if not current_user.is_authenticated():
     return status_.status_401(), 401
 
-  """
-  If the user is properly authenticated, then proceed to see if they
-  have requests a type of content we serve
-  """
-  if request.headers['Content-Type'] == 'application/json' or ('format' in request.args and request.args['format'] == 'json'):
-    this_data = JSON(current_user, serialize=True, exclude_fields=['password'])
-    return this_data.create(), 200
+  arguments = {
+    'the_content': current_user,
+    'exclude_fields': ['password']
 
-  elif request.headers['Content-Type'] == 'text/csv' or ('format' in request.args and request.args['format'] == 'csv'):
-    this_data = CSV(current_user, serialize=True, exclude_fields=['password'])
-    return this_data.create(), 200
+  }
 
-
-  """
-  If the user hasn't requested a specific content type then we should
-  tell them that, by directing them to an "Unsupported Media Type"
-  """
-  return status_.status_415(), 415
+  return User().endpoint_response(**arguments)
 
 
 @module.route('/user/profile/', methods=['GET'])

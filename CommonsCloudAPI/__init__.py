@@ -60,7 +60,7 @@ def create_application(name = __name__, env = 'testing'):
     We cannot load the security information until after our blueprints
     have been loaded into our application.
     """
-    from user.models import user_datastore
+    from CommonsCloudAPI.models.user import user_datastore
     security.init_app(app, user_datastore)
     
     # Initialize our database and create tables

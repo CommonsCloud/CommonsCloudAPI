@@ -55,6 +55,8 @@ class JSON(FormatContent):
   """
   def create(self):
 
+    print self.the_content
+
     today = datetime.utcnow()
     expires =  today + timedelta(+30)
 
