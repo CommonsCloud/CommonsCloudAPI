@@ -146,3 +146,24 @@ class Statistic(db.Model, CommonsModel):
 
         return new_statistic
 
+
+    """
+    Delete an existing Statistic from the CommonsCloudAPI
+
+    @param (object) self
+
+    @param (int) statistic_id
+        The unique ID of the Field to be retrieved from the system
+
+    @return (bool)
+        A boolean to indicate if the deletion was succesful
+
+    """
+    def statistic_delete(self, statistic_id):
+
+        statistic_ = Statistic.query.get(statistic_id)
+
+        db.session.delete(statistic_)
+        db.session.commit()
+
+        return True

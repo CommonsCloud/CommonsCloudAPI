@@ -58,3 +58,18 @@ def statistic_post():
 #   }
 
 #   return Statistic_.endpoint_response(**arguments)
+
+
+"""
+DELETE
+
+User attempting to access this endpoint must have the `delete`
+permission associated with them in the `user_applications` table
+"""
+@module.route('/statistic/<int:statistic_id>/', methods=['DELETE'])
+# @oauth.require_oauth()
+def statistic_delete(statistic_id):
+
+  Statistic().statistic_delete(statistic_id)
+
+  return status_.status_204(), 204
