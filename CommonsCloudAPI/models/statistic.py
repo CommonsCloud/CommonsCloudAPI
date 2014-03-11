@@ -22,9 +22,6 @@ from datetime import datetime
 Import Flask Dependencies
 """
 from flask import abort
-from flask import request
-
-from flask.ext.security import current_user
 
 
 """
@@ -34,9 +31,6 @@ from CommonsCloudAPI.models.base import CommonsModel
 
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
-from CommonsCloudAPI.extensions import status as status_
-
-from CommonsCloudAPI.models.field import Field
 
 
 """
@@ -110,7 +104,7 @@ class Statistic(db.Model, CommonsModel):
     @param (object) self
 
     @param (int) statistic_id
-        The unique ID of the Field to be retrieved from the system
+        The unique ID of the Statistic to be retrieved from the system
 
     @return (bool)
         A boolean to indicate if the deletion was succesful
