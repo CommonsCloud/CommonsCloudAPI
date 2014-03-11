@@ -40,21 +40,6 @@ from CommonsCloudAPI.models.field import Field
 
 
 """
-Field to Statistic Association
-"""
-class StatisticField(db.Model):
-
-    __tablename__ = 'statistic_field'
-    __table_args__ = {
-        'extend_existing': True
-    }
-
-    field_id = db.Column(db.Integer(), db.ForeignKey('field.id'), primary_key=True)
-    statistic_id = db.Column(db.Integer(), db.ForeignKey('statistic.id'), primary_key=True)
-    statistics = db.relationship('Field', backref=db.backref("statistic_field", cascade="all,delete"))
-
-
-"""
 Define our individual models
 """
 class Statistic(db.Model, CommonsModel):
@@ -71,15 +56,15 @@ class Statistic(db.Model, CommonsModel):
     function = db.Column(db.String(24))
     created = db.Column(db.DateTime)
     status = db.Column(db.Boolean)
-    field = db.relationship('StatisticField', backref=db.backref('statistic'))
+    field_id = db.Column(db.Integer, db.ForeignKey('field.id'))
 
-    def __init__(self, name="", units="", function="SUM", created=datetime.now(), status=True, field=[]):
+    def __init__(self, name="", units="", function="SUM", created=datetime.now(), status=True, field_id=""):
         self.name = name
         self.units = units
         self.function = function
         self.created = created
         self.status = status
-        self.field = field
+        self.field_id = field_id
 
 
     """
@@ -108,6 +93,7 @@ class Statistic(db.Model, CommonsModel):
           'name': sanitize.sanitize_string(statistic_content.get('name', '')),
           'units': sanitize.sanitize_string(statistic_content.get('units', '')),
           'function': sanitize.sanitize_string(statistic_content.get('function', '')),
+          'field_id': statistic_content.get('field_id', '')
         }
 
         statistic_ = Statistic(**new_statistic)
@@ -115,36 +101,7 @@ class Statistic(db.Model, CommonsModel):
         db.session.add(statistic_)
         db.session.commit()
 
-
-        self.set_statistic_field_relationship(statistic_, statistic_content.get('field_id', ''))
-
         return statistic_
-
-
-    def set_statistic_field_relationship(self, statistic, field_id):
-
-        """
-        Start a new Permission object
-        """
-        new_statistic = StatisticField()
-
-        """
-        Set the ID of the Application to act upon
-        """
-        field_ = Field.query.get(field_id)
-
-        if not hasattr(field_, 'id'):
-            return abort(404)
-
-        new_statistic.field_id = field_.id
-
-        """
-        Add the new permissions defined with the user defined
-        """
-        statistic.field.append(new_statistic)
-        db.session.commit()
-
-        return new_statistic
 
 
     """
@@ -162,7 +119,6 @@ class Statistic(db.Model, CommonsModel):
     def statistic_delete(self, statistic_id):
 
         statistic_ = Statistic.query.get(statistic_id)
-
         db.session.delete(statistic_)
         db.session.commit()
 

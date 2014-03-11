@@ -105,6 +105,7 @@ class Field(db.Model, CommonsModel):
     is_required = db.Column(db.Boolean)
     weight = db.Column(db.Integer)
     status = db.Column(db.Boolean)
+    statistics = db.relationship('Statistic', backref=db.backref('field'))
 
     def __init__(self, label="", name="", help="", data_type="", relationship="", is_listed=True, is_searchable=False, is_required=False, weight="", status=True):
         self.label = label
