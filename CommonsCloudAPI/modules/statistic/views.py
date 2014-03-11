@@ -44,6 +44,16 @@ def statistic_post():
   return Statistic_.endpoint_response(new_statistic, 201)
 
 
+@module.route('/statistic/<int:statistic_id>/', methods=['PUT', 'PATCH'])
+# @oauth.require_oauth()
+def statistic_update(statistic_id):
+
+  Statistic_ = Statistic()
+  updated_statistic = Statistic_.statistic_update(statistic_id, request)
+
+  return Statistic_.endpoint_response(updated_statistic, 200)
+
+
 # @module.route('/template/<int:template_id>/statistics/', methods=['GET'])
 # # @oauth.require_oauth()
 # def statistic_list(template_id):

@@ -99,6 +99,47 @@ class Statistic(db.Model, CommonsModel):
 
 
     """
+    Update an existing statistic in the CommonsCloudAPI
+
+    @param (object) self
+
+    @param (dictionary) request_object
+      The content that is being submitted by the user
+    """
+    def statistic_update(self, statistic_id, request_object):
+
+        """
+        Make sure we can use the request data as json
+        """
+        statistic_ = Statistic.query.get(statistic_id)
+        statistic_content = json.loads(request_object.data)
+
+        """
+        Part 2: Update the fields that we have data for
+        """
+        if hasattr(statistic_, 'name'):
+          statistic_.name = sanitize.sanitize_string(statistic_content.get('name', statistic_.name))
+
+        if hasattr(statistic_, 'units'):
+          statistic_.units = sanitize.sanitize_string(statistic_content.get('units', statistic_.units))
+
+        if hasattr(statistic_, 'function'):
+          statistic_.function = sanitize.sanitize_string(statistic_content.get('function', statistic_.function))
+
+        if hasattr(statistic_, 'field_id'):
+          statistic_.field_id = statistic_content.get('field_id', statistic_.field_id)
+
+        if hasattr(statistic_, 'status'):
+          statistic_.status = statistic_content.get('status', statistic_.status)
+
+
+        db.session.commit()
+
+        return statistic_
+
+
+
+    """
     Delete an existing Statistic from the CommonsCloudAPI
 
     @param (object) self
@@ -117,3 +158,4 @@ class Statistic(db.Model, CommonsModel):
         db.session.commit()
 
         return True
+
