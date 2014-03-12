@@ -92,3 +92,17 @@ def user_profile_post():
 
   return redirect(url_for('user.user_profile_get')), 301
 
+
+@module.route('/template/<int:template_id>/users/', methods=['GET'])
+# @oauth.require_oauth()
+def template_users(template_id):
+
+  user_ = User()
+  template_users = user_.template_users(template_id)
+
+  arguments = {
+    'the_content': template_users,
+    'list_name': 'users'
+  }
+
+  return user_.endpoint_response(**arguments)

@@ -183,7 +183,7 @@ class Template(db.Model, CommonsModel):
     db.session.commit()
 
     """
-    Part X: Tell the system what user should have permission to
+    Tell the system what user should have permission to
     access the newly created application
     """
     permission = {
@@ -198,6 +198,7 @@ class Template(db.Model, CommonsModel):
 
 
     """
+    Tell the system what Application this template belongs to
     """
     application_ = Application().query.get(application_id)
 
@@ -206,9 +207,13 @@ class Template(db.Model, CommonsModel):
 
     self.set_application_template_relationship(template_, application_)
 
-    print "all relationships done, let's update that column"
+
+    """
+    Add an 'owner' field to the Storage engine here, because we can't
+    do it in the 'create_storage' because of the User model stepping on
+    itself and causing problems with permissions
+    """
     self.create_owner_field(template_)
-    print "done adding column"
 
     return template_
 

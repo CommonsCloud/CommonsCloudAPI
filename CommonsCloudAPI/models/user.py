@@ -30,6 +30,8 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 
 from CommonsCloudAPI.models.base import CommonsModel
+from CommonsCloudAPI.models.template import UserTemplates
+
 
 
 user_roles = db.Table('user_roles',
@@ -222,6 +224,29 @@ class User(db.Model, UserMixin, CommonsModel):
   """
   def user_remove(self):
     pass
+
+
+  def template_users(self, template_id):    
+
+    user_id_list = self._template_user_id_list(template_id)
+    users_list = User.query.filter(User.id.in_(user_id_list)).all()
+
+    print users_list
+
+    return users_list
+
+
+  def _template_user_id_list(self, template_id):
+
+    users_ = UserTemplates.query.filter_by(template_id=template_id).all()
+
+    users_id_list = []
+
+    for user_ in users_:
+      users_id_list.append(user_.user_id)
+
+    return users_id_list
+
 
 """
 The last thing we need to do is actually hook these things up to the

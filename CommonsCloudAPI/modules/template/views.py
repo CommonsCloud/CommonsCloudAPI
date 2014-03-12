@@ -119,3 +119,4 @@ def template_delete(template_id):
   Template().template_delete(template_id)
 
   return status_.status_204(), 204
+
