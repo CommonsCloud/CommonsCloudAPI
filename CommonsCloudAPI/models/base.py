@@ -119,7 +119,8 @@ class CommonsModel(object):
       for object_ in _content:
         result = OrderedDict()
         for key in object_.__mapper__.c.keys():
-          result[key] = getattr(object_, key)
+          if key in self.__public__:
+            result[key] = getattr(object_, key)
 
         list_.append(result)
 

@@ -20,10 +20,13 @@ from flask import request
 from flask import url_for
 
 from flask.ext.security import current_user
+from flask.ext.security import login_required
 
 """
 Import CommonsCloudAPI Dependencies
 """
+from CommonsCloudAPI.extensions import oauth
+
 from CommonsCloudAPI.models.user import User
 
 from . import module
@@ -38,25 +41,36 @@ def index():
 
 
 @module.route('/user/me/', methods=['GET'])
+# @oauth.require_oauth()
+@login_required
 def user_me():
-
-  if not current_user.is_authenticated():
-    return redirect('/login')
 
   arguments = {
     'the_content': current_user,
     'exclude_fields': ['password']
-
   }
 
   return User().endpoint_response(**arguments)
 
 
-@module.route('/user/profile/', methods=['GET'])
-def user_profile_get():
+@module.route('/user/list/', methods=['GET'])
+# @oauth.require_oauth()
+def user_list():
 
-  if not current_user.is_authenticated():
-    return redirect('/login')
+  User_ = User()
+  user_list = User_.user_list()
+
+  arguments = {
+    'the_content': user_list,
+    'list_name': 'users'
+  }
+
+  return User_.endpoint_response(**arguments)
+
+
+@module.route('/user/profile/', methods=['GET'])
+@login_required
+def user_profile_get():
 
   user_ = User()
   this_user = user_.user_get(current_user.id)
@@ -64,10 +78,8 @@ def user_profile_get():
 
 
 @module.route('/user/profile/', methods=['POST'])
+@login_required
 def user_profile_post():
-
-  if not current_user.is_authenticated():
-    return redirect('/login')
 
   user_ = User()
   user_.user_update(request.form)

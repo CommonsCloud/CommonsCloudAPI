@@ -130,9 +130,6 @@ class User(db.Model, UserMixin, CommonsModel):
   """
   Get the SQLAlchemy User object for the current_user
 
-  @requires
-      from flask.ext.security import current_user
-
   @param (object) self
 
   @return (object) user_
@@ -142,6 +139,18 @@ class User(db.Model, UserMixin, CommonsModel):
   def user_get(self, user_id):
     user_ = User.query.get(user_id)
     return user_
+
+
+  """
+  Get the a list of User objects for the entire system
+
+  @return (array) users_
+      The array of objects for all users in system
+
+  """
+  def user_list(self):
+    users_ = User.query.all()
+    return users_
 
 
   """
