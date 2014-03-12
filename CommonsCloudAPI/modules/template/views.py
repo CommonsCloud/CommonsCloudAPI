@@ -65,8 +65,6 @@ in the future we should figure out what the repercussions of that are.
 # @oauth.require_oauth()
 def template_post():
 
-  print 'Creating a template'
-
   Template_ = Template()
   new_template = Template_.template_create(request)
 
