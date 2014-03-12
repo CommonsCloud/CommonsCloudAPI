@@ -24,9 +24,6 @@ from flask.ext.security import current_user
 """
 Import CommonsCloudAPI Dependencies
 """
-from CommonsCloudAPI.extensions import db
-from CommonsCloudAPI.extensions import status as status_
-
 from CommonsCloudAPI.models.user import User
 
 from . import module
@@ -37,14 +34,14 @@ Basic route for currently logged in user
 """
 @module.route('/', methods=['GET'])
 def index():
-  return redirect('/user/me/?format=json')
+  return redirect(url_for('user.user_profile_get'))
 
 
 @module.route('/user/me/', methods=['GET'])
 def user_me():
 
   if not current_user.is_authenticated():
-    return status_.status_401(), 401
+    return redirect('/login')
 
   arguments = {
     'the_content': current_user,
@@ -59,7 +56,7 @@ def user_me():
 def user_profile_get():
 
   if not current_user.is_authenticated():
-    return status_.status_401(), 401
+    return redirect('/login')
 
   user_ = User()
   this_user = user_.user_get(current_user.id)
@@ -70,7 +67,7 @@ def user_profile_get():
 def user_profile_post():
 
   if not current_user.is_authenticated():
-    return status_.status_401(), 401
+    return redirect('/login')
 
   user_ = User()
   user_.user_update(request.form)
