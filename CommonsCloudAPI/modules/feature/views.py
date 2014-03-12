@@ -56,14 +56,31 @@ def feature_list(storage):
         return status_.status_500(e), 500
 
 
-@module.route('/<string:storage>/', methods=['GET'])
+@module.route('/feature/<string:storage>/search/', methods=['GET'])
 # @oauth.require_oauth()
 def feature_search(storage):
 
     Feature_ = Feature()
     feature_list = Feature_.feature_search(storage, request.args['q'])
 
-    return feature_list, 200
+    try:
+        return feature_list, 200
+    except Exception as e:
+        return status_.status_500(e), 500
+
+
+@module.route('/feature/<string:storage>/statistic/', methods=['GET'])
+# @oauth.require_oauth()
+def feature_statistic(storage):
+
+    Feature_ = Feature()
+    feature_list = Feature_.feature_statistic(storage, request.args['q'])
+
+    try:
+        return feature_list, 200
+    except Exception as e:
+        return status_.status_500(e), 500
+
 
 
 @module.route('/feature/<string:storage>/<int:feature_id>/', methods=['GET'])

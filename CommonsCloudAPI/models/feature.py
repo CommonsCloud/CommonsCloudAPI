@@ -28,6 +28,8 @@ from flask import request
 from flask.ext.security import current_user
 
 from flask.ext.restless.views import API
+from flask.ext.restless.views import FunctionAPI
+
 
 
 """
@@ -100,8 +102,17 @@ class Feature(CommonsModel):
     def feature_update(self, request_object, template_id, feature_id):
         pass
 
-    def feature_search(self, storage, search_path):
+    def feature_statistic(self, storage, search_path):
 
+        this_template = Template.query.filter_by(storage=storage).first()
+
+        Model_ = self.get_storage(this_template)
+
+        endpoint_ = FunctionAPI(db.session, Model_)
+
+        return endpoint_.get()
+
+    def feature_search(self, storage, search_path):
 
         this_template = Template.query.filter_by(storage=storage).first()
 
@@ -109,11 +120,7 @@ class Feature(CommonsModel):
 
         endpoint_ = API(db.session, Model_)
 
-        query_builder = endpoint_._search()
-
-        print 'Query builder started', query_builder
-
-        return query_builder
+        return endpoint_._search()
 
     def feature_delete(self, storage, feature_id):
         
