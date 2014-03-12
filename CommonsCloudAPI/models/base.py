@@ -273,7 +273,7 @@ class CommonsModel(object):
     http://docs.sqlalchemy.org/en/rel_0_9/faq.html#my-program-is-hanging-when-i-say-table-drop-metadata-drop-all
 
     """
-    db.session.close()
+    # db.session.close()
 
 
     """
@@ -282,8 +282,7 @@ class CommonsModel(object):
     new_table = db.Table(table_name, db.metadata,
       db.Column('id', db.Integer(), primary_key=True),
       db.Column('created', db.DateTime()),
-      db.Column('status', db.String(24), nullable=False),
-      db.Column('owner', db.Integer, db.ForeignKey('user.id'))
+      db.Column('status', db.String(24), nullable=False)
     )
 
    
@@ -347,6 +346,38 @@ class CommonsModel(object):
     restart the application, which would be very bad
     """
     assert new_column is exisitng_table.c[field.name]
+    
+    return new_column
+
+
+  def create_owner_field(self, template):
+
+    if not template.storage:
+      return abort(404)
+    
+    """
+    Create a new custom table for a Feature Type
+    """
+    exisitng_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+
+    """
+    We must bind the engine to the metadata here in order for our fields to
+    recognize the existing Table we have loaded in the following steps
+    """
+    db.metadata.bind = db.engine
+
+    """
+    Create the new column just like we would if we were hard coding the model
+    """
+    new_column = db.Column('owner', db.Integer, db.ForeignKey('user.id'))
+    new_column.create(exisitng_table)
+
+    """
+    Finally we need to make sure that the existing table knows that we've have
+    just added a new column, otherwise we won't be able to use it until we
+    restart the application, which would be very bad
+    """
+    assert new_column is exisitng_table.c['owner']
     
     return new_column
 

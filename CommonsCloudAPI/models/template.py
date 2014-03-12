@@ -156,15 +156,11 @@ class Template(db.Model, CommonsModel):
 
     application_id = int(content_.get('application_id', 0))
 
-    print application_id, 'application_id'
-
     """
     Part 3: Make sure we have a table that has been created in the database
     to associate our Template features with
     """
     storage_name = self.create_storage()
-
-    print storage_name, 'storage_name'
 
     """
     Part X: Add the new application to the database
@@ -185,8 +181,6 @@ class Template(db.Model, CommonsModel):
 
     db.session.add(template_)
     db.session.commit()
-
-    print template_, 'Template created'
 
     """
     Part X: Tell the system what user should have permission to
@@ -211,6 +205,10 @@ class Template(db.Model, CommonsModel):
       return abort(400)
 
     self.set_application_template_relationship(template_, application_)
+
+    print "all relationships done, let's update that column"
+    self.create_owner_field(template_)
+    print "done adding column"
 
     return template_
 
