@@ -272,7 +272,8 @@ class CommonsModel(object):
     new_table = db.Table(table_name, db.metadata,
       db.Column('id', db.Integer, primary_key=True),
       db.Column('created', db.DateTime()),
-      db.Column('status', db.String(24), nullable=False)
+      db.Column('status', db.String(24), nullable=False),
+      db.Column('owner', db.Integer, db.ForeignKey('user.id'))
     )
    
     """

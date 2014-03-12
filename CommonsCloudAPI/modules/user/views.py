@@ -50,7 +50,7 @@ def user_me():
     'exclude_fields': ['password']
   }
 
-  return User().endpoint_response(**arguments), 200
+  return User().endpoint_response(**arguments)
 
 
 @module.route('/user/list/', methods=['GET'])
@@ -65,7 +65,7 @@ def user_list():
     'list_name': 'users'
   }
 
-  return User_.endpoint_response(**arguments), 200
+  return User_.endpoint_response(**arguments)
 
 
 @module.route('/user/profile/', methods=['GET'])

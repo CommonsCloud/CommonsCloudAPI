@@ -83,6 +83,8 @@ class UserTemplates(db.Model, CommonsModel):
   view = db.Column(db.Boolean())
   edit = db.Column(db.Boolean())
   delete = db.Column(db.Boolean())
+  is_moderator = db.Column(db.Boolean())
+  is_admin = db.Column(db.Boolean())
   templates = db.relationship('Template', backref=db.backref("user_templates", cascade="all,delete"))
 
 
