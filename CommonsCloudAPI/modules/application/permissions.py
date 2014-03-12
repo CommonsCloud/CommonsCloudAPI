@@ -40,8 +40,6 @@ class permission_required(object):
         @wraps(f)
         def decorated_function(*args, **kwargs):
 
-          print self.permission_type
-
           permission = check_permissions(kwargs['application_id'])
 
           if not permission.get(self.permission_type, True):
