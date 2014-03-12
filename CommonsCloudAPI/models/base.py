@@ -266,15 +266,26 @@ class CommonsModel(object):
     if not table_name:
       table_name = self.generate_template_hash()
     
+
+    """
+    Why are we closing the session, what gives?
+
+    http://docs.sqlalchemy.org/en/rel_0_9/faq.html#my-program-is-hanging-when-i-say-table-drop-metadata-drop-all
+
+    """
+    db.session.close()
+
+
     """
     Create a new custom table for a Feature Type
     """
     new_table = db.Table(table_name, db.metadata,
-      db.Column('id', db.Integer, primary_key=True),
+      db.Column('id', db.Integer(), primary_key=True),
       db.Column('created', db.DateTime()),
       db.Column('status', db.String(24), nullable=False),
       db.Column('owner', db.Integer, db.ForeignKey('user.id'))
     )
+
    
     """
     Make sure everything commits to the database
