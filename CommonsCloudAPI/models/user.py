@@ -189,9 +189,9 @@ class User(db.Model, UserMixin, CommonsModel):
     """
     Booleans and Arrays are not sanitized right now ... they probably should be
     """
-    user_.active = user_object_.get('active', current_user.active)
-    user_.roles = user_object_.get('roles', current_user.roles)
-    user_.permissions = user_object_.get('permissions', current_user.permissions)
+    # user_.active = user_object_.get('active', current_user.active)
+    # user_.roles = user_object_.get('roles', current_user.roles)
+    # user_.permissions = user_object_.get('permissions', current_user.permissions)
 
     """
     Save all of our updates to the database
