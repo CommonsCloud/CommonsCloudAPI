@@ -32,6 +32,9 @@ from CommonsCloudAPI.models.user import User
 from . import module
 
 
+from CommonsCloudAPI.modules.template.permissions import permission_required
+
+
 """
 Basic route for currently logged in user
 """
@@ -95,6 +98,7 @@ def user_profile_post():
 
 @module.route('/template/<int:template_id>/users/', methods=['GET'])
 # @oauth.require_oauth()
+@permission_required('is_admin')
 def template_users(template_id):
 
   user_ = User()

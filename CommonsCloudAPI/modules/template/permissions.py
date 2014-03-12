@@ -42,6 +42,8 @@ class permission_required(object):
 
           permission = check_permissions(kwargs['template_id'])
 
+          print permission
+
           if not permission.get(self.permission_type, True):
             return status_.status_401(), 401
      
@@ -76,6 +78,18 @@ class DeleteTemplatePermission(Permission):
         need = DeleteTemplateNeed(template_id)
         super(DeleteTemplatePermission, self).__init__(need)
 
+AdminTemplateNeed = partial(TemplateNeed, 'delete')
+class AdminTemplatePermission(Permission):
+    def __init__(self, template_id):
+        need = AdminTemplateNeed(template_id)
+        super(AdminTemplatePermission, self).__init__(need)
+
+ModerateTemplateNeed = partial(TemplateNeed, 'delete')
+class ModerateTemplatePermission(Permission):
+    def __init__(self, template_id):
+        need = ModerateTemplateNeed(template_id)
+        super(ModerateTemplatePermission, self).__init__(need)
+
 
 """
 Returns a list of possible permissions for the current template
@@ -92,6 +106,8 @@ def check_permissions(template_id):
   return {
     'can_view': ViewTemplatePermission(template_id).can(),
     'can_edit': EditTemplatePermission(template_id).can(),
-    'can_delete': DeleteTemplatePermission(template_id).can()
+    'can_delete': DeleteTemplatePermission(template_id).can(),
+    'is_admin': AdminTemplatePermission(template_id).can(),
+    'is_moderator': ModerateTemplatePermission(template_id).can()
   }
 
