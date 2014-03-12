@@ -61,6 +61,9 @@ class Feature(CommonsModel):
 
         Storage_ = self.get_storage(Template_)
 
+        print 'Storage_'
+        print dir(Storage_)
+
         content_ = json.loads(request_object.data)
 
         content_['created'] = content_.get('created', datetime.now())
