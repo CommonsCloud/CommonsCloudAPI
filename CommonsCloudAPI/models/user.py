@@ -210,6 +210,19 @@ class User(db.Model, UserMixin, CommonsModel):
     return user_
 
 
+  """
+  Remove a user entirely from our system
+
+  This should be a multiple step process:
+
+  1. User arrives at the "Remove account" page
+  2. Message is displayed warning the user of ramifications of account removal
+  3. User must type in their current password
+
+  """
+  def user_remove(self):
+    pass
+
 """
 The last thing we need to do is actually hook these things up to the
 User Datastore provided by SQLAlchemy's Engine's datastore that provides

@@ -37,7 +37,7 @@ Basic route for currently logged in user
 """
 @module.route('/', methods=['GET'])
 def index():
-  return redirect(url_for('user.user_profile_get'))
+  return redirect(url_for('user.user_profile_get')), 301
 
 
 @module.route('/user/me/', methods=['GET'])
@@ -50,7 +50,7 @@ def user_me():
     'exclude_fields': ['password']
   }
 
-  return User().endpoint_response(**arguments)
+  return User().endpoint_response(**arguments), 200
 
 
 @module.route('/user/list/', methods=['GET'])
@@ -65,7 +65,7 @@ def user_list():
     'list_name': 'users'
   }
 
-  return User_.endpoint_response(**arguments)
+  return User_.endpoint_response(**arguments), 200
 
 
 @module.route('/user/profile/', methods=['GET'])
@@ -77,6 +77,12 @@ def user_profile_get():
   return render_template('user/profile.html', user=this_user), 200
 
 
+# @module.route('/user/remove/', methods=['GET', 'POST'])
+# @login_required
+# def user_remove():
+#   return render_template('user/remove.html', user=current_user), 200
+
+
 @module.route('/user/profile/', methods=['POST'])
 @login_required
 def user_profile_post():
@@ -84,5 +90,5 @@ def user_profile_post():
   user_ = User()
   user_.user_update(request.form)
 
-  return redirect(url_for('user.user_profile_get'))
+  return redirect(url_for('user.user_profile_get')), 301
 

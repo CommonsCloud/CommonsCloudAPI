@@ -1,0 +1,17 @@
+{% extends "default.html" %}
+
+{% block content %}
+
+      <h1>Remove my account</h1>
+
+      <form method="POST" action="{{ url_for('user.user_remove') }}" id="user_remove_form" name="user_remove_form">
+
+        <p></p>
+
+        <div class="form-actions">
+          <input type="submit" id="submit" name="submit" class="button large" value="Delete" tabindex="3" />
+        </div>
+
+      </form>
+
+{% endblock %}
