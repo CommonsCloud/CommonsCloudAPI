@@ -43,29 +43,31 @@ def index():
   return redirect(url_for('user.user_profile_get')), 301
 
 
-@module.route('/user/me/', methods=['GET'])
+@module.route('/user/me.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 @login_required
-def user_me():
+def user_me(extension):
 
   arguments = {
     'the_content': current_user,
-    'exclude_fields': ['password']
+    'exclude_fields': ['password'],
+    'extension': extension
   }
 
   return User().endpoint_response(**arguments)
 
 
-@module.route('/v2/users/list/', methods=['GET'])
+@module.route('/v2/users/list.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-def user_list():
+def user_list(extension):
 
   User_ = User()
   user_list = User_.user_list()
 
   arguments = {
     'the_content': user_list,
-    'list_name': 'users'
+    'list_name': 'users',
+    'extension': extension
   }
 
   return User_.endpoint_response(**arguments)
@@ -96,17 +98,18 @@ def user_profile_post():
   return redirect(url_for('user.user_profile_get')), 301
 
 
-@module.route('/v2/templates/<int:template_id>/users/', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 @permission_required('is_admin')
-def template_users(template_id):
+def template_users(template_id, extension):
 
   user_ = User()
   template_users = user_.template_users(template_id)
 
   arguments = {
     'the_content': template_users,
-    'list_name': 'users'
+    'list_name': 'users',
+    'extension': extension
   }
 
   return user_.endpoint_response(**arguments)

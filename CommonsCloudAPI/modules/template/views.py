@@ -30,16 +30,16 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/v2/templates/', methods=['GET'])
+@module.route('/v2/templates.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-def template_list():
+def template_list(extension):
 
   return status_.status_303(), 303
 
 
-@module.route('/v2/applications/<int:application_id>/templates/', methods=['GET'])
+@module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-def application_templates_get(application_id):
+def application_templates_get(application_id, extension):
 
   Template_ = Template()
   these_templates = Template_.application_templates_get(application_id)
@@ -49,48 +49,65 @@ def application_templates_get(application_id):
 
   arguments = {
     'the_content': these_templates,
-    'list_name': 'templates'
+    'list_name': 'templates',
+    'extension': extension
   }
 
   return Template_.endpoint_response(**arguments)
 
 
-@module.route('/v2/templates/', methods=['POST'])
+@module.route('/v2/templates.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
-def template_post():
+def template_post(extension):
 
   Template_ = Template()
   new_template = Template_.template_create(request)
 
-  return Template_.endpoint_response(new_template, code=201)
+  arguments = {
+    'the_content': new_template,
+    'extension': extension,
+    'code': 201
+  }
+
+  return Template_.endpoint_response(**arguments)
 
 
-@module.route('/v2/templates/<int:template_id>/', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 @permission_required('can_view')
-def template_get(template_id):
+def template_get(template_id, extension):
 
   Template_ = Template()
   this_template = Template_.template_get(template_id)
 
-  return Template_.endpoint_response(this_template)
+  arguments = {
+    'the_content': this_template,
+    'extension': extension
+  }
+
+  return Template_.endpoint_response(**arguments)
 
 
-@module.route('/v2/templates/<int:template_id>/', methods=['PUT', 'PATCH'])
+@module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 @permission_required('can_edit')
-def application_update(template_id):
+def application_update(template_id, extension):
 
   Template_ = Template()
   updated_template = Template_.template_update(template_id, request)
 
-  return Template_.endpoint_response(updated_template)
+  arguments = {
+    'the_content': updated_template,
+    'extension': extension
+  }
+
+  return Template_.endpoint_response(**arguments)
 
 
-@module.route('/v2/templates/<int:template_id>/', methods=['DELETE'])
+@module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['DELETE'])
 # @oauth.require_oauth()
 @permission_required('can_delete')
-def template_delete(template_id):
+def template_delete(template_id, extension):
 
   Template().template_delete(template_id)
 
