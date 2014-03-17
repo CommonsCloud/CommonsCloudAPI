@@ -56,7 +56,7 @@ def user_me():
   return User().endpoint_response(**arguments)
 
 
-@module.route('/v2/user/list/', methods=['GET'])
+@module.route('/v2/users/list/', methods=['GET'])
 # @oauth.require_oauth()
 def user_list():
 
@@ -96,7 +96,7 @@ def user_profile_post():
   return redirect(url_for('user.user_profile_get')), 301
 
 
-@module.route('/v2/template/<int:template_id>/users/', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>/users/', methods=['GET'])
 # @oauth.require_oauth()
 @permission_required('is_admin')
 def template_users(template_id):

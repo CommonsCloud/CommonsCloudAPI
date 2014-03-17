@@ -31,7 +31,7 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/v2/template/<int:template_id>/field/<int:field_id>/', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>/field/<int:field_id>/', methods=['GET'])
 # @oauth.require_oauth()
 def field_get(template_id, field_id):
 
@@ -51,7 +51,7 @@ def field_get(template_id, field_id):
 """
 A list of templates that belongs to a specific application
 """
-@module.route('/v2/template/<int:template_id>/field/', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>/field/', methods=['GET'])
 # @oauth.require_oauth()
 def template_fields_get(template_id):
 
@@ -70,7 +70,7 @@ def template_fields_get(template_id):
 
 
 
-@module.route('/v2/template/<int:template_id>/field/', methods=['POST'])
+@module.route('/v2/templates/<int:template_id>/field/', methods=['POST'])
 # @oauth.require_oauth()
 def field_post(template_id):
 
@@ -86,7 +86,7 @@ PUT/PATCH
 User attempting to access this endpoint must have the `edit`
 permission associated with them in the `user_templates` table
 """
-@module.route('/v2/template/<int:template_id>/field/<int:field_id>/', methods=['PUT', 'PATCH'])
+@module.route('/v2/templates/<int:template_id>/field/<int:field_id>/', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 @permission_required('can_edit')
 def field_update(template_id, field_id):
@@ -97,7 +97,7 @@ def field_update(template_id, field_id):
   return Field_.endpoint_response(updated_field)
 
 
-@module.route('/v2/template/<int:template_id>/field/<int:field_id>/', methods=['DELETE'])
+@module.route('/v2/templates/<int:template_id>/field/<int:field_id>/', methods=['DELETE'])
 # @oauth.require_oauth()
 @permission_required('can_delete')
 def field_delete(template_id, field_id):

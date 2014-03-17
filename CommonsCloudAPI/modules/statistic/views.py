@@ -28,7 +28,7 @@ from CommonsCloudAPI.models.statistic import Statistic
 from . import module
 
 
-@module.route('/v2/statistic/', methods=['POST'])
+@module.route('/v2/statistics/', methods=['POST'])
 # @oauth.require_oauth()
 def statistic_post():
 
@@ -38,7 +38,7 @@ def statistic_post():
   return Statistic_.endpoint_response(new_statistic, 201)
 
 
-@module.route('/v2/statistic/<int:statistic_id>/', methods=['PUT', 'PATCH'])
+@module.route('/v2/statistics/<int:statistic_id>/', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 def statistic_update(statistic_id):
 
@@ -48,7 +48,7 @@ def statistic_update(statistic_id):
   return Statistic_.endpoint_response(updated_statistic, 200)
 
 
-@module.route('/v2/statistic/<int:statistic_id>/', methods=['DELETE'])
+@module.route('/v2/statistics/<int:statistic_id>/', methods=['DELETE'])
 # @oauth.require_oauth()
 def statistic_delete(statistic_id):
 

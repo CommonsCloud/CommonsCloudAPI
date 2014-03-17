@@ -30,14 +30,14 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/v2/feature/', methods=['GET'])
+@module.route('/v2/features/', methods=['GET'])
 # @oauth.require_oauth()
 def feature_index():
 
     return status_.status_303(), 303
 
 
-@module.route('/v2/feature/<string:storage>/', methods=['GET'])
+@module.route('/v2/features/<string:storage>/', methods=['GET'])
 # @oauth.require_oauth()
 def feature_list(storage):
 
@@ -56,7 +56,7 @@ def feature_list(storage):
         return status_.status_500(e), 500
 
 
-@module.route('/v2/feature/<string:storage>/search/', methods=['GET'])
+@module.route('/v2/features/<string:storage>/search/', methods=['GET'])
 # @oauth.require_oauth()
 def feature_search(storage):
 
@@ -69,7 +69,7 @@ def feature_search(storage):
         return status_.status_500(e), 500
 
 
-@module.route('/v2/feature/<string:storage>/statistic/', methods=['GET'])
+@module.route('/v2/features/<string:storage>/statistic/', methods=['GET'])
 # @oauth.require_oauth()
 def feature_statistic(storage):
 
@@ -83,7 +83,7 @@ def feature_statistic(storage):
 
 
 
-@module.route('/v2/feature/<string:storage>/<int:feature_id>/', methods=['GET'])
+@module.route('/v2/features/<string:storage>/<int:feature_id>/', methods=['GET'])
 # @oauth.require_oauth()
 def feature_get(storage, feature_id):
 
@@ -101,7 +101,7 @@ def feature_get(storage, feature_id):
         return status_.status_500(e), 500
 
 
-@module.route('/v2/feature/<string:storage>/', methods=['POST'])
+@module.route('/v2/features/<string:storage>/', methods=['POST'])
 # @oauth.require_oauth()
 def feature_create(storage):
 
@@ -115,7 +115,7 @@ def feature_create(storage):
 
 
 
-@module.route('/v2/feature/<string:storage>/<int:feature_id>/', methods=['DELETE'])
+@module.route('/v2/features/<string:storage>/<int:feature_id>/', methods=['DELETE'])
 # @oauth.require_oauth()
 def feature_delete(storage, feature_id):
 
