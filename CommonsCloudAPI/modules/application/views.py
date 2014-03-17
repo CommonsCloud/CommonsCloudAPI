@@ -30,9 +30,9 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/application/', methods=['GET'])
+@module.route('/v2/applications.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-def application_list():
+def application_list(extension):
 
   Application_ = Application()
 
@@ -40,7 +40,8 @@ def application_list():
 
   arguments = {
     'the_content': applications_,
-    'list_name': 'applications'
+    'list_name': 'applications',
+    'extension': extension
   }
 
   return Application_.endpoint_response(**arguments)

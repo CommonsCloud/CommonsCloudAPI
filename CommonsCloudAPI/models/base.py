@@ -477,7 +477,7 @@ class CommonsModel(object):
       message describing why the content couldn't be delivered
 
   """
-  def endpoint_response(self, the_content, list_name='', exclude_fields=[], code=200):
+  def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200):
 
     """
     Make sure the content is ready to be served
@@ -493,14 +493,12 @@ class CommonsModel(object):
     If the user is properly authenticated, then proceed to see if they
     have requests a type of content we serve
     """
-    if request.headers['Content-Type'] == 'application/json' or \
-        ('format' in request.args and request.args['format'] == 'json'):
+    if (extension == 'json'):
 
       this_data = JSON(the_content, list_name=list_name, exclude_fields=exclude_fields)
       return this_data.create(), code
 
-    elif request.headers['Content-Type'] == 'text/csv' or \
-        ('format' in request.args and request.args['format'] == 'csv'):
+    elif (extension == 'csv'):
 
       this_data = CSV(the_content_, exclude_fields=exclude_fields)
       return this_data.create(), code
