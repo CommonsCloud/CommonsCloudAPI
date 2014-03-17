@@ -50,6 +50,7 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.utilities.format_csv import CSV
+from CommonsCloudAPI.utilities.format_geojson import GeoJSON
 from CommonsCloudAPI.utilities.format_json import JSON
 
 class CommonsModel(object):
@@ -482,10 +483,12 @@ class CommonsModel(object):
     """
     Make sure the content is ready to be served
     """
-    if type(the_content) is list:
+    if type(the_content) is list and extension != 'geojson':
       the_content = {
         list_name: self.serialize_list(the_content)
       }
+    elif type(the_content) is list:
+      the_content = self.serialize_list(the_content)
     else:
       the_content = self.serialize_object(the_content)
 
@@ -498,9 +501,14 @@ class CommonsModel(object):
       this_data = JSON(the_content, list_name=list_name, exclude_fields=exclude_fields)
       return this_data.create(), code
 
+    elif (extension == 'geojson'):
+
+      this_data = GeoJSON(the_content, list_name=list_name, exclude_fields=exclude_fields)
+      return this_data.create(), code
+
     elif (extension == 'csv'):
 
-      this_data = CSV(the_content_, exclude_fields=exclude_fields)
+      this_data = CSV(the_content, exclude_fields=exclude_fields)
       return this_data.create(), code
 
     """
