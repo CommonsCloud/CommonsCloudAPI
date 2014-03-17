@@ -404,12 +404,9 @@ class CommonsModel(object):
         }
     }
 
-
     Model = type(class_name, (db.Model,), arguments)
 
     db.metadata.bind = db.engine
-
-    # print dir(Model)
 
     """
     For the API to return items properly, we should check to see if the fields
@@ -513,31 +510,4 @@ class CommonsModel(object):
     tell them that, by directing them to an "Unsupported Media Type"
     """
     return status_.status_415(), 415
-
-
-
-
-# """
-# Define our individual models
-# """
-# class Statistic(db.Model):
-
-#   id = db.Column(db.Integer, primary_key=True)
-#   template = db.Column(db.Integer, db.ForeignKey('template.id'))
-#   field = db.Column(db.Integer, db.ForeignKey('field.id'))
-#   name = db.Column(db.String(255))
-#   units = db.Column(db.String(24))
-#   math_type = db.Column(db.String(24))
-#   created = db.Column(db.DateTime)
-#   status = db.Column(db.Boolean)
-
-#   def __init__(self, name, units, math_type, template=[], field=[]):
-#       self.template = template
-#       self.field = field
-#       self.name = name
-#       self.units = units
-#       self.math_type = math_type
-#       self.created = datetime.utcnow()
-#       self.status = True
-
 
