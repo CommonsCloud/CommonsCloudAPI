@@ -31,9 +31,9 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/v2/templates/<int:template_id>/field/<int:field_id>/', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>/field/<int:field_id>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-def field_get(template_id, field_id):
+def field_get(template_id, field_id, extension):
 
   Field_ = Field()
   this_field = Field_.field_get(field_id)
@@ -42,7 +42,8 @@ def field_get(template_id, field_id):
     return this_field, this_field.code
 
   arguments = {
-    'the_content': this_field
+    'the_content': this_field,
+    'extension': extension
   }
 
   return Field_.endpoint_response(**arguments)
@@ -51,9 +52,9 @@ def field_get(template_id, field_id):
 """
 A list of templates that belongs to a specific application
 """
-@module.route('/v2/templates/<int:template_id>/field/', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>/field.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-def template_fields_get(template_id):
+def template_fields_get(template_id, extension):
 
   Field_ = Field()
   these_fields = Field_.template_fields_get(template_id)
@@ -63,16 +64,17 @@ def template_fields_get(template_id):
 
   arguments = {
     'the_content': these_fields,
-    'list_name': 'fields'
+    'list_name': 'fields',
+    'extension': extension
   }
 
   return Field_.endpoint_response(**arguments)
 
 
 
-@module.route('/v2/templates/<int:template_id>/field/', methods=['POST'])
+@module.route('/v2/templates/<int:template_id>/field.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
-def field_post(template_id):
+def field_post(template_id, extension):
 
   Field_ = Field()
   new_field = Field_.field_create(request, template_id)
@@ -86,21 +88,26 @@ PUT/PATCH
 User attempting to access this endpoint must have the `edit`
 permission associated with them in the `user_templates` table
 """
-@module.route('/v2/templates/<int:template_id>/field/<int:field_id>/', methods=['PUT', 'PATCH'])
+@module.route('/v2/templates/<int:template_id>/field/<int:field_id>.<string:extension>', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 @permission_required('can_edit')
-def field_update(template_id, field_id):
+def field_update(template_id, field_id, extension):
 
   Field_ = Field()
   updated_field = Field_.field_update(request, template_id, field_id)
 
-  return Field_.endpoint_response(updated_field)
+  arguments = {
+    'the_content': updated_field,
+    'extension': extension
+  }
+
+  return Field_.endpoint_response(**arguments)
 
 
-@module.route('/v2/templates/<int:template_id>/field/<int:field_id>/', methods=['DELETE'])
+@module.route('/v2/templates/<int:template_id>/field/<int:field_id>.<string:extension>', methods=['DELETE'])
 # @oauth.require_oauth()
 @permission_required('can_delete')
-def field_delete(template_id, field_id):
+def field_delete(template_id, field_id, extension):
 
   Field().field_delete(template_id, field_id)
 
