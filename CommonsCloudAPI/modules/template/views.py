@@ -30,14 +30,14 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/template/', methods=['GET'])
+@module.route('/v2/template/', methods=['GET'])
 # @oauth.require_oauth()
 def template_list():
 
   return status_.status_303(), 303
 
 
-@module.route('/application/<int:application_id>/templates/', methods=['GET'])
+@module.route('/v2/application/<int:application_id>/templates/', methods=['GET'])
 # @oauth.require_oauth()
 def application_templates_get(application_id):
 
@@ -55,13 +55,7 @@ def application_templates_get(application_id):
   return Template_.endpoint_response(**arguments)
 
 
-"""
-CREATE
-
-Everyone that has a user account can add new applications, however
-in the future we should figure out what the repercussions of that are.
-"""
-@module.route('/template/', methods=['POST'])
+@module.route('/v2/template/', methods=['POST'])
 # @oauth.require_oauth()
 def template_post():
 
@@ -71,13 +65,7 @@ def template_post():
   return Template_.endpoint_response(new_template, code=201)
 
 
-"""
-GET/VIEW
-
-User attempting to access this endpoint must have the `view`
-permission associated with them in the `user_templates` table
-"""
-@module.route('/template/<int:template_id>/', methods=['GET'])
+@module.route('/v2/template/<int:template_id>/', methods=['GET'])
 # @oauth.require_oauth()
 @permission_required('can_view')
 def template_get(template_id):
@@ -88,13 +76,7 @@ def template_get(template_id):
   return Template_.endpoint_response(this_template)
 
 
-"""
-PUT/PATCH
-
-User attempting to access this endpoint must have the `edit`
-permission associated with them in the `user_templates` table
-"""
-@module.route('/template/<int:template_id>/', methods=['PUT', 'PATCH'])
+@module.route('/v2/template/<int:template_id>/', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 @permission_required('can_edit')
 def application_update(template_id):
@@ -105,13 +87,7 @@ def application_update(template_id):
   return Template_.endpoint_response(updated_template)
 
 
-"""
-DELETE
-
-User attempting to access this endpoint must have the `delete`
-permission associated with them in the `user_applications` table
-"""
-@module.route('/template/<int:template_id>/', methods=['DELETE'])
+@module.route('/v2/template/<int:template_id>/', methods=['DELETE'])
 # @oauth.require_oauth()
 @permission_required('can_delete')
 def template_delete(template_id):

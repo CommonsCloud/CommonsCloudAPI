@@ -47,12 +47,6 @@ def application_list(extension):
   return Application_.endpoint_response(**arguments)
 
 
-"""
-CREATE
-
-Everyone that has a user account can add new applications, however
-in the future we should figure out what the repercussions of that are.
-"""
 @module.route('/v2/applications.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
 def application_post(extension):
@@ -69,12 +63,6 @@ def application_post(extension):
   return Application_.endpoint_response(**arguments)
 
 
-"""
-GET/VIEW
-
-User attempting to access this endpoint must have the `view`
-permission associated with them in the `user_applications` table
-"""
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 @permission_required('can_view')
@@ -94,12 +82,6 @@ def application_get(application_id, extension):
   return Application_.endpoint_response(**arguments)
 
 
-"""
-PUT/PATCH
-
-User attempting to access this endpoint must have the `edit`
-permission associated with them in the `user_applications` table
-"""
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 @permission_required('can_edit')
@@ -116,12 +98,6 @@ def application_update(application_id, extension):
   return Application_.endpoint_response(**arguments)
 
 
-"""
-DELETE
-
-User attempting to access this endpoint must have the `delete`
-permission associated with them in the `user_applications` table
-"""
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['DELETE'])
 # @oauth.require_oauth()
 @permission_required('can_delete')
