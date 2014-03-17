@@ -28,29 +28,41 @@ from CommonsCloudAPI.models.statistic import Statistic
 from . import module
 
 
-@module.route('/v2/statistics/', methods=['POST'])
+@module.route('/v2/statistics.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
-def statistic_post():
+def statistic_post(extension):
 
   Statistic_ = Statistic()
   new_statistic = Statistic_.statistic_create(request)
 
-  return Statistic_.endpoint_response(new_statistic, 201)
+  arguments = {
+    'the_content': new_statistic,
+    'extension': extension,
+    'code': 201
+  }
+
+  return Statistic_.endpoint_response(**arguments)
 
 
-@module.route('/v2/statistics/<int:statistic_id>/', methods=['PUT', 'PATCH'])
+@module.route('/v2/statistics/<int:statistic_id>.<string:extension>', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
-def statistic_update(statistic_id):
+def statistic_update(statistic_id, extension):
 
   Statistic_ = Statistic()
   updated_statistic = Statistic_.statistic_update(statistic_id, request)
 
-  return Statistic_.endpoint_response(updated_statistic, 200)
+  arguments = {
+    'the_content': updated_statistic,
+    'extension': extension,
+    'code': 200
+  }
+
+  return Statistic_.endpoint_response(**arguments)
 
 
-@module.route('/v2/statistics/<int:statistic_id>/', methods=['DELETE'])
+@module.route('/v2/statistics/<int:statistic_id>.<string:extension>', methods=['DELETE'])
 # @oauth.require_oauth()
-def statistic_delete(statistic_id):
+def statistic_delete(statistic_id, extension):
 
   Statistic().statistic_delete(statistic_id)
 
