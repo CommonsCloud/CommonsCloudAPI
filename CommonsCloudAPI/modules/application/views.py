@@ -53,14 +53,20 @@ CREATE
 Everyone that has a user account can add new applications, however
 in the future we should figure out what the repercussions of that are.
 """
-@module.route('/application/', methods=['POST'])
+@module.route('/v2/applications.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
-def application_post():
+def application_post(extension):
 
   Application_ = Application()
   new_application = Application_.application_create(request)
 
-  return Application_.endpoint_response(new_application, 201)
+  arguments = {
+    'the_content': new_application,
+    'extension': extension,
+    'code': 201
+  }
+
+  return Application_.endpoint_response(**arguments)
 
 
 """
@@ -69,10 +75,10 @@ GET/VIEW
 User attempting to access this endpoint must have the `view`
 permission associated with them in the `user_applications` table
 """
-@module.route('/application/<int:application_id>/', methods=['GET'])
+@module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 @permission_required('can_view')
-def application_get(application_id):
+def application_get(application_id, extension):
 
   Application_ = Application()
   this_application = Application_.application_get(application_id)
@@ -80,7 +86,12 @@ def application_get(application_id):
   if type(this_application) is 'Response':
     return this_application, this_application.code
 
-  return Application_.endpoint_response(this_application)
+  arguments = {
+    'the_content': this_application,
+    'extension': extension
+  }
+
+  return Application_.endpoint_response(**arguments)
 
 
 """
@@ -89,15 +100,20 @@ PUT/PATCH
 User attempting to access this endpoint must have the `edit`
 permission associated with them in the `user_applications` table
 """
-@module.route('/application/<int:application_id>/', methods=['PUT', 'PATCH'])
+@module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 @permission_required('can_edit')
-def application_update(application_id):
+def application_update(application_id, extension):
 
   Application_ = Application()
   updated_application = Application_.application_update(application_id, request)
 
-  return Application_.endpoint_response(updated_application)
+  arguments = {
+    'the_content': updated_application,
+    'extension': extension
+  }
+
+  return Application_.endpoint_response(**arguments)
 
 
 """
@@ -106,10 +122,10 @@ DELETE
 User attempting to access this endpoint must have the `delete`
 permission associated with them in the `user_applications` table
 """
-@module.route('/application/<int:application_id>/', methods=['DELETE'])
+@module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['DELETE'])
 # @oauth.require_oauth()
 @permission_required('can_delete')
-def application_delete(application_id):
+def application_delete(application_id, extension):
 
   Application().application_delete(application_id)
 

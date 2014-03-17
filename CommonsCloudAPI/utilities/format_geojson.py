@@ -22,7 +22,10 @@ from datetime import timedelta
 Import Flask Dependencies
 """
 from flask import jsonify
-from geojson import FeatureCollection, dumps
+
+from geojson import dumps
+from geojson import Feature
+from geojson import FeatureCollection
 
 
 """
@@ -60,12 +63,27 @@ class GeoJSON(FormatContent):
     expires =  today + timedelta(+30)
 
     if type(self.the_content) is list:
-        response = jsonify(FeatureCollection(self.the_content))
-        print 'list'
+
+        features = []
+
+        for feature in self.the_content:
+
+          arguments = {
+            'id': feature['id'],
+            'properties': feature
+          }
+
+          features.append(Feature(**arguments))
+
+        response = jsonify(FeatureCollection(features))
     else:
-        response = jsonify(self.the_content)
-        response = jsonify(FeatureCollection(self.the_content))
-        print 'single'
+
+        arguments = {
+          'id': self.the_content['id'],
+          'properties': self.the_content
+        }
+
+        response = jsonify(Feature(**arguments))
 
 
     """
