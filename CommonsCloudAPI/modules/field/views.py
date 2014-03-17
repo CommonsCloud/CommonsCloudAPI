@@ -31,7 +31,7 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/v2/templates/<int:template_id>/field/<int:field_id>.<string:extension>', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 def field_get(template_id, field_id, extension):
 
@@ -52,7 +52,7 @@ def field_get(template_id, field_id, extension):
 """
 A list of templates that belongs to a specific application
 """
-@module.route('/v2/templates/<int:template_id>/field.<string:extension>', methods=['GET'])
+@module.route('/v2/templates/<int:template_id>/fields.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 def template_fields_get(template_id, extension):
 
@@ -72,7 +72,7 @@ def template_fields_get(template_id, extension):
 
 
 
-@module.route('/v2/templates/<int:template_id>/field.<string:extension>', methods=['POST'])
+@module.route('/v2/templates/<int:template_id>/fields.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
 def field_post(template_id, extension):
 
@@ -88,7 +88,7 @@ PUT/PATCH
 User attempting to access this endpoint must have the `edit`
 permission associated with them in the `user_templates` table
 """
-@module.route('/v2/templates/<int:template_id>/field/<int:field_id>.<string:extension>', methods=['PUT', 'PATCH'])
+@module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['PUT', 'PATCH'])
 # @oauth.require_oauth()
 @permission_required('can_edit')
 def field_update(template_id, field_id, extension):
@@ -104,7 +104,7 @@ def field_update(template_id, field_id, extension):
   return Field_.endpoint_response(**arguments)
 
 
-@module.route('/v2/templates/<int:template_id>/field/<int:field_id>.<string:extension>', methods=['DELETE'])
+@module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['DELETE'])
 # @oauth.require_oauth()
 @permission_required('can_delete')
 def field_delete(template_id, field_id, extension):
