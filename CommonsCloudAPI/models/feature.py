@@ -66,6 +66,9 @@ class Feature(CommonsModel):
         print 'Storage_'
         print dir(Storage_)
 
+        print 'relationships'
+        print Storage_.__mapper__.relationships.keys()
+
         content_ = json.loads(request_object.data)
 
         content_['created'] = content_.get('created', datetime.now())
@@ -86,9 +89,8 @@ class Feature(CommonsModel):
         Field_ = Field()
 
         this_template = Template_.query.filter_by(storage=storage).first()
-        fields_ = Field_.template_fields_get(this_template.id)
 
-        Storage_ = self.get_storage(this_template, fields_)
+        Storage_ = self.get_storage(this_template, this_template.fields)
 
         feature = Storage_.query.get(feature_id)
 

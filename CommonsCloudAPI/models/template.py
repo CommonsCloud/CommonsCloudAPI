@@ -117,7 +117,8 @@ class Template(db.Model, CommonsModel):
   is_listed = db.Column(db.Boolean)
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
-  fields = db.relationship('TemplateFields', backref=db.backref('template'))
+  fields = db.relationship('Field', secondary='template_fields', backref=db.backref('template'))
+
 
   def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, created=datetime.now(), status=True):
     self.name = name

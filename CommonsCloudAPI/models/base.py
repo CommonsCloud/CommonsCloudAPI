@@ -53,6 +53,7 @@ from CommonsCloudAPI.utilities.format_csv import CSV
 from CommonsCloudAPI.utilities.format_geojson import GeoJSON
 from CommonsCloudAPI.utilities.format_json import JSON
 
+
 class CommonsModel(object):
 
   __public__ = ['id', 'name', 'created', 'status']
@@ -383,47 +384,172 @@ class CommonsModel(object):
     return new_column
 
 
+  # def get_storage(self, template, fields=[]):
+
+  #   class_name = str(template.storage)
+
+  #   arguments = _get_storage_arguments(template, class_name)
+
+  #   Model = type(class_name, (db.Model,), arguments)
+
+  #   db.metadata.bind = db.engine
+
+  #   """
+  #   For the API to return items properly, we should check to see if the fields
+  #   we are attempting to call are marked as listed or not.
+  #   """
+  #   if fields:
+        
+  #     public_fields = self.__public__
+
+  #     for field in fields:
+  #       if field.is_listed:
+  #         public_fields.append(field.name)
+
+  #     self.__public__ = public_fields
+
+  #   return Model
+
+
+  # def _get_storage_arguments(self, template, class_name):
+
+  #   Table_ = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+
+  #   arguments = {
+  #       "__table__": Table_,
+  #       "__tablename__": class_name,
+  #       "__table_args__": {
+  #           "extend_existing": True
+  #       }
+  #   }
+
+
+
+  #   return arguments
+
+
   def get_storage(self, template, fields=[]):
 
-    """
-    Load an existing table into our metadata
-    """
-    Table_ = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
-
-    """
-    We must bind the engine to the metadata here in order for our fields to
-    recognize the existing Table we have loaded in the following steps
-    """
-
     class_name = str(template.storage)
+    relationships = self.get_relationship_fields(template.fields)
+
+    # Fields_ = Field()
+
+    # field_id_list_ = Fields_._template_fields_id_list(template.id)
+    # relationships = Fields_.query.filter_by(Field.id.in_(field_id_list_))
+
 
     arguments = {
-        "__table__": Table_,
-        "__tablename__": class_name,
-        "__table_args__": {
-            "extend_existing": True
-        }
+      "class_name": class_name,
+      "relationships": relationships
     }
 
-    Model = type(class_name, (db.Model,), arguments)
+    class_arguments = self.get_class_arguments(**arguments)
 
-    db.metadata.bind = db.engine
-
-    """
-    For the API to return items properly, we should check to see if the fields
-    we are attempting to call are marked as listed or not.
-    """
-    if fields:
-        
-      public_fields = self.__public__
-
-      for field in fields:
-        if field.is_listed:
-          public_fields.append(field.name)
-
-      self.__public__ = public_fields
-
+    Model = type(class_name, (db.Model,), class_arguments)
+    
     return Model
+
+
+  """
+  Create a dictionary of Class Arguments to assist
+  us in building reliable SQLAlchemy models capable
+  of handling many-to-many relationships.
+  """
+  def get_class_arguments(self, class_name, relationships, attachments=[]):
+
+    """
+    Start an empty object to store all of our Class Arguments
+    """
+    class_arguments = {}
+
+
+    """
+    Automatically load all of our basic table fields and other
+    meta information
+    """
+    class_arguments['__table__'] = db.Table(class_name, db.metadata, autoload=True, autoload_with=db.engine)
+    class_arguments['__tablename__'] = class_name
+    class_arguments['__table_args__'] = {
+      "extend_existing": True
+    }
+
+
+    """
+    Unfortunately we have to manually load the relationships that
+    our models need to work properly.
+    
+    To build relationships out properly we need a few things:
+    
+    'type_5740f6daa55f4fc790e7eeacb96d726e' : db.relationship('type_5740f6daa55f4fc790e7eeacb96d726e', secondary=our_reference_table, backref=db.backref(class_name))
+
+    1. We need the name of the association table (e.g., ref_XXXXXXXXXXXXXXXXXXXXX)
+    2. We need the name of the other table that actually contains the content to
+       be referenced (e.g., type_XXXXXXXXXXXXXXXXXXX)
+    3. We should have a model class for the association table
+    4. We need the name of the class or 'storage' of the Class being acted on
+    
+    """
+    for relationship in relationships:
+
+      print relationship
+      
+      # table_name_str = str(relationship.get('table_name'))
+      # table_name_uni = unicode(relationship.get('table_name'))
+
+      # RelationshipModel = create_model_class(table_name_uni)
+      
+      
+      # """
+      # Setup our association table for each relationship that we have
+      # in our fields list
+      # """
+      # parent_id_key = str(class_name) + '.id'
+      # child_id_key = table_name_str + '.id'
+      
+      # association_table = db.Table(str(relationship.get('association_table')), db.metadata,
+      #     db.Column('parent_id', db.Integer, db.ForeignKey(parent_id_key), primary_key=True),
+      #     db.Column('child_id', db.Integer, db.ForeignKey(child_id_key), primary_key=True),
+      #     extend_existing = True,
+      #     autoload = True,
+      #     autoload_with = db.engine
+      # )    
+
+      # class_arguments[table_name_str] = db.relationship(RelationshipModel, secondary=association_table, backref=class_name)
+
+    print 'dir(class_arguments)'
+    print dir(class_arguments)
+
+    return class_arguments
+
+
+  """
+  Create a list of fields that need to have relationships loaded
+  for them to operate properly
+  """
+  def get_relationship_fields(self, fields):
+      
+    relationships = []
+
+    print 'fields'
+    print fields
+    
+    for field in fields:
+      if 'relationship' in field.data_type or 'file' in field.data_type:
+
+        new_relationship = {}
+        
+        new_relationship = {
+          'table_name': field.relationship,
+          'association_table': field.name
+        }
+        
+        relationships.append(new_relationship)
+
+    print 'relationships'
+    print relationships
+    
+    return relationships
 
 
   """
@@ -479,6 +605,10 @@ class CommonsModel(object):
 
   """
   def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200):
+
+
+    print 'content type'
+    print type(the_content)
 
     """
     Make sure the content is ready to be served

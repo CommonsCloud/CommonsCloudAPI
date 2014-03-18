@@ -107,7 +107,7 @@ class Field(db.Model, CommonsModel):
     status = db.Column(db.Boolean)
     statistics = db.relationship('Statistic', backref=db.backref('field'))
 
-    def __init__(self, label="", name="", help="", data_type="", relationship="", is_listed=True, is_searchable=False, is_required=False, weight="", status=True):
+    def __init__(self, label="", name="", help="", data_type="", relationship="", is_listed=True, is_searchable=False, is_required=False, weight="", status=True, templates=[]):
         self.label = label
         self.name = name
         self.help = help
@@ -118,6 +118,7 @@ class Field(db.Model, CommonsModel):
         self.is_required = is_required
         self.weight = weight
         self.status = status
+        self.templates = templates
 
 
     """
@@ -404,6 +405,8 @@ class Field(db.Model, CommonsModel):
 
         template_ = Template.query.get(template_id)
 
+        print template_.fields
+
         fields_ = []
 
         for field in template_.fields:
@@ -423,10 +426,7 @@ class Field(db.Model, CommonsModel):
         if not hasattr(template_, 'id'):
           return abort(404)
     
-        field_id_list = self._template_fields_id_list(template_id)
-        fields_ = Field.query.filter(Field.id.in_(field_id_list)).all()
-
-        return fields_
+        return list(template_.fields)
 
 
     """
