@@ -67,7 +67,7 @@ class Feature(CommonsModel):
         content_ = json.loads(request_object.data)
 
         content_['created'] = content_.get('created', datetime.now())
-        content_['status'] = content_.get('status', True)
+        content_['status'] = content_.get('status', 'public')
 
         new_feature = Storage_(**content_)
 
