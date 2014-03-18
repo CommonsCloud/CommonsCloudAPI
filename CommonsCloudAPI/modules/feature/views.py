@@ -15,6 +15,7 @@ limitations under the License.
 Import Flask Dependencies
 """
 from flask import request
+from flask import jsonify
 
 
 """
@@ -30,14 +31,8 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/v2/features.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-def feature_index(extension):
-
-    return status_.status_303(), 303
-
-
-@module.route('/v2/features/<string:storage>.<string:extension>', methods=['GET'])
+@module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
+# @module.route('/v2/features/<string:storage>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 def feature_list(storage, extension):
 
@@ -57,7 +52,7 @@ def feature_list(storage, extension):
         return status_.status_500(e), 500
 
 
-@module.route('/v2/features/<string:storage>/search.<string:extension>', methods=['GET'])
+@module.route('/v2/type_<string:storage>/search.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 def feature_search(storage, extension):
 
@@ -70,7 +65,7 @@ def feature_search(storage, extension):
         return status_.status_500(e), 500
 
 
-@module.route('/v2/features/<string:storage>/statistic.<string:extension>', methods=['GET'])
+@module.route('/v2/type_<string:storage>/statistic.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 def feature_statistic(storage, extension):
 
@@ -83,8 +78,7 @@ def feature_statistic(storage, extension):
         return status_.status_500(e), 500
 
 
-
-@module.route('/v2/features/<string:storage>/<int:feature_id>.<string:extension>', methods=['GET'])
+@module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 def feature_get(storage, feature_id, extension):
 
@@ -103,7 +97,7 @@ def feature_get(storage, feature_id, extension):
         return status_.status_500(e), 500
 
 
-@module.route('/v2/features/<string:storage>.<string:extension>', methods=['POST'])
+@module.route('/v2/type_<string:storage>.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
 def feature_create(storage, extension):
 
@@ -122,8 +116,7 @@ def feature_create(storage, extension):
         return status_.status_500(e), 500
 
 
-
-@module.route('/v2/features/<string:storage>/<int:feature_id>.<string:extension>', methods=['DELETE'])
+@module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['DELETE'])
 # @oauth.require_oauth()
 def feature_delete(storage, feature_id, extension):
 
@@ -133,3 +126,4 @@ def feature_delete(storage, feature_id, extension):
         return status_.status_204(), 204
     except Exception as e:
         return status_.status_500(e), 500
+

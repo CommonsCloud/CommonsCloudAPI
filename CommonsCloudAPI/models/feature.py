@@ -55,7 +55,9 @@ class Feature(CommonsModel):
     def __init__(self):
         pass
 
-    def feature_create(self, request_object, storage):
+    def feature_create(self, request_object, storage_):
+
+        storage = str('type_' + storage_)
 
         Template_ = Template.query.filter_by(storage=storage).first()
 
@@ -76,7 +78,9 @@ class Feature(CommonsModel):
 
         return new_feature
 
-    def feature_get(self, storage, feature_id):
+    def feature_get(self, storage_, feature_id):
+
+        storage = str('type_' + storage_)
 
         Template_ = Template()
         Field_ = Field()
@@ -93,9 +97,15 @@ class Feature(CommonsModel):
 
         return feature
 
-    def feature_list(self, storage):
+    def feature_list(self, storage_):
+
+        storage = str('type_' + storage_)
 
         Template_ = Template.query.filter_by(storage=storage).first()
+
+        if not hasattr(Template_, 'id'):
+            return abort(404)
+
         Storage_ = self.get_storage(Template_)
 
         features = Storage_.query.all()
@@ -105,7 +115,9 @@ class Feature(CommonsModel):
     def feature_update(self, request_object, template_id, feature_id):
         pass
 
-    def feature_statistic(self, storage, search_path):
+    def feature_statistic(self, storage_, search_path):
+
+        storage = str('type_' + storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
 
@@ -115,7 +127,9 @@ class Feature(CommonsModel):
 
         return endpoint_.get()
 
-    def feature_search(self, storage, search_path):
+    def feature_search(self, storage_, search_path):
+
+        storage = str('type_' + storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
 
@@ -125,8 +139,10 @@ class Feature(CommonsModel):
 
         return endpoint_._search()
 
-    def feature_delete(self, storage, feature_id):
+    def feature_delete(self, storage_, feature_id):
         
+        storage = str('type_' + storage_)
+
         this_template = Template.query.filter_by(storage=storage).first()
 
         Storage_ = self.get_storage(this_template)
