@@ -135,7 +135,7 @@ class CommonsModel(object):
   letters to lowercase letters, and return the updated string.
   """
   def generate_machine_name(self, human_name):
-    return re.sub('[^0-9a-zA-Z ]+', '', human_name).replace(' ','_').lower()
+    return re.sub('[^0-9a-zA-Z ] +', '', human_name).replace(' ','_').lower()
 
 
   """
@@ -430,13 +430,12 @@ class CommonsModel(object):
 
   def get_storage(self, template, fields=[]):
 
-    class_name = str(template.storage)
-    relationships = self.get_relationship_fields(template.fields)
-
-    # Fields_ = Field()
-
-    # field_id_list_ = Fields_._template_fields_id_list(template.id)
-    # relationships = Fields_.query.filter_by(Field.id.in_(field_id_list_))
+    if type(template) is str:
+      class_name = str(template)
+      relationships = []
+    else:
+      class_name = str(template.storage)
+      relationships = self.get_relationship_fields(template.fields)
 
 
     arguments = {
@@ -456,7 +455,7 @@ class CommonsModel(object):
   us in building reliable SQLAlchemy models capable
   of handling many-to-many relationships.
   """
-  def get_class_arguments(self, class_name, relationships, attachments=[]):
+  def get_class_arguments(self, class_name, relationships):
 
     """
     Start an empty object to store all of our Class Arguments
@@ -491,34 +490,28 @@ class CommonsModel(object):
     
     """
     for relationship in relationships:
-
-      print relationship
       
-      # table_name_str = str(relationship.get('table_name'))
-      # table_name_uni = unicode(relationship.get('table_name'))
+      table_name = str(relationship.relationship)
 
-      # RelationshipModel = create_model_class(table_name_uni)
+      RelationshipModel = self.get_storage(table_name)
       
       
       # """
       # Setup our association table for each relationship that we have
       # in our fields list
       # """
-      # parent_id_key = str(class_name) + '.id'
-      # child_id_key = table_name_str + '.id'
+      parent_id_key = str(class_name) + '.id'
+      child_id_key = table_name + '.id'
       
-      # association_table = db.Table(str(relationship.get('association_table')), db.metadata,
-      #     db.Column('parent_id', db.Integer, db.ForeignKey(parent_id_key), primary_key=True),
-      #     db.Column('child_id', db.Integer, db.ForeignKey(child_id_key), primary_key=True),
-      #     extend_existing = True,
-      #     autoload = True,
-      #     autoload_with = db.engine
-      # )    
+      association_table = db.Table(str(relationship.get('association_table')), db.metadata,
+          db.Column('parent_id', db.Integer, db.ForeignKey(parent_id_key), primary_key=True),
+          db.Column('child_id', db.Integer, db.ForeignKey(child_id_key), primary_key=True),
+          extend_existing = True,
+          autoload = True,
+          autoload_with = db.engine
+      )    
 
-      # class_arguments[table_name_str] = db.relationship(RelationshipModel, secondary=association_table, backref=class_name)
-
-    print 'dir(class_arguments)'
-    print dir(class_arguments)
+      class_arguments[table_name] = db.relationship(RelationshipModel, secondary=association_table, backref=class_name)
 
     return class_arguments
 
@@ -531,24 +524,10 @@ class CommonsModel(object):
       
     relationships = []
 
-    print 'fields'
-    print fields
-    
     for field in fields:
       if 'relationship' in field.data_type or 'file' in field.data_type:
+        relationships.append(field)
 
-        new_relationship = {}
-        
-        new_relationship = {
-          'table_name': field.relationship,
-          'association_table': field.name
-        }
-        
-        relationships.append(new_relationship)
-
-    print 'relationships'
-    print relationships
-    
     return relationships
 
 
@@ -606,9 +585,6 @@ class CommonsModel(object):
   """
   def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200):
 
-
-    print 'content type'
-    print type(the_content)
 
     """
     Make sure the content is ready to be served

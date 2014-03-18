@@ -100,6 +100,7 @@ class Field(db.Model, CommonsModel):
     help = db.Column(db.String(255))
     data_type = db.Column(db.String(100))
     relationship = db.Column(db.String(255))
+    association = db.Column(db.String(255))
     is_listed = db.Column(db.Boolean)
     is_searchable = db.Column(db.Boolean)
     is_required = db.Column(db.Boolean)
@@ -107,12 +108,13 @@ class Field(db.Model, CommonsModel):
     status = db.Column(db.Boolean)
     statistics = db.relationship('Statistic', backref=db.backref('field'))
 
-    def __init__(self, label="", name="", help="", data_type="", relationship="", is_listed=True, is_searchable=False, is_required=False, weight="", status=True, templates=[]):
+    def __init__(self, label="", name="", help="", data_type="", relationship="", association="", is_listed=True, is_searchable=False, is_required=False, weight="", status=True, templates=[]):
         self.label = label
         self.name = name
         self.help = help
         self.data_type = data_type
         self.relationship = relationship
+        self.association = association
         self.is_listed = is_listed
         self.is_searchable = is_searchable
         self.is_required = is_required
@@ -167,7 +169,8 @@ class Field(db.Model, CommonsModel):
           'is_searchable': content_.get('is_searchable', True),
           'is_required': content_.get('is_required', False),
           'weight': content_.get('created', 1),
-          'status': content_.get('status', True)
+          'status': content_.get('status', True),
+          'templates': [Template_]
         }
 
         field_ = Field(**new_field)
@@ -187,7 +190,7 @@ class Field(db.Model, CommonsModel):
 
         self.set_user_field_permissions(field_, permission, current_user)
         
-        self.set_template_field_relationship(field_, Template_)
+        # self.set_template_field_relationship(field_, Template_)
 
 
         """
