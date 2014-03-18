@@ -56,12 +56,12 @@ def application_templates_get(application_id, extension):
   return Template_.endpoint_response(**arguments)
 
 
-@module.route('/v2/templates.<string:extension>', methods=['POST'])
+@module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
-def template_post(extension):
+def template_post(extension, application_id):
 
   Template_ = Template()
-  new_template = Template_.template_create(request)
+  new_template = Template_.template_create(request, application_id)
 
   arguments = {
     'the_content': new_template,

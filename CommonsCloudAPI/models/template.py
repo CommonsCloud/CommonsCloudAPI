@@ -139,7 +139,7 @@ class Template(db.Model, CommonsModel):
   @param (dictionary) application_content
       The content that is being submitted by the user
   """
-  def template_create(self, request_object):
+  def template_create(self, request_object, application_id):
 
     """
     Part 1: Make sure we can use the request data as json
@@ -151,10 +151,8 @@ class Template(db.Model, CommonsModel):
     template successfully, including things like a Name, an associated
     Application, and a Storage mechanism
     """
-    if not content_.get('application_id', 0):
+    if not application_id:
       return abort(400)
-
-    application_id = int(content_.get('application_id', 0))
 
     """
     Part 3: Make sure we have a table that has been created in the database

@@ -25,4 +25,4 @@ from . import module
 
 @module.route('/', methods=['GET'])
 def index():
-	return redirect('/user/me?format=json'), 301
+	return redirect('/user/profile'), 301
