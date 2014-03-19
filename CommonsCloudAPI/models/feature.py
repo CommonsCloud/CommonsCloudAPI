@@ -99,21 +99,6 @@ class Feature(CommonsModel):
 
         return feature
 
-    def feature_list(self, storage_):
-
-        storage = str('type_' + storage_)
-
-        Template_ = Template.query.filter_by(storage=storage).first()
-
-        if not hasattr(Template_, 'id'):
-            return abort(404)
-
-        Storage_ = self.get_storage(Template_)
-
-        features = Storage_.query.all()
-
-        return features
-
     def feature_update(self, request_object, template_id, feature_id):
         pass
 
@@ -129,7 +114,7 @@ class Feature(CommonsModel):
 
         return endpoint_.get()
 
-    def feature_search(self, storage_, search_path):
+    def feature_list(self, storage_):
 
         storage = str('type_' + storage_)
 
@@ -137,7 +122,27 @@ class Feature(CommonsModel):
 
         Model_ = self.get_storage(this_template)
 
-        endpoint_ = API(db.session, Model_)
+        #
+        # @todo
+        #       This is where we need to get a list of fields, from the
+        #       template `this_template` that have an `is_listed` value
+        #       of True in the database
+        #
+        # @todo
+        #       We also need to make sure we're post processing the data
+        #       so that GeoJSON is being returned properly and so that
+        #       we can easily export to other formats.
+        #
+        #
+        arguments = {
+            "include_columns": ['id', 'well_name'],
+            "preprocessors": {
+                'GET_SINGLE': [],
+                'GET_MANY': []
+            }
+        }
+
+        endpoint_ = API(db.session, Model_, **arguments)
 
         return endpoint_._search()
 

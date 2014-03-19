@@ -45,27 +45,14 @@ def feature_list(storage, extension):
         "extension": extension,
         'code': 200
     }
-
     try:
-        return Feature_.endpoint_response(**arguments)
-    except Exception as e:
-        return status_.status_500(e), 500
-
-
-@module.route('/v2/type_<string:storage>/search.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-def feature_search(storage, extension):
-
-    Feature_ = Feature()
-    feature_list = Feature_.feature_search(storage, request.args['q'])
-
-    try:
+        # return Feature_.endpoint_response(**arguments)
         return feature_list, 200
     except Exception as e:
         return status_.status_500(e), 500
 
 
-@module.route('/v2/type_<string:storage>/statistic.<string:extension>', methods=['GET'])
+@module.route('/v2/type_<string:storage>/statistics.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 def feature_statistic(storage, extension):
 

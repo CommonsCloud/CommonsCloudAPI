@@ -39,9 +39,13 @@ Import Flask Dependencies
 from flask import abort
 from flask import request
 
+import json
+
 from geoalchemy2.types import Geometry
 
 from sqlalchemy.orm import ColumnProperty
+
+from flask.ext.restless.helpers import to_dict
 
 """
 Import Commons Cloud Dependencies
@@ -119,10 +123,13 @@ class CommonsModel(object):
       list_ = []
 
       for object_ in _content:
-        result = OrderedDict()
-        for key in object_.__mapper__.c.keys():
-          if key in self.__public__:
-            result[key] = getattr(object_, key)
+
+        result = to_dict(object_)
+
+        # result = OrderedDict()
+        # for key in object_.__mapper__.c.keys():
+        #   if key in self.__public__:
+        #     result[key] = getattr(object_, key)
 
         list_.append(result)
 
@@ -584,6 +591,9 @@ class CommonsModel(object):
 
   """
   def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200):
+
+    
+    # print json.dumps({'features': the_content.data})
 
 
     """
