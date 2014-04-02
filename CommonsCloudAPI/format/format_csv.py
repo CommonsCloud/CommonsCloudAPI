@@ -67,7 +67,7 @@ class CSV(FormatContent):
     this_directory = self.get_directory_name()
     this_filename  = self.get_file_name()
     this_filepath  = ('%s%s%s') % (this_directory, '/', this_filename)
-    this_content   = self.serialize_object() if self.serialize is True else self.the_content
+    # this_content   = self.serialize_object() if self.serialize is True else self.the_content
 
     """
     With the current file open, begin writing our content
@@ -77,22 +77,22 @@ class CSV(FormatContent):
       """
       Create the header row for our CSV
       """
-      headers = self.the_content.__mapper__.c.keys()
+      headers = list(self.the_content[0].iterkeys())
 
       """
       Create the Writer for our CSV document
       """
-      dict_writer = csv.DictWriter(open_file, headers, lineterminator="\r\n", delimiter=",", doublequote=False, quoting=csv.QUOTE_NONNUMERIC, quotechar="'")
+      writer_ = csv.DictWriter(open_file, headers, lineterminator="\r\n", delimiter=",", doublequote=False, quoting=csv.QUOTE_NONNUMERIC, quotechar="'")
 
       """
       Write the headers to the document
       """
-      dict_writer.writeheader()
+      writer_.writeheader()
 
       """
       Write the content to the document
       """
-      dict_writer.writerows([this_content])
+      writer_.writerows(self.the_content)
 
       """
       Close the file since we are done adding content to it for now

@@ -599,7 +599,7 @@ class CommonsModel(object):
     """
     Make sure the content is ready to be served
     """
-    if type(the_content) is list and extension != 'geojson':
+    if type(the_content) is list and extension != 'geojson' and extension != 'csv':
       the_content = {
         list_name: self.serialize_list(the_content)
       }
