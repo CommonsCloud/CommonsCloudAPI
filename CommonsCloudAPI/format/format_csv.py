@@ -26,7 +26,7 @@ from flask import send_from_directory
 """
 Import CommonsCloudAPI Dependencies
 """
-from .format import FormatContent
+from . import FormatContent
 
 
 """

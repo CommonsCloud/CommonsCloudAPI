@@ -23,15 +23,11 @@ Import Flask Dependencies
 """
 from flask import jsonify
 
-from geojson import dumps
-from geojson import Feature
-from geojson import FeatureCollection
-
 
 """
 Import CommonsCloudAPI Dependencies
 """
-from .format import FormatContent
+from . import FormatContent
 
 
 """
@@ -42,7 +38,7 @@ A class for formatting objects in Java Script Object Notation or JSON
 @method create
 
 """
-class GeoJSON(FormatContent):
+class JSON(FormatContent):
 
   """
   Creates a JSON file based on user requested content
@@ -54,7 +50,7 @@ class GeoJSON(FormatContent):
       The object we are acting on behalf of
 
   @return (method) jsonify
-      A jsonified object ready for displayin the browser as JSON
+  	  A jsonified object ready for displayin the browser as JSON
 
   """
   def create(self):
@@ -62,28 +58,9 @@ class GeoJSON(FormatContent):
     today = datetime.utcnow()
     expires =  today + timedelta(+30)
 
-    if type(self.the_content) is list:
-
-        features = []
-
-        for feature in self.the_content:
-
-          arguments = {
-            'id': feature['id'],
-            'properties': feature
-          }
-
-          features.append(Feature(**arguments))
-
-        response = jsonify(FeatureCollection(features))
-    else:
-
-        arguments = {
-          'id': self.the_content['id'],
-          'properties': self.the_content
-        }
-
-        response = jsonify(Feature(**arguments))
+    response = jsonify({
+      "response": self.the_content
+    })
 
 
     """
