@@ -63,13 +63,18 @@ class Feature(CommonsModel):
 
         Storage_ = self.get_storage(Template_)
 
-        print 'Storage_'
-        print dir(Storage_)
+        # print 'Storage_'
+        # print dir(Storage_)
 
-        print 'relationships'
-        print Storage_.__mapper__.relationships.keys()
+        # print 'relationships'
+        # print Storage_.__mapper__.relationships.keys()
 
-        content_ = json.loads(request_object.data)
+        try:
+            content_ = json.loads(request_object.data)
+        except Exception, e:
+            # return abort(400, e)
+            return status_.status_400("You didn't submit any content with your request."), 400
+
 
         content_['created'] = content_.get('created', datetime.now())
         content_['status'] = content_.get('status', 'public')

@@ -129,13 +129,14 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_400(self):
+  def status_400(self, system_message=""):
 
     message = {
       'status': '400 Bad Request',
       'code': '400',
       'message': 'The request could not be understood by the server due to malformed syntax. You SHOULD NOT repeat the request without modifications.',
-      'details': 'Chances are you forgot to include one of the required variables needed to create a new resource.'
+      'details': 'Chances are you forgot to include one of the required variables needed to create a new resource.',
+      'error': str(system_message)
     }
 
     return jsonify(message) if self.return_type == 'json' else message
@@ -279,14 +280,14 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_500(self, message=""):
+  def status_500(self, system_message=""):
 
     message = {
       'status': '500 Internal Server Error',
       'code': '500',
       'message': 'The server has not found anything matching the Request-URI.',
       'details': 'You need to check the system, application, and proxy logs.',
-      'error': str(message)
+      'error': str(system_message)
     }
 
     return jsonify(message) if self.return_type == 'json' else message
