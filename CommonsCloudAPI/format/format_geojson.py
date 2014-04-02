@@ -68,9 +68,16 @@ class GeoJSON(FormatContent):
 
         for feature in self.the_content:
 
+          properties = {}
+
+          for property_ in feature:
+            if property_ != 'geometry':
+              properties[property_] = feature[property_]
+
           arguments = {
+            'geometry': feature['geometry'],
             'id': feature['id'],
-            'properties': feature
+            'properties': properties
           }
 
           features.append(Feature(**arguments))
@@ -78,9 +85,16 @@ class GeoJSON(FormatContent):
         response = jsonify(FeatureCollection(features))
     else:
 
+        properties = {}
+
+        for property_ in self.the_content:
+          if property_ != 'geometry':
+            properties[property_] = self.the_content[property_]
+
         arguments = {
+          'geometry': self.the_content['geometry'],
           'id': self.the_content['id'],
-          'properties': self.the_content
+          'properties': properties
         }
 
         response = jsonify(Feature(**arguments))

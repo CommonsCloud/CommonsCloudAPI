@@ -84,6 +84,7 @@ def feature_get(storage, feature_id, extension):
     try:
         return Feature_.endpoint_response(**arguments)
     except Exception as e:
+        print e
         return status_.status_500(e), 500
 
 

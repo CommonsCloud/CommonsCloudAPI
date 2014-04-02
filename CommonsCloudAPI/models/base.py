@@ -27,6 +27,7 @@ Import Python Dependencies
 """
 import re
 import uuid
+import datetime
 
 from collections import OrderedDict
 
@@ -286,8 +287,8 @@ class CommonsModel(object):
     """
     new_table = db.Table(table_name, db.metadata,
       db.Column('id', db.Integer(), primary_key=True),
-      db.Column('created', db.DateTime()),
-      db.Column('geometry', Geometry('GEOMETRY'), nullable=False),
+      db.Column('created', db.DateTime(), default=datetime.now()),
+      db.Column('geometry', Geometry('GEOMETRY'), nullable=True),
       db.Column('status', db.String(24), nullable=False)
     )
 

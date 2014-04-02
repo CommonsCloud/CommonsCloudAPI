@@ -190,7 +190,7 @@ class Field(db.Model, CommonsModel):
 
         self.set_user_field_permissions(field_, permission, current_user)
         
-        # self.set_template_field_relationship(field_, Template_)
+        self.set_template_field_relationship(field_, Template_)
 
 
         """

@@ -27,6 +27,8 @@ from flask import request
 
 from flask.ext.security import current_user
 
+from geoalchemy2.functions import ST_AsGeoJSON
+
 from flask.ext.restless.views import API
 from flask.ext.restless.views import FunctionAPI
 
@@ -44,13 +46,15 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
+from CommonsCloudAPI.utilities.geometry import ST_GeomFromGeoJSON
+
 
 """
 Define our individual models
 """
 class Feature(CommonsModel):
 
-    __public__ = ['id', 'name', 'created', 'status']
+    __public__ = ['id', 'name', 'created', 'status', 'geometry']
 
     def __init__(self):
         pass
@@ -75,6 +79,7 @@ class Feature(CommonsModel):
             return status_.status_400("You didn't submit any content with your request."), 400
 
 
+        content_['geometry'] = ST_GeomFromGeoJSON(json.dumps(content_.get('geometry', None)))
         content_['created'] = content_.get('created', datetime.now())
         content_['status'] = content_.get('status', 'public')
 
@@ -97,6 +102,10 @@ class Feature(CommonsModel):
         Storage_ = self.get_storage(this_template, this_template.fields)
 
         feature = Storage_.query.get(feature_id)
+
+        the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
+
+        feature.geometry = json.loads(the_geometry)
 
         if not hasattr(feature, 'id'):
             return abort(404)
