@@ -71,8 +71,7 @@ class Feature(CommonsModel):
 
         try:
             content_ = json.loads(request_object.data)
-        except Exception, e:
-            # return abort(400, e)
+        except Exception as e:
             return status_.status_400("You didn't submit any content with your request."), 400
 
 

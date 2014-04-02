@@ -78,6 +78,9 @@ def feature_get(storage, feature_id, extension):
         'code': 200
     }
 
+    if (extension == 'csv'):
+        return status_.status_415('We do not support exporting a single item as a CSV file.'), 415
+
     try:
         return Feature_.endpoint_response(**arguments)
     except Exception as e:
