@@ -177,11 +177,7 @@ class CommonsModel(object):
       "textarea": db.Text(),
       "boolean": db.Boolean(),
       "date": db.Date(),
-      "time": db.Time(),
-      "point": Geometry('POINT'),
-      "polygon": Geometry('POLYGON'),
-      "linestring": Geometry('LINESTRING'),
-      "geometry": Geometry('GEOMETRY')
+      "time": db.Time()
     }
 
     if field.data_type == 'relationship':
@@ -291,6 +287,7 @@ class CommonsModel(object):
     new_table = db.Table(table_name, db.metadata,
       db.Column('id', db.Integer(), primary_key=True),
       db.Column('created', db.DateTime()),
+      db.Column('geometry', Geometry('GEOMETRY'), nullable=False),
       db.Column('status', db.String(24), nullable=False)
     )
 
