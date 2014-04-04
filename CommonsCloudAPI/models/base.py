@@ -127,10 +127,10 @@ class CommonsModel(object):
 
         result = to_dict(object_)
 
-        # result = OrderedDict()
-        # for key in object_.__mapper__.c.keys():
-        #   if key in self.__public__:
-        #     result[key] = getattr(object_, key)
+        result = OrderedDict()
+        for key in object_.__mapper__.c.keys():
+          if key in self.__public__:
+            result[key] = getattr(object_, key)
 
         list_.append(result)
 
@@ -263,6 +263,16 @@ class CommonsModel(object):
       'storage': attachment_table_name
     }
 
+  """
+  Storage name
+  """
+  def validate_storage(self, storage_name):
+
+    if not storage_name.startswith('type_'):
+      storage_name = str('type_' + storage_name)
+
+    return storage_name
+
 
   """
   Create a table in the database that contains a base line of defaults
@@ -388,51 +398,6 @@ class CommonsModel(object):
 
     return new_column
 
-
-  # def get_storage(self, template, fields=[]):
-
-  #   class_name = str(template.storage)
-
-  #   arguments = _get_storage_arguments(template, class_name)
-
-  #   Model = type(class_name, (db.Model,), arguments)
-
-  #   db.metadata.bind = db.engine
-
-  #   """
-  #   For the API to return items properly, we should check to see if the fields
-  #   we are attempting to call are marked as listed or not.
-  #   """
-  #   if fields:
-
-  #     public_fields = self.__public__
-
-  #     for field in fields:
-  #       if field.is_listed:
-  #         public_fields.append(field.name)
-
-  #     self.__public__ = public_fields
-
-  #   return Model
-
-
-  # def _get_storage_arguments(self, template, class_name):
-
-  #   Table_ = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
-
-  #   arguments = {
-  #       "__table__": Table_,
-  #       "__tablename__": class_name,
-  #       "__table_args__": {
-  #           "extend_existing": True
-  #       }
-  #   }
-
-
-
-  #   return arguments
-
-
   def get_storage(self, template, fields=[]):
 
     if type(template) is str:
@@ -451,6 +416,22 @@ class CommonsModel(object):
     class_arguments = self.get_class_arguments(**arguments)
 
     Model = type(class_name, (db.Model,), class_arguments)
+
+
+    """
+    For the API to return items properly, we should check to see if the fields
+    we are attempting to call are marked as listed or not.
+    """
+    if fields:
+
+      public_fields = self.__public__
+
+      for field in fields:
+        if field.is_listed:
+          public_fields.append(field.name)
+
+      self.__public__ = public_fields
+
 
     return Model
 

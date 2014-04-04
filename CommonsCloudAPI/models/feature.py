@@ -61,9 +61,14 @@ class Feature(CommonsModel):
 
     def feature_create(self, request_object, storage_):
 
-        storage = str('type_' + storage_)
+        print 'creation for ', storage_
+
+        storage = self.validate_storage(storage_)
         Template_ = Template.query.filter_by(storage=storage).first()
         Storage_ = self.get_storage(Template_)
+
+        print Storage_
+        print dir(Storage_)
 
         """
         Relationships and Attachments
@@ -99,25 +104,31 @@ class Feature(CommonsModel):
 
         for field_ in content_:
           if field_ not in relationships:
-            new_content[field_] = content_[field_]
-          elif field_ in relationships:
-            new_feature_relationships = self.feature_relationships()
-          elif field_ in attachments:
-            new_feature_attachments = self.feature_attachments()
+            new_content[field_] = content_.get(field_, None)
 
         """
         Create the new feature and save it to the database
         """
-        new_feature = Storage_(**new_content)
+        print 'Complete Feature ready for submission > ', new_content, new_content.keys()
 
+        new_feature = Storage_(**new_content)
         db.session.add(new_feature)
+        db.session.commit()
+
+        for field_ in content_:
+          if field_ in relationships:
+            this_field = content_.get(field_, None)
+            association_table = self._get_field_association(Template_, field_)
+            print 'association_table', association_table
+            new_feature_relationships = self.feature_relationships(this_field, new_feature.id, association_table)
+
         db.session.commit()
 
         return new_feature
 
     def feature_get(self, storage_, feature_id):
 
-        storage = str('type_' + storage_)
+        storage = self.validate_storage(storage_)
 
         Template_ = Template()
         Field_ = Field()
@@ -144,7 +155,7 @@ class Feature(CommonsModel):
 
     def feature_statistic(self, storage_, search_path):
 
-        storage = str('type_' + storage_)
+        storage = self.validate_storage(storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
 
@@ -156,7 +167,7 @@ class Feature(CommonsModel):
 
     def feature_list(self, storage_):
 
-        storage = str('type_' + storage_)
+        storage = self.validate_storage(storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
 
@@ -188,7 +199,7 @@ class Feature(CommonsModel):
 
     def feature_delete(self, storage_, feature_id):
 
-        storage = str('type_' + storage_)
+        storage = self.validate_storage(storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
 
@@ -204,18 +215,30 @@ class Feature(CommonsModel):
 
         return True
 
-    def feature_relationships(self):
-      print 'relationships processing > ', field_
-      pass
+    def feature_relationships(self, content, parent_id, association_table):
+
+      if not type(content) is list:
+        abort(500)
+
+      print 'association_table', type(association_table), association_table
+      Storage_ = self.get_storage(str(association_table))
+
+      for child_feature in content:
+        if 'id' in child_feature:
+          relationship_ = Storage_(parent_id=parent_id, child_id=child_feature['id'])
+          db.session.add(relationship_)
+
 
     def _feature_relationship_associate(self):
       pass
 
-    def _feature_relationship_create(self):
+    def _feature_relationship_create(self, request_object, ):
+      # for storage in new_feature.__mapper__.relationships.keys():
+      #   self.feature_create(self, request_object, storage_)
       pass
 
     def feature_attachments(self):
-      print 'attachment processing > ', field_
+      print 'attachment processing > '
       pass
 
     def _feature_attachment_associate(self):
@@ -224,12 +247,21 @@ class Feature(CommonsModel):
     def _feature_attachment_create(self):
       pass
 
+    def _get_field_association(self, template, relationship):
+
+      for field in template.fields:
+        if field.relationship == relationship:
+          return field.association
+
     def _get_fields_of_type(self, template_, type_):
 
       fields_ = []
 
       for field in template_.fields:
         if field.data_type == type_:
-          fields_.append(field.name)
+          if type_ == 'relationship':
+            fields_.append(field.relationship)
+          else:
+            fields_.append(field.name)
 
       return fields_
