@@ -65,24 +65,41 @@ class Feature(CommonsModel):
 
         Template_ = Template.query.filter_by(storage=storage).first()
 
+        """
+        Relationships and Attachments
+        """
+        attachments = self._get_fields_of_type(Template_, 'file')
+        relationships = self._get_fields_of_type(Template_, 'relationships')
+
+        print attachments
+        print relationships
+
         Storage_ = self.get_storage(Template_)
 
-        # print 'Storage_'
-        # print dir(Storage_)
+        """
+        Setup the request object so that we can work with it
+        """
+        request_ = json.loads(request_object.data)
+        content_ = request_
 
-        # print 'relationships'
-        # print Storage_.__mapper__.relationships.keys()
+        """
+        Check for a geometry and if it exists, we need to add a new geometry
+        key to the content_ dictionary
+        """
+        geometry_ = content_.get('geometry', None)
+        if geometry_ is not None:
+            content_['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
 
-        try:
-            content_ = json.loads(request_object.data)
-        except Exception as e:
-            return status_.status_400("You didn't submit any content with your request."), 400
-
-
-        content_['geometry'] = ST_GeomFromGeoJSON(json.dumps(content_.get('geometry', None)))
+        """
+        Set our created and status attributes based on user input or at least
+        setup the default
+        """
         content_['created'] = content_.get('created', datetime.now())
         content_['status'] = content_.get('status', 'public')
 
+        """
+        Create the new feature and save it to the database
+        """
         new_feature = Storage_(**content_)
 
         db.session.add(new_feature)
@@ -160,7 +177,7 @@ class Feature(CommonsModel):
         return endpoint_._search()
 
     def feature_delete(self, storage_, feature_id):
-        
+
         storage = str('type_' + storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
@@ -177,3 +194,12 @@ class Feature(CommonsModel):
 
         return True
 
+    def _get_fields_of_type(self, template_, type_):
+
+      fields_ = []
+
+      for field in template_.fields:
+        if field.data_type == type_:
+          fields_.append(field.name)
+
+      return fields_

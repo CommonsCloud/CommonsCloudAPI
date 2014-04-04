@@ -32,7 +32,6 @@ from .permissions import permission_required
 
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
-# @module.route('/v2/features/<string:storage>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
 def feature_list(storage, extension):
 
@@ -112,9 +111,8 @@ def feature_create(storage, extension):
 def feature_delete(storage, feature_id, extension):
 
     Feature().feature_delete(storage, feature_id)
-    
+
     try:
         return status_.status_204(), 204
     except Exception as e:
         return status_.status_500(e), 500
-
