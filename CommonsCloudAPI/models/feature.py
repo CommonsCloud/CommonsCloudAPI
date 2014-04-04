@@ -62,19 +62,14 @@ class Feature(CommonsModel):
     def feature_create(self, request_object, storage_):
 
         storage = str('type_' + storage_)
-
         Template_ = Template.query.filter_by(storage=storage).first()
+        Storage_ = self.get_storage(Template_)
 
         """
         Relationships and Attachments
         """
         attachments = self._get_fields_of_type(Template_, 'file')
-        relationships = self._get_fields_of_type(Template_, 'relationships')
-
-        print attachments
-        print relationships
-
-        Storage_ = self.get_storage(Template_)
+        relationships = self._get_fields_of_type(Template_, 'relationship')
 
         """
         Setup the request object so that we can work with it
@@ -98,9 +93,22 @@ class Feature(CommonsModel):
         content_['status'] = content_.get('status', 'public')
 
         """
+        Strip and re-process any relationships or attachments
+        """
+        new_content = {}
+
+        for field_ in content_:
+          if field_ not in relationships:
+            new_content[field_] = content_[field_]
+          elif field_ in relationships:
+            new_feature_relationships = self.feature_relationships()
+          elif field_ in attachments:
+            new_feature_attachments = self.feature_attachments()
+
+        """
         Create the new feature and save it to the database
         """
-        new_feature = Storage_(**content_)
+        new_feature = Storage_(**new_content)
 
         db.session.add(new_feature)
         db.session.commit()
@@ -120,9 +128,11 @@ class Feature(CommonsModel):
 
         feature = Storage_.query.get(feature_id)
 
-        the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
+        if this_template.is_geospatial and feature.geometry is not None:
+          print 'feature.geometry', feature.geometry
+          the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
 
-        feature.geometry = json.loads(the_geometry)
+          feature.geometry = json.loads(the_geometry)
 
         if not hasattr(feature, 'id'):
             return abort(404)
@@ -193,6 +203,26 @@ class Feature(CommonsModel):
         db.session.commit()
 
         return True
+
+    def feature_relationships(self):
+      print 'relationships processing > ', field_
+      pass
+
+    def _feature_relationship_associate(self):
+      pass
+
+    def _feature_relationship_create(self):
+      pass
+
+    def feature_attachments(self):
+      print 'attachment processing > ', field_
+      pass
+
+    def _feature_attachment_associate(self):
+      pass
+
+    def _feature_attachment_create(self):
+      pass
 
     def _get_fields_of_type(self, template_, type_):
 

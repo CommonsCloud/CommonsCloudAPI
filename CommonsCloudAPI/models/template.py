@@ -45,7 +45,7 @@ from CommonsCloudAPI.models.application import Application
 Application to Template Association
 
 Each template belongs to a specific application, even if the template is
-shared across multiple applications ... each instance will need to have a 
+shared across multiple applications ... each instance will need to have a
 one to one relationship (application <=> templates)
 
 While we don't technically need to have an association table at this time,
@@ -100,13 +100,13 @@ the system.
 """
 class Template(db.Model, CommonsModel):
 
-  __public__ = ['id', 'name', 'help', 'storage', 'is_public', 'is_crowdsourced', 'is_moderated', 'is_listed', 'created', 'status', 'fields']
+  __public__ = ['id', 'name', 'help', 'storage', 'is_public', 'is_crowdsourced', 'is_moderated', 'is_listed', 'is_geospatial', 'created', 'status', 'fields']
 
   __tablename__ = 'template'
   __table_args__ = {
     'extend_existing': True
   }
-  
+
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(60))
   help = db.Column(db.String(255))
@@ -371,7 +371,7 @@ class Template(db.Model, CommonsModel):
   @param (dict) permission
       A dictionary containing boolean values for the `view`, `edit`, and `delete` properties
 
-      Example: 
+      Example:
 
         permission = {
           'view': True,
@@ -470,12 +470,9 @@ class Template(db.Model, CommonsModel):
 
   """
   def application_templates_get(self, application_id):
-  
+
 
     template_id_list = self._application_templates_id_list(application_id)
     templates_ = Template.query.filter(Template.id.in_(template_id_list)).all()
 
     return templates_
-
-
-

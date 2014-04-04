@@ -86,7 +86,7 @@ A field that helps make up a Template within CommonsCloudAPI
     The base model for which all CommonsCloudAPI models stem
 """
 class Field(db.Model, CommonsModel):
-  
+
     __public__ = ['id', 'label', 'name', 'help', 'data_type', 'relationship', 'is_listed', 'is_searchable', 'is_required', 'weight', 'status']
 
     __tablename__ = 'field'
@@ -145,7 +145,7 @@ class Field(db.Model, CommonsModel):
 
         """
         Fields are directly tied to Templates and really have no life of their
-        own outside of Templates. Because of that we need to instantiate a 
+        own outside of Templates. Because of that we need to instantiate a
         Template object that we can work with
         """
         Template_ = Template().query.get(template_id)
@@ -189,7 +189,7 @@ class Field(db.Model, CommonsModel):
         }
 
         self.set_user_field_permissions(field_, permission, current_user)
-        
+
         self.set_template_field_relationship(field_, Template_)
 
 
@@ -236,7 +236,7 @@ class Field(db.Model, CommonsModel):
 
         """
         Fields are directly tied to Templates and really have no life of their
-        own outside of Templates. Because of that we need to instantiate a 
+        own outside of Templates. Because of that we need to instantiate a
         Template object that we can work with
         """
         field_ = Field().query.get(field_id)
@@ -302,7 +302,7 @@ class Field(db.Model, CommonsModel):
 
     """
     def field_get(self, field_id):
-        
+
         field_ = Field.query.get(field_id)
 
         if not hasattr(field_, 'id'):
@@ -323,7 +323,7 @@ class Field(db.Model, CommonsModel):
     @param (dict) permission
       A dictionary containing boolean values for the `view`, `edit`, and `delete` properties
 
-      Example: 
+      Example:
 
         permission = {
           'view': True,
@@ -385,11 +385,9 @@ class Field(db.Model, CommonsModel):
         Set the ID of the Template to act upon
         """
         new_field.field_id = field.id
+        new_field.template_id = template.id
 
-        """
-        Add the new permissions defined with the user defined
-        """
-        template.fields.append(new_field)
+        db.session.add(new_field)
         db.session.commit()
 
         return new_field
@@ -428,7 +426,7 @@ class Field(db.Model, CommonsModel):
 
         if not hasattr(template_, 'id'):
           return abort(404)
-    
+
         return list(template_.fields)
 
 
@@ -455,4 +453,3 @@ class Field(db.Model, CommonsModel):
         db.session.commit()
 
         return True
-

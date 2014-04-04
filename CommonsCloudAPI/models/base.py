@@ -27,7 +27,7 @@ Import Python Dependencies
 """
 import re
 import uuid
-import datetime
+from datetime import datetime
 
 from collections import OrderedDict
 
@@ -66,7 +66,7 @@ class CommonsModel(object):
 
   def __init__(self):
     pass
- 
+
   """
   In order to be able to work with an object it needs to be serialized,
   otherwise we can turn it into any type of file
@@ -94,13 +94,13 @@ class CommonsModel(object):
       #       `result[key].append(item.template_id)` is the only thing that
       #       needs to be wrapped to make this thing complete.
       #
-      
+
       # for key in _content.__mapper__.relationships.keys():
       #   if key in self.__public_relationships__ and _content.__mapper__.relationships[key].uselist:
       #     result[key] = []
       #     for item in getattr(_content, key):
       #       result[key].append(item.template_id)
-            
+
       return result
 
 
@@ -219,7 +219,7 @@ class CommonsModel(object):
     Make sure everything commits to the database
     """
     db.create_all()
-    
+
     return {
       'type': 'relationship',
       'storage': table_name
@@ -271,7 +271,7 @@ class CommonsModel(object):
 
     if not table_name:
       table_name = self.generate_template_hash()
-    
+
 
     """
     Why are we closing the session, what gives?
@@ -292,12 +292,12 @@ class CommonsModel(object):
       db.Column('status', db.String(24), nullable=False)
     )
 
-   
+
     """
     Make sure everything commits to the database
     """
     db.create_all()
-    
+
     return table_name
 
 
@@ -317,7 +317,7 @@ class CommonsModel(object):
 
     if not template.storage or not hasattr(field, 'data_type'):
       return abort(404)
-    
+
     """
     Create a new custom table for a Feature Type
     """
@@ -353,7 +353,7 @@ class CommonsModel(object):
     restart the application, which would be very bad
     """
     assert new_column is exisitng_table.c[field.name]
-    
+
     return new_column
 
 
@@ -361,7 +361,7 @@ class CommonsModel(object):
 
     if not template.storage:
       return abort(404)
-    
+
     """
     Create a new custom table for a Feature Type
     """
@@ -385,7 +385,7 @@ class CommonsModel(object):
     restart the application, which would be very bad
     """
     assert new_column is exisitng_table.c['owner']
-    
+
     return new_column
 
 
@@ -404,7 +404,7 @@ class CommonsModel(object):
   #   we are attempting to call are marked as listed or not.
   #   """
   #   if fields:
-        
+
   #     public_fields = self.__public__
 
   #     for field in fields:
@@ -451,7 +451,7 @@ class CommonsModel(object):
     class_arguments = self.get_class_arguments(**arguments)
 
     Model = type(class_name, (db.Model,), class_arguments)
-    
+
     return Model
 
 
@@ -482,9 +482,9 @@ class CommonsModel(object):
     """
     Unfortunately we have to manually load the relationships that
     our models need to work properly.
-    
+
     To build relationships out properly we need a few things:
-    
+
     'type_5740f6daa55f4fc790e7eeacb96d726e' : db.relationship('type_5740f6daa55f4fc790e7eeacb96d726e', secondary=our_reference_table, backref=db.backref(class_name))
 
     1. We need the name of the association table (e.g., ref_XXXXXXXXXXXXXXXXXXXXX)
@@ -492,29 +492,29 @@ class CommonsModel(object):
        be referenced (e.g., type_XXXXXXXXXXXXXXXXXXX)
     3. We should have a model class for the association table
     4. We need the name of the class or 'storage' of the Class being acted on
-    
+
     """
     for relationship in relationships:
-      
+
       table_name = str(relationship.relationship)
 
       RelationshipModel = self.get_storage(table_name)
-      
-      
-      # """
-      # Setup our association table for each relationship that we have
-      # in our fields list
-      # """
+
+
+      """
+      Setup our association table for each relationship that we have
+      in our fields list
+      """
       parent_id_key = str(class_name) + '.id'
       child_id_key = table_name + '.id'
-      
-      association_table = db.Table(str(relationship.get('association_table')), db.metadata,
+
+      association_table = db.Table(str(relationship.association), db.metadata,
           db.Column('parent_id', db.Integer, db.ForeignKey(parent_id_key), primary_key=True),
           db.Column('child_id', db.Integer, db.ForeignKey(child_id_key), primary_key=True),
           extend_existing = True,
           autoload = True,
           autoload_with = db.engine
-      )    
+      )
 
       class_arguments[table_name] = db.relationship(RelationshipModel, secondary=association_table, backref=class_name)
 
@@ -526,7 +526,7 @@ class CommonsModel(object):
   for them to operate properly
   """
   def get_relationship_fields(self, fields):
-      
+
     relationships = []
 
     for field in fields:
@@ -567,7 +567,7 @@ class CommonsModel(object):
     Delete the new column just like we would if we were hard coding the model
     """
     exisitng_table.c[field.name].drop()
-    
+
     return True
 
 
@@ -583,14 +583,14 @@ class CommonsModel(object):
       If the `the_content` is really a list then we should give int
       a name for the list to be keyed as in the returned JSON object
 
-  @return (object) 
+  @return (object)
       An JSON object either contianing the formatted content or an error
       message describing why the content couldn't be delivered
 
   """
   def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200):
 
-    
+
     # print json.dumps({'features': the_content.data})
 
 
@@ -630,4 +630,3 @@ class CommonsModel(object):
     tell them that, by directing them to an "Unsupported Media Type"
     """
     return status_.status_415(), 415
-
