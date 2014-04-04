@@ -14,8 +14,10 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
-from flask import request
 from flask import jsonify
+from flask import redirect
+from flask import request
+from flask import url_for
 
 
 """
@@ -94,14 +96,13 @@ def feature_create(storage, extension):
     Feature_ = Feature()
     new_feature = Feature_.feature_create(request, storage)
 
-    arguments = {
-        "the_content": new_feature,
-        "extension": extension,
-        "code": 201
-    }
-
     try:
-        return Feature_.endpoint_response(**arguments)
+        arguments = {
+          "storage": storage,
+          "feature_id": new_feature.id,
+          "extension": extension
+        }
+        return redirect(url_for('.feature_get', **arguments))
     except Exception as e:
         return status_.status_500(e), 500
 
