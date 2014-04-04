@@ -61,14 +61,9 @@ class Feature(CommonsModel):
 
     def feature_create(self, request_object, storage_):
 
-        print 'creation for ', storage_
-
         storage = self.validate_storage(storage_)
         Template_ = Template.query.filter_by(storage=storage).first()
         Storage_ = self.get_storage(Template_)
-
-        print Storage_
-        print dir(Storage_)
 
         """
         Relationships and Attachments
@@ -97,9 +92,6 @@ class Feature(CommonsModel):
         content_['created'] = content_.get('created', datetime.now())
         content_['status'] = content_.get('status', 'public')
 
-        """
-        Strip and re-process any relationships or attachments
-        """
         new_content = {}
 
         for field_ in content_:
@@ -109,18 +101,14 @@ class Feature(CommonsModel):
         """
         Create the new feature and save it to the database
         """
-        print 'Complete Feature ready for submission > ', new_content, new_content.keys()
-
         new_feature = Storage_(**new_content)
         db.session.add(new_feature)
         db.session.commit()
 
         for field_ in content_:
           if field_ in relationships:
-            this_field = content_.get(field_, None)
-            association_table = self._get_field_association(Template_, field_)
-            print 'association_table', association_table
-            new_feature_relationships = self.feature_relationships(this_field, new_feature.id, association_table)
+            association_table = self._feature_relationship_associate(Template_, field_)
+            new_feature_relationships = self.feature_relationships(content_.get(field_, None), new_feature.id, association_table)
 
         db.session.commit()
 
@@ -130,10 +118,7 @@ class Feature(CommonsModel):
 
         storage = self.validate_storage(storage_)
 
-        Template_ = Template()
-        Field_ = Field()
-
-        this_template = Template_.query.filter_by(storage=storage).first()
+        this_template = Template.query.filter_by(storage=storage).first()
 
         Storage_ = self.get_storage(this_template, this_template.fields)
 
@@ -173,18 +158,6 @@ class Feature(CommonsModel):
 
         Model_ = self.get_storage(this_template)
 
-        #
-        # @todo
-        #       This is where we need to get a list of fields, from the
-        #       template `this_template` that have an `is_listed` value
-        #       of True in the database
-        #
-        # @todo
-        #       We also need to make sure we're post processing the data
-        #       so that GeoJSON is being returned properly and so that
-        #       we can easily export to other formats.
-        #
-        #
         arguments = {
             "include_columns": ['id', 'well_name'],
             "preprocessors": {
@@ -220,25 +193,25 @@ class Feature(CommonsModel):
       if not type(content) is list:
         abort(500)
 
-      print 'association_table', type(association_table), association_table
       Storage_ = self.get_storage(str(association_table))
 
       for child_feature in content:
         if 'id' in child_feature:
           relationship_ = Storage_(parent_id=parent_id, child_id=child_feature['id'])
           db.session.add(relationship_)
+        else:
+          print 'We need to save a new feature because it doesn\'t exist'
 
 
-    def _feature_relationship_associate(self):
-      pass
+    def _feature_relationship_associate(self, template, relationship):
+      for field in template.fields:
+        if field.relationship == relationship:
+          return field.association
 
     def _feature_relationship_create(self, request_object, ):
-      # for storage in new_feature.__mapper__.relationships.keys():
-      #   self.feature_create(self, request_object, storage_)
       pass
 
     def feature_attachments(self):
-      print 'attachment processing > '
       pass
 
     def _feature_attachment_associate(self):
@@ -246,12 +219,6 @@ class Feature(CommonsModel):
 
     def _feature_attachment_create(self):
       pass
-
-    def _get_field_association(self, template, relationship):
-
-      for field in template.fields:
-        if field.relationship == relationship:
-          return field.association
 
     def _get_fields_of_type(self, template_, type_):
 
