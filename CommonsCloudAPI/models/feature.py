@@ -74,8 +74,7 @@ class Feature(CommonsModel):
         """
         Setup the request object so that we can work with it
         """
-        request_ = json.loads(request_object.data)
-        content_ = request_
+        content_ = json.loads(request_object.data)
 
         """
         Check for a geometry and if it exists, we need to add a new geometry
@@ -128,14 +127,14 @@ class Feature(CommonsModel):
 
         feature = Storage_.query.get(feature_id)
 
+        if not hasattr(feature, 'id'):
+            return abort(404)
+
         if this_template.is_geospatial and feature.geometry is not None:
           print 'feature.geometry', feature.geometry
           the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
 
           feature.geometry = json.loads(the_geometry)
-
-        if not hasattr(feature, 'id'):
-            return abort(404)
 
         return feature
 
