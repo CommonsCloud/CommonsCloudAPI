@@ -95,7 +95,7 @@ class Feature(CommonsModel):
         new_content = {}
 
         for field_ in content_:
-          if field_ not in relationships:
+          if field_ not in relationships and field_ not in attachments:
             new_content[field_] = content_.get(field_, None)
 
         """
@@ -105,12 +105,16 @@ class Feature(CommonsModel):
         db.session.add(new_feature)
         db.session.commit()
 
+
+        """
+        Save relationships and attachments
+        """
         for field_ in content_:
           if field_ in relationships:
             association_table = self._feature_relationship_associate(Template_, field_)
             new_feature_relationships = self.feature_relationships(content_.get(field_, None), new_feature.id, association_table)
-
-        db.session.commit()
+          elif field_ in attachments:
+            pass
 
         return new_feature
 
@@ -190,9 +194,6 @@ class Feature(CommonsModel):
 
     def feature_relationships(self, content, parent_id, association_table):
 
-      if not type(content) is list:
-        abort(500)
-
       Storage_ = self.get_storage(str(association_table))
 
       for child_feature in content:
@@ -201,6 +202,8 @@ class Feature(CommonsModel):
           db.session.add(relationship_)
         else:
           print 'We need to save a new feature because it doesn\'t exist'
+
+      db.session.commit()
 
 
     def _feature_relationship_associate(self, template, relationship):
