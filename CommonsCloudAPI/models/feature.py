@@ -165,16 +165,16 @@ class Feature(CommonsModel):
         if not hasattr(feature, 'id'):
             return abort(404)
 
-        child_features = getattr(feature, relationship)
-
+        """
+        We need to create a generic list of each of the features because we
+        cannot display a InstrumentedList via `endpoint_response`
+        """
         relationships = []
 
-        for child_feature in child_features:
+        for child_feature in getattr(feature, relationship):
           relationships.append(child_feature)
 
-
         return relationships
-
 
     def feature_update(self, request_object, template_id, feature_id):
         pass
