@@ -74,7 +74,12 @@ class Feature(CommonsModel):
         """
         Setup the request object so that we can work with it
         """
-        content_ = json.loads(request_object.data)
+        print request_object
+        if hasattr(request_object, 'data'):
+          content_ = json.loads(request_object.data)
+        else:
+          content_ = request_object
+
 
         """
         Check for a geometry and if it exists, we need to add a new geometry
@@ -110,8 +115,17 @@ class Feature(CommonsModel):
         """
         for field_ in content_:
           if field_ in relationships:
-            association_table = self._feature_relationship_associate(Template_, field_)
-            new_feature_relationships = self.feature_relationships(content_.get(field_, None), new_feature.id, association_table)
+
+            assoc_ = self._feature_relationship_associate(Template_, field_)
+
+            details = {
+              "parent_id": new_feature.id,
+              "child_table": field_,
+              "content": content_.get(field_, None),
+              "association_table": assoc_
+            }
+
+            new_feature_relationships = self.feature_relationships(**details)
           elif field_ in attachments:
             pass
 
@@ -191,16 +205,23 @@ class Feature(CommonsModel):
 
         return True
 
-    def feature_relationships(self, content, parent_id, association_table):
+    def feature_relationships(self, child_table, content, parent_id, association_table):
 
       Storage_ = self.get_storage(str(association_table))
+
+      print 'child_table', child_table
 
       for child_feature in content:
         if 'id' in child_feature:
           relationship_ = Storage_(parent_id=parent_id, child_id=child_feature['id'])
           db.session.add(relationship_)
         else:
-          print 'We need to save a new feature because it doesn\'t exist'
+          new_feature = self.feature_create(child_feature, child_table)
+          db.session.add(new_feature)
+          db.session.commit()
+
+          relationship_ = Storage_(parent_id=parent_id, child_id=new_feature.id)
+          db.session.add(relationship_)
 
       db.session.commit()
 
