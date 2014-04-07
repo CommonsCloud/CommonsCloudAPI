@@ -74,13 +74,23 @@ class Feature(CommonsModel):
         """
         Setup the request object so that we can work with it
         """
-        print request_object
-        if hasattr(request_object, 'data'):
+        # if hasattr(request_object, 'data'):
+        #   content_ = json.loads(getattr(request_object, 'data'))
+        # else:
+        #   content_ = request_object
+
+        if request_object.data:
           content_ = json.loads(request_object.data)
-        else:
-          content_ = request_object
+        elif request_object.form:
+          content_ = json.loads(request_object.form['data'])
 
+        if hasattr(request_object, 'files'):
+          print 'has files'
+        #   print 'has files', getattr(request_object, 'files')
+        # else:
+        #   print 'has no files', request_object.get('files')
 
+        
         """
         Check for a geometry and if it exists, we need to add a new geometry
         key to the content_ dictionary
@@ -88,45 +98,46 @@ class Feature(CommonsModel):
         geometry_ = content_.get('geometry', None)
         if geometry_ is not None:
             content_['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
-
+        
         """
         Set our created and status attributes based on user input or at least
         setup the default
         """
         content_['created'] = content_.get('created', datetime.now())
         content_['status'] = content_.get('status', 'public')
-
+        
         new_content = {}
-
+        
         for field_ in content_:
           if field_ not in relationships and field_ not in attachments:
             new_content[field_] = content_.get(field_, None)
-
+        
         """
         Create the new feature and save it to the database
         """
         new_feature = Storage_(**new_content)
         db.session.add(new_feature)
         db.session.commit()
-
-
+        
+        
         """
         Save relationships and attachments
         """
         for field_ in content_:
           if field_ in relationships:
-
+        
             assoc_ = self._feature_relationship_associate(Template_, field_)
-
+        
             details = {
               "parent_id": new_feature.id,
               "child_table": field_,
               "content": content_.get(field_, None),
               "assoc_": assoc_
             }
-
+        
             new_feature_relationships = self.feature_relationships(**details)
           elif field_ in attachments:
+            print request_object.files
             pass
 
         return new_feature
