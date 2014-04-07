@@ -122,7 +122,7 @@ class Feature(CommonsModel):
               "parent_id": new_feature.id,
               "child_table": field_,
               "content": content_.get(field_, None),
-              "association_table": assoc_
+              "assoc_": assoc_
             }
 
             new_feature_relationships = self.feature_relationships(**details)
@@ -205,12 +205,22 @@ class Feature(CommonsModel):
 
         return True
 
-    def feature_relationships(self, child_table, content, parent_id, association_table):
+    def feature_relationships(self, child_table, content, parent_id, assoc_):
 
-      Storage_ = self.get_storage(str(association_table))
+      """
+      We have to make sure that our dynamically typed Model for the association
+      table has been loaded, prior to attempting to save data to it.
+      """
+      Storage_ = self.get_storage(str(assoc_))
 
-      print 'child_table', child_table
+      """
+      This is a little complicated.
 
+      [if] If the object has an `id` then we simply need to take the parent id
+           and the child id, saving them to the association table
+      [el] Else we are assuming that the child doesn't exist and we need to
+           create it before we save it to the assocation table
+      """
       for child_feature in content:
         if 'id' in child_feature:
           relationship_ = Storage_(parent_id=parent_id, child_id=child_feature['id'])
@@ -223,6 +233,10 @@ class Feature(CommonsModel):
           relationship_ = Storage_(parent_id=parent_id, child_id=new_feature.id)
           db.session.add(relationship_)
 
+      """
+      Instead of doing commits on each individual relationship add, we're doing
+      a single commit at the end so we're only writing to the database once.
+      """
       db.session.commit()
 
 
@@ -230,9 +244,6 @@ class Feature(CommonsModel):
       for field in template.fields:
         if field.relationship == relationship:
           return field.association
-
-    def _feature_relationship_create(self, request_object, ):
-      pass
 
     def feature_attachments(self):
       pass
