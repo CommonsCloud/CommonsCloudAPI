@@ -85,7 +85,28 @@ def feature_get(storage, feature_id, extension):
     try:
         return Feature_.endpoint_response(**arguments)
     except Exception as e:
-        print e
+        return status_.status_500(e), 500
+
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/<string:relationship>.<string:extension>', methods=['GET'])
+# @oauth.require_oauth()
+def feature_get_relationship(storage, feature_id, relationship, extension):
+
+    Feature_ = Feature()
+    feature = Feature_.feature_get_relationship(storage, feature_id, relationship)
+
+    arguments = {
+        "the_content": feature,
+        "extension": extension,
+        "code": 200
+    }
+
+    if (extension == 'csv'):
+        return status_.status_415("We do not support exporting a single item or it's relationships as a CSV file."), 415
+
+    try:
+        return Feature_.endpoint_response(**arguments)
+    except Exception as e:
         return status_.status_500(e), 500
 
 

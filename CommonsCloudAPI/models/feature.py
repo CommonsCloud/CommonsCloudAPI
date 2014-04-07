@@ -152,6 +152,30 @@ class Feature(CommonsModel):
 
         return feature
 
+    def feature_get_relationship(self, storage_, feature_id, relationship):
+
+        storage = self.validate_storage(storage_)
+
+        this_template = Template.query.filter_by(storage=storage).first()
+
+        Storage_ = self.get_storage(this_template, this_template.fields)
+
+        feature = Storage_.query.get(feature_id)
+
+        if not hasattr(feature, 'id'):
+            return abort(404)
+
+        child_features = getattr(feature, relationship)
+
+        relationships = []
+
+        for child_feature in child_features:
+          relationships.append(child_feature)
+
+
+        return relationships
+
+
     def feature_update(self, request_object, template_id, feature_id):
         pass
 
@@ -238,7 +262,6 @@ class Feature(CommonsModel):
       a single commit at the end so we're only writing to the database once.
       """
       db.session.commit()
-
 
     def _feature_relationship_associate(self, template, relationship):
       for field in template.fields:
