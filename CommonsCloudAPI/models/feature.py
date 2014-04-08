@@ -74,17 +74,12 @@ class Feature(CommonsModel):
         """
         Setup the request object so that we can work with it
         """
-        # if hasattr(request_object, 'data'):
-        #   content_ = json.loads(getattr(request_object, 'data'))
-        # else:
-        #   content_ = request_object
-
         if request_object.data:
           content_ = json.loads(request_object.data)
         elif request_object.form:
           content_ = json.loads(request_object.form['data'])
 
-        if hasattr(request_object, 'files'):
+        if request_object.files:
           print 'has files'
         #   print 'has files', getattr(request_object, 'files')
         # else:

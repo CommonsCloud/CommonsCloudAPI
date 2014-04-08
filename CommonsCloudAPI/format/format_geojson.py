@@ -112,4 +112,6 @@ class GeoJSON(FormatContent):
     response.headers.add('Pragma', 'no-cache')
     response.headers.add('Cache-Control', 'no-cache')
 
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
     return response

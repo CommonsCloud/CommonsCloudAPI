@@ -26,6 +26,7 @@ from flask.ext.security import login_required
 Import CommonsCloudAPI Dependencies
 """
 from CommonsCloudAPI.extensions import oauth
+from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.user import User
 
@@ -45,8 +46,10 @@ def index():
 
 @module.route('/user/me.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-@login_required
 def user_me(extension):
+
+  if not hasattr(current_user, 'id'):
+    return status_.status_401(), 401
 
   arguments = {
     'the_content': current_user,

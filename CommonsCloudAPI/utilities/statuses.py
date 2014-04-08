@@ -65,7 +65,12 @@ class CommonsStatus():
       'message': 'Looking good McFly'
     }
 
-    return jsonify(message) if self.return_type == 'json' else message
+    response = jsonify(message)
+
+    response.headers.add('Access-Control-Allow-Origin', 'http://127.0.0.1:9000')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+
+    return response
 
 
   """
@@ -164,7 +169,12 @@ class CommonsStatus():
       'details': 'You probably just need to login or authenticate via OAuth before accessing this endpoint. Otherwise you do not have permission to access this resource.'
     }
 
-    return jsonify(message) if self.return_type == 'json' else message
+    response = jsonify(message)
+
+    response.headers.add('Access-Control-Allow-Origin', 'http://127.0.0.1:9000')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+
+    return response
 
 
   """

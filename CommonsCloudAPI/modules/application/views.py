@@ -16,6 +16,8 @@ Import Flask Dependencies
 """
 from flask import request
 
+from flask.ext.security import login_required
+
 
 """
 Import Application Module Dependencies
@@ -65,7 +67,8 @@ def application_post(extension):
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-@permission_required('can_view')
+# @permission_required('can_view')
+@login_required
 def application_get(application_id, extension):
 
   Application_ = Application()
