@@ -575,7 +575,7 @@ class CommonsModel(object):
       message describing why the content couldn't be delivered
 
   """
-  def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200):
+  def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200, **extras):
 
     print 'grr'
 
@@ -586,15 +586,12 @@ class CommonsModel(object):
     Make sure the content is ready to be served
     """
     if not isinstance(the_content, basestring) and extension == 'json':
-      print 'if'
       the_content = {
         list_name: self.serialize_list(the_content)
       }
     elif type(the_content) is list:
-      print 'elif'
       the_content = self.serialize_list(the_content)
     else:
-      print 'else'
       the_content = self.serialize_object(the_content)
 
     """
@@ -603,12 +600,12 @@ class CommonsModel(object):
     """
     if (extension == 'json'):
 
-      this_data = JSON(the_content, list_name=list_name, exclude_fields=exclude_fields)
+      this_data = JSON(the_content, list_name=list_name, exclude_fields=exclude_fields, **extras)
       return this_data.create(), code
 
     elif (extension == 'geojson'):
 
-      this_data = GeoJSON(the_content, list_name=list_name, exclude_fields=exclude_fields)
+      this_data = GeoJSON(the_content, list_name=list_name, exclude_fields=exclude_fields, **extras)
       return this_data.create(), code
 
     elif (extension == 'csv'):

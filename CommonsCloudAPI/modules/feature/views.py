@@ -37,15 +37,20 @@ from .permissions import permission_required
 # @oauth.require_oauth()
 def feature_list(storage, extension):
 
+    if (extension == 'csv'):
+        return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
+
     Feature_ = Feature()
     feature_list = Feature_.feature_list(storage)
 
-    print 'feature_list', type(feature_list), feature_list
-
     arguments = {
-        'the_content': feature_list,
+        'the_content': feature_list.get('objects'),
         'list_name': 'features',
-        'extension': extension
+        'extension': extension,
+        'current_page': feature_list.get('page'),
+        'total_pages': feature_list.get('total_pages'),
+        'total_features': feature_list.get('num_results'),
+        'features_per_page': feature_list.get('limit')
     }
 
     try:
@@ -71,6 +76,9 @@ def feature_statistic(storage, extension):
 # @oauth.require_oauth()
 def feature_get(storage, feature_id, extension):
 
+    if (extension == 'csv'):
+        return status_.status_415('We do not support exporting a single item as a CSV file.'), 415
+
     Feature_ = Feature()
     feature = Feature_.feature_get(storage, feature_id)
 
@@ -79,9 +87,6 @@ def feature_get(storage, feature_id, extension):
         "extension": extension,
         'code': 200
     }
-
-    if (extension == 'csv'):
-        return status_.status_415('We do not support exporting a single item as a CSV file.'), 415
 
     try:
         return Feature_.endpoint_response(**arguments)

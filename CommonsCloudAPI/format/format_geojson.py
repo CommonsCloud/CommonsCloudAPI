@@ -82,7 +82,11 @@ class GeoJSON(FormatContent):
 
           features.append(Feature(**arguments))
 
-        response = jsonify(FeatureCollection(features))
+          arguments = {
+            'properties': self.extras
+          }
+
+        response = jsonify(FeatureCollection(features, **arguments))
     else:
 
         properties = {}

@@ -82,7 +82,7 @@ class CSV(FormatContent):
       """
       Create the Writer for our CSV document
       """
-      writer_ = csv.DictWriter(open_file, headers, lineterminator="\r\n", delimiter=",", doublequote=False, quoting=csv.QUOTE_NONNUMERIC, quotechar="'")
+      writer_ = csv.DictWriter(open_file, headers, lineterminator="\r\n", delimiter=",", doublequote=False, quoting=csv.QUOTE_NONNUMERIC, quotechar="'", escapechar="\n\r")
 
       """
       Write the headers to the document

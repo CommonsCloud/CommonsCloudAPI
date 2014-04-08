@@ -271,7 +271,6 @@ class CommonsStatus():
       'status': '415 Unsupported Media Type',
       'code': '415',
       'message': 'The server is refusing to service the request because the entity of the request is in a format not supported by the requested resource for the requested method.',
-      'details': 'This normally happens when you forget to append a \'Content-Type\' header to the request or when you ask for a format that we don\'t support. CommonsCloud currently supports text/csv and application/json Content-Types and can also support the \'format\' URL parameter with either json or csv as the value',
       'error': str(system_message).replace('"', "")
     }
 
