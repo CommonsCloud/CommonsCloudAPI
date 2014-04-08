@@ -27,6 +27,7 @@ from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.feature import Feature
+from CommonsCloudAPI.models.statistic import Statistic
 
 from . import module
 
@@ -42,6 +43,7 @@ def feature_list(storage, extension):
 
     Feature_ = Feature()
     feature_list = Feature_.feature_list(storage)
+    feature_statistics = Feature_.feature_statistic(storage)
 
     arguments = {
         'the_content': feature_list.get('objects'),
@@ -50,7 +52,8 @@ def feature_list(storage, extension):
         'current_page': feature_list.get('page'),
         'total_pages': feature_list.get('total_pages'),
         'total_features': feature_list.get('num_results'),
-        'features_per_page': feature_list.get('limit')
+        'features_per_page': feature_list.get('limit'),
+        'statistics': feature_statistics
     }
 
     try:
@@ -59,22 +62,22 @@ def feature_list(storage, extension):
         return status_.status_500(e), 500
 
 
-@module.route('/v2/type_<string:storage>/statistics.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-def feature_statistic(storage, extension):
+# @module.route('/v2/type_<string:storage>/statistics.<string:extension>', methods=['GET'])
+# # @oauth.require_oauth()
+# def feature_statistic(storage, extension):
 
-    Feature_ = Feature()
-    feature_statistic = Feature_.feature_statistic(storage, request.args['q'])
+#     Feature_ = Feature()
+#     feature_statistic = Feature_.feature_statistic(storage, request.args['q'])
 
-    arguments = {
-        'the_content': feature_statistic,
-        'extension': extension
-    }
+#     arguments = {
+#         'the_content': feature_statistic,
+#         'extension': extension
+#     }
 
-    try:
-        return Feature_.endpoint_response(**arguments)
-    except Exception as e:
-        return status_.status_500(e), 500
+#     try:
+#         return Feature_.endpoint_response(**arguments)
+#     except Exception as e:
+#         return status_.status_500(e), 500
 
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['GET'])

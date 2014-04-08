@@ -31,7 +31,7 @@ from geoalchemy2.functions import ST_AsGeoJSON
 
 from flask.ext.restless.views import API
 from flask.ext.restless.views import FunctionAPI
-
+from flask.ext.restless.search import search
 
 
 """
@@ -41,6 +41,7 @@ from CommonsCloudAPI.models.base import CommonsModel
 
 from CommonsCloudAPI.models.template import Template
 from CommonsCloudAPI.models.field import Field
+from CommonsCloudAPI.models.statistic import Statistic
 
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
@@ -187,16 +188,17 @@ class Feature(CommonsModel):
 
     def feature_statistic(self, storage_):
 
+        search_params = json.loads(request.args.get('q', '{}'))
+
         storage = self.validate_storage(storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
 
         Model_ = self.get_storage(this_template)
 
-        endpoint_ = FunctionAPI(db.session, Model_)
+        query = search(db.session, Model_, search_params)
 
-        print endpoint_.get()
-        return  'brr'
+        return self.get_statistics(query.all(), this_template)
 
     def feature_list(self, storage_):
 
@@ -288,3 +290,58 @@ class Feature(CommonsModel):
             fields_.append(field.name)
 
       return fields_
+
+    """
+    Determine statistics for this query
+    """
+    def get_statistics(self, query_results, template):
+
+      statistics_list = []
+
+      statistic_field_id_list = self._statistic_field_id_list(template.fields)
+      
+      statistics = Statistic.query.filter(Statistic.field_id.in_(statistic_field_id_list)).all()
+      
+      for statistic in statistics:
+        
+        this_statistic_field = Field.query.get(statistic.field_id)
+        this_statistic_value = self.get_statistic_value(statistic, query_results, this_statistic_field)
+        
+        this_statistic = {
+          "name": statistic.name,
+          "units": statistic.units,
+          "value": this_statistic_value
+        }
+        
+        statistics_list.append(this_statistic)
+        
+      return statistics_list
+        
+    """
+    Return a single value for a given field
+    """
+    def get_statistic_value(self, statistic_object, query_results, field):
+          
+      try:
+        if 'SUM' in statistic_object.function:
+          return self.get_statistic_value_sum(query_results, field)
+
+      except Exception as e:
+        print e
+          
+    def get_statistic_value_sum(self, query_results, field, product = 0):
+
+      for result in query_results:
+        field_value = getattr(result, field.name, '')
+        product = product+int(field_value or 0)
+
+      return product
+
+    def _statistic_field_id_list(self, fields):
+
+      ids = []
+
+      for field in fields:
+        ids.append(field.id)
+
+      return ids
