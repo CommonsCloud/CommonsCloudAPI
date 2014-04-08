@@ -64,10 +64,15 @@ def feature_list(storage, extension):
 def feature_statistic(storage, extension):
 
     Feature_ = Feature()
-    feature_list = Feature_.feature_statistic(storage, request.args['q'])
+    feature_statistic = Feature_.feature_statistic(storage, request.args['q'])
+
+    arguments = {
+        'the_content': feature_statistic,
+        'extension': extension
+    }
 
     try:
-        return feature_list, 200
+        return Feature_.endpoint_response(**arguments)
     except Exception as e:
         return status_.status_500(e), 500
 

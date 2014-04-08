@@ -185,7 +185,7 @@ class Feature(CommonsModel):
     def feature_update(self, request_object, template_id, feature_id):
         pass
 
-    def feature_statistic(self, storage_, search_path):
+    def feature_statistic(self, storage_):
 
         storage = self.validate_storage(storage_)
 
@@ -195,7 +195,8 @@ class Feature(CommonsModel):
 
         endpoint_ = FunctionAPI(db.session, Model_)
 
-        return endpoint_.get()
+        print endpoint_.get()
+        return  'brr'
 
     def feature_list(self, storage_):
 
@@ -205,11 +206,7 @@ class Feature(CommonsModel):
 
         Model_ = self.get_storage(this_template, this_template.fields)
 
-        print 'self.__public__', self.__public__
-
-        arguments = {}
-
-        endpoint_ = API(db.session, Model_, **arguments)
+        endpoint_ = API(db.session, Model_)
 
         return endpoint_._search()
 

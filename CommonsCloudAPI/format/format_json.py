@@ -59,7 +59,8 @@ class JSON(FormatContent):
     expires =  today + timedelta(+30)
 
     response = jsonify({
-      "response": self.the_content
+      "response": self.the_content,
+      "properties": self.extras
     })
 
     response.headers.add('Access-Control-Allow-Origin', 'http://127.0.0.1:9000')

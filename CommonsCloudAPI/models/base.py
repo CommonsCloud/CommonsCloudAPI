@@ -127,8 +127,6 @@ class CommonsModel(object):
 
         result = OrderedDict()
 
-        print 'self.__public__', self.__public__
-
         if hasattr(object_, '__mapper__'):
           for key in object_.__mapper__.c.keys():
             if key in self.__public__:
@@ -576,11 +574,6 @@ class CommonsModel(object):
 
   """
   def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200, **extras):
-
-    print 'grr'
-
-    # print json.dumps({'features': the_content.data})
-
 
     """
     Make sure the content is ready to be served
