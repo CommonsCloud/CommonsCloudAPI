@@ -125,12 +125,18 @@ class CommonsModel(object):
 
       for object_ in _content:
 
-        result = to_dict(object_)
-
         result = OrderedDict()
-        for key in object_.__mapper__.c.keys():
-          if key in self.__public__:
-            result[key] = getattr(object_, key)
+
+        print 'self.__public__', self.__public__
+
+        if hasattr(object_, '__mapper__'):
+          for key in object_.__mapper__.c.keys():
+            if key in self.__public__:
+              result[key] = getattr(object_, key)
+        else:
+          for key in object_.keys():
+            if key in self.__public__:
+              result[key] = object_.get(key)
 
         list_.append(result)
 
@@ -422,7 +428,7 @@ class CommonsModel(object):
     For the API to return items properly, we should check to see if the fields
     we are attempting to call are marked as listed or not.
     """
-    if fields:
+    if fields or hasattr(template, 'fields'):
 
       public_fields = self.__public__
 
@@ -571,6 +577,7 @@ class CommonsModel(object):
   """
   def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200):
 
+    print 'grr'
 
     # print json.dumps({'features': the_content.data})
 
@@ -578,13 +585,16 @@ class CommonsModel(object):
     """
     Make sure the content is ready to be served
     """
-    if type(the_content) is list and extension != 'geojson' and extension != 'csv':
+    if not isinstance(the_content, basestring) and extension == 'json':
+      print 'if'
       the_content = {
         list_name: self.serialize_list(the_content)
       }
     elif type(the_content) is list:
+      print 'elif'
       the_content = self.serialize_list(the_content)
     else:
+      print 'else'
       the_content = self.serialize_object(the_content)
 
     """

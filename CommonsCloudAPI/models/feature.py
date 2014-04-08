@@ -203,15 +203,11 @@ class Feature(CommonsModel):
 
         this_template = Template.query.filter_by(storage=storage).first()
 
-        Model_ = self.get_storage(this_template)
+        Model_ = self.get_storage(this_template, this_template.fields)
 
-        arguments = {
-            "include_columns": ['id', 'well_name'],
-            "preprocessors": {
-                'GET_SINGLE': [],
-                'GET_MANY': []
-            }
-        }
+        print 'self.__public__', self.__public__
+
+        arguments = {}
 
         endpoint_ = API(db.session, Model_, **arguments)
 

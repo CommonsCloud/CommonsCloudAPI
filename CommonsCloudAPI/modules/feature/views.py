@@ -40,15 +40,16 @@ def feature_list(storage, extension):
     Feature_ = Feature()
     feature_list = Feature_.feature_list(storage)
 
+    print 'feature_list', type(feature_list), feature_list
+
     arguments = {
         'the_content': feature_list,
         'list_name': 'features',
-        "extension": extension,
-        'code': 200
+        'extension': extension
     }
+
     try:
-        # return Feature_.endpoint_response(**arguments)
-        return feature_list, 200
+        return Feature_.endpoint_response(**arguments)
     except Exception as e:
         return status_.status_500(e), 500
 
