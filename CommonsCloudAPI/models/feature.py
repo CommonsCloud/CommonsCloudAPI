@@ -14,6 +14,7 @@ limitations under the License.
 """
 Import Python Dependencies
 """
+import boto
 import json
 
 from datetime import datetime
@@ -24,6 +25,7 @@ Import Flask Dependencies
 """
 from flask import abort
 from flask import request
+from flask import current_app
 
 from flask.ext.security import current_user
 
@@ -79,6 +81,8 @@ class Feature(CommonsModel):
           content_ = json.loads(request_object.data)
         elif request_object.form:
           content_ = json.loads(request_object.form['data'])
+        else:
+          return abort(400)
 
         if request_object.files:
           print 'has files'
@@ -133,7 +137,9 @@ class Feature(CommonsModel):
         
             new_feature_relationships = self.feature_relationships(**details)
           elif field_ in attachments:
-            print request_object.files
+            s3 = self.get_s3_connection()
+            print dir(s3)
+            print s3
             pass
 
         return new_feature
@@ -345,3 +351,15 @@ class Feature(CommonsModel):
         ids.append(field.id)
 
       return ids
+
+    def get_s3_connection(self):
+      """
+      Amazon S3 Connection
+      """
+      arguments = {
+          "aws_access_key_id": current_app.config['AWS_ACCESS_KEY_ID'],
+          "aws_secret_access_key": current_app.config['AWS_SECRET_ACCESS_KEY']
+      }
+
+      return boto.connect_s3(**arguments)
+

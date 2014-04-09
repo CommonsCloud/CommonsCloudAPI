@@ -226,7 +226,8 @@ class CommonsModel(object):
 
     return {
       'type': 'relationship',
-      'storage': table_name
+      'association': table_name,
+      'relationship': field.relationship
     }
 
   def generate_attachment_field(self, field, template):
@@ -260,11 +261,12 @@ class CommonsModel(object):
     """
     Finally we can create the actual relationship
     """
-    self.generate_relationship_field(field, template)
+    relationship_ = self.generate_relationship_field(field, template)
 
     return {
       'type': 'file',
-      'storage': attachment_table_name
+      'association': attachment_table_name,
+      'relationship': relationship_['association']
     }
 
   """
@@ -350,10 +352,10 @@ class CommonsModel(object):
     field_type = self.generate_field_type(field, template)
 
     if field.data_type == 'relationship':
-      return
+      return field_type
 
     if field.data_type == 'file':
-      return
+      return field_type
 
     """
     Create the new column just like we would if we were hard coding the model

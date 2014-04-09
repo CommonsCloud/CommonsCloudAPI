@@ -198,6 +198,18 @@ class Field(db.Model, CommonsModel):
         """
         field_storage = self.create_storage_field(Template_, field_)
 
+        if 'relationship' in content_.get('data_type', 'text'):
+            print 'field_storage', dir(field_storage), field_storage
+            print 'We need to update the association field!!!'
+        elif 'file' in content_.get('data_type', 'text'):
+            print 'field_storage', dir(field_storage), field_storage
+            field_.association = field_storage['association']
+            field_.relationship = field_storage['relationship']
+
+            print 'We need to update the association field!!!'
+            db.session.commit()
+
+
         """
         Before attempting to return the field as a JSON object, we need to
         make sure that we have a saved field to display, otherwise we'll
