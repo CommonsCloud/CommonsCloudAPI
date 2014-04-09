@@ -580,7 +580,7 @@ class CommonsModel(object):
     """
     Make sure the content is ready to be served
     """
-    if not isinstance(the_content, basestring) and extension == 'json':
+    if type(the_content) is list and extension == 'json':
       the_content = {
         list_name: self.serialize_list(the_content)
       }
