@@ -12,14 +12,6 @@ limitations under the License.
 
 
 """
-Import Flask Dependencies
-"""
-from flask import request
-
-from flask.ext.security import login_required
-
-
-"""
 Import Application Module Dependencies
 """
 from CommonsCloudAPI.extensions import oauth
@@ -33,10 +25,11 @@ from .permissions import permission_required
 
 
 @module.route('/v2/applications.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-def application_list(extension):
+@oauth.require_oauth()
+def application_list(request, extension):
 
   Application_ = Application()
+  Application_.current_user = request.user
 
   applications_ = Application_.application_list()
 
@@ -50,11 +43,13 @@ def application_list(extension):
 
 
 @module.route('/v2/applications.<string:extension>', methods=['POST'])
-# @oauth.require_oauth()
-def application_post(extension):
+@oauth.require_oauth()
+def application_post(request, extension):
 
   Application_ = Application()
-  new_application = Application_.application_create(request)
+  Application_.current_user = request.user
+
+  new_application = Application_.application_create()
 
   arguments = {
     'the_content': new_application,
@@ -66,12 +61,13 @@ def application_post(extension):
 
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 # @permission_required('can_view')
-@login_required
-def application_get(application_id, extension):
+def application_get(request, application_id, extension):
 
   Application_ = Application()
+  Application_.current_user = request.user
+
   this_application = Application_.application_get(application_id)
 
   if type(this_application) is 'Response':
@@ -86,11 +82,13 @@ def application_get(application_id, extension):
 
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['PUT', 'PATCH'])
-# @oauth.require_oauth()
-@permission_required('can_edit')
-def application_update(application_id, extension):
+@oauth.require_oauth()
+# @permission_required('can_edit')
+def application_update(request, application_id, extension):
 
   Application_ = Application()
+  Application_.current_user = request.user
+
   updated_application = Application_.application_update(application_id, request)
 
   arguments = {
@@ -102,11 +100,14 @@ def application_update(application_id, extension):
 
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['DELETE'])
-# @oauth.require_oauth()
-@permission_required('can_delete')
-def application_delete(application_id, extension):
+@oauth.require_oauth()
+# @permission_required('can_delete')
+def application_delete(request, application_id, extension):
 
-  Application().application_delete(application_id)
+  Application_ = Application()
+  Application_.current_user = request.user
+
+  Application_.application_delete(application_id)
 
   return status_.status_204(), 204
 

@@ -25,8 +25,6 @@ Import Flask Dependencies
 from flask import abort
 from flask import request
 
-from flask.ext.security import current_user
-
 
 """
 Import Commons Cloud Dependencies
@@ -74,13 +72,14 @@ class Application(db.Model, CommonsModel):
   templates = db.relationship('ApplicationTemplates', backref=db.backref('application'))
 
 
-  def __init__(self, name="", url="", description=None, created=datetime.utcnow(), status=True, templates=[]):
+  def __init__(self, name="", url="", description=None, created=datetime.utcnow(), status=True, templates=[], current_user_={}):
     self.name = name
     self.description = description
     self.url = url
     self.created = created
     self.status = status
     self.templates = templates
+    self.current_user = current_user_
 
 
   """
@@ -123,7 +122,7 @@ class Application(db.Model, CommonsModel):
       'delete': True
     }
 
-    self.set_user_application_permissions(application_, permission, current_user)
+    self.set_user_application_permissions(application_, permission, self.current_user)
 
     return application_
 
@@ -185,10 +184,10 @@ class Application(db.Model, CommonsModel):
 
     applications_ = []
 
-    if not hasattr(current_user, 'id'):
+    if not hasattr(self.current_user, 'id'):
       return abort(401)
 
-    for application in current_user.applications:
+    for application in self.current_user.applications:
       applications_.append(application.application_id)
 
     return applications_

@@ -1,4 +1,4 @@
-from flask import Flask, url_for, session, request, jsonify
+from flask import Flask, url_for, session, request, jsonify, redirect
 from flask_oauthlib.client import OAuth
 
 
@@ -16,7 +16,7 @@ remote = oauth.remote_app(
     consumer_key=CLIENT_ID,
     consumer_secret=CLIENT_SECRET,
     request_token_params={'scope': 'email'},
-    base_url='http://127.0.0.1:5000/api/',
+    base_url='http://127.0.0.1:5000/v2/',
     request_token_url=None,
     access_token_url='http://127.0.0.1:5000/oauth/token',
     authorize_url='http://127.0.0.1:5000/oauth/authorize'
@@ -26,9 +26,7 @@ remote = oauth.remote_app(
 @app.route('/')
 def index():
     if 'remote_oauth' in session:
-        print 'session', dir(session), session
-        resp = remote.get('me')
-        print resp
+        resp = remote.get('applications.json')
         return jsonify(resp.data)
     next_url = request.args.get('next') or request.referrer or None
     return remote.authorize(
@@ -44,9 +42,8 @@ def authorized(resp):
             request.args['error_reason'],
             request.args['error_description']
         )
-    print resp
     session['remote_oauth'] = (resp['access_token'], '')
-    return jsonify(oauth_token=resp['access_token'])
+    return redirect('/')
 
 
 @remote.tokengetter

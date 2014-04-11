@@ -139,16 +139,6 @@ def authorize(*args, **kwargs):
   confirm = request.form.get('confirm', 'no')
   return confirm == 'yes'
 
-
-@module.route('/api/me')
-@oauth.require_oauth()
-def me(req):
-    print 'requested /api/me'
-    user = req.user
-    print user.firstname
-    return jsonify({})
-
-
 @oauth.clientgetter
 def load_client(client_id):
     return Client.query.filter_by(client_id=client_id).first()

@@ -44,12 +44,9 @@ def index():
   return redirect(url_for('user.user_profile_get')), 301
 
 
-@module.route('/user/me.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-def user_me(extension):
-
-  if not hasattr(current_user, 'id'):
-    return status_.status_401(), 401
+@module.route('/v2/user/me', methods=['GET'])
+@oauth.require_oauth()
+def user_me():
 
   arguments = {
     'the_content': current_user,
