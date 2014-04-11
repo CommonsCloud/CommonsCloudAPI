@@ -265,8 +265,8 @@ class CommonsModel(object):
 
     return {
       'type': 'file',
-      'association': attachment_table_name,
-      'relationship': relationship_['association']
+      'association': relationship_['association'],
+      'relationship': attachment_table_name
     }
 
   """

@@ -72,6 +72,7 @@ class Feature(CommonsModel):
         Relationships and Attachments
         """
         attachments = self._get_fields_of_type(Template_, 'file')
+        print 'attachments', attachments
         relationships = self._get_fields_of_type(Template_, 'relationship')
 
         """
@@ -81,16 +82,10 @@ class Feature(CommonsModel):
           content_ = json.loads(request_object.data)
         elif request_object.form:
           content_ = json.loads(request_object.form['data'])
+          print 'content_', content_
         else:
           return abort(400)
 
-        if request_object.files:
-          print 'has files'
-        #   print 'has files', getattr(request_object, 'files')
-        # else:
-        #   print 'has no files', request_object.get('files')
-
-        
         """
         Check for a geometry and if it exists, we need to add a new geometry
         key to the content_ dictionary
@@ -124,6 +119,7 @@ class Feature(CommonsModel):
         Save relationships and attachments
         """
         for field_ in content_:
+          print 'field_', field_
           if field_ in relationships:
         
             assoc_ = self._feature_relationship_associate(Template_, field_)
@@ -138,6 +134,7 @@ class Feature(CommonsModel):
             new_feature_relationships = self.feature_relationships(**details)
           elif field_ in attachments:
             s3 = self.get_s3_connection()
+            print 'request_object.files', request_object.files
             print dir(s3)
             print s3
             pass

@@ -10,20 +10,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+"""
+Import System Dependencies
+"""
+from datetime import datetime, timedelta
+
 
 """
 Import Flask Dependencies
 """
 from flask import jsonify
+from flask import url_for
 from flask import redirect
 from flask import render_template
 from flask import request
-from flask import url_for
+
+from werkzeug.security import gen_salt
 
 from flask.ext.security import current_user
 from flask.ext.security import login_required
-
-from werkzeug.security import gen_salt
 
 
 """
@@ -32,18 +37,15 @@ Import Application Dependencies
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import oauth
 
+from CommonsCloudAPI.models.oauth import Client
+from CommonsCloudAPI.models.oauth import Grant
+from CommonsCloudAPI.models.oauth import Token
+
 
 """
 Import Module Dependencies
 """
 from . import module
-
-from .models import Client
-from .models import RequestToken
-from .models import Nonce
-from .models import AccessToken
-
-from .utilities import *
 
 
 """
@@ -81,9 +83,10 @@ def oauth_client():
   # actually just be a utility function
   #
   item = Client(
-    client_key=client_id,
+    client_id=client_id,
     client_secret=client_secret,
     _redirect_uris='http://localhost:8000/authorized',
+    _default_scopes='email',
     user_id=this_user.id,
   )
   #
@@ -105,17 +108,10 @@ def oauth_client():
   ), 200
 
 
-@module.route('/oauth/request_token')
-@oauth.request_token_handler
-def request_token():
-    return {}
-
-
-@module.route('/oauth/access_token')
-@oauth.access_token_handler
+@module.route('/oauth/token')
+@oauth.token_handler
 def access_token():
-    return {}
-
+    return None
 
 @module.route('/oauth/authorize', methods=['GET', 'POST'])
 @oauth.authorize_handler
@@ -133,16 +129,83 @@ def authorize(*args, **kwargs):
   this_user = current_user
 
   if request.method == 'GET':
-    resource_owner_key = kwargs.get('resource_owner_key')
-    request_token = RequestToken.query.filter_by(token=resource_owner_key).first()
 
-    client = Client.query.filter_by(client_key=request_token.client_key).first()
+    client_id = kwargs.get('client_id')
+    client = Client.query.filter_by(client_id=client_id).first()
     kwargs['client'] = client
     kwargs['user'] = this_user
-
     return render_template('oauth/authorize.html', **kwargs)
 
   confirm = request.form.get('confirm', 'no')
-
   return confirm == 'yes'
 
+
+@module.route('/api/me')
+@oauth.require_oauth()
+def me(req):
+    print 'requested /api/me'
+    user = req.user
+    print user.firstname
+    return jsonify({})
+
+
+@oauth.clientgetter
+def load_client(client_id):
+    return Client.query.filter_by(client_id=client_id).first()
+
+
+@oauth.grantgetter
+def load_grant(client_id, code):
+    return Grant.query.filter_by(client_id=client_id, code=code).first()
+
+
+@oauth.grantsetter
+def save_grant(client_id, code, request, *args, **kwargs):
+    # decide the expires time yourself
+    expires = datetime.utcnow() + timedelta(seconds=100)
+    grant = Grant(
+        client_id=client_id,
+        code=code['code'],
+        redirect_uri=request.redirect_uri,
+        _scopes=' '.join(request.scopes),
+        user=current_user,
+        expires=expires
+    )
+    db.session.add(grant)
+    db.session.commit()
+    return grant
+
+
+@oauth.tokengetter
+def load_token(access_token=None, refresh_token=None):
+    if access_token:
+        return Token.query.filter_by(access_token=access_token).first()
+    elif refresh_token:
+        return Token.query.filter_by(refresh_token=refresh_token).first()
+
+
+@oauth.tokensetter
+def save_token(token, request, *args, **kwargs):
+    toks = Token.query.filter_by(
+        client_id=request.client.client_id,
+        user_id=request.user.id
+    )
+    # make sure that every client has only one token connected to a user
+    for t in toks:
+        db.session.delete(t)
+
+    expires_in = token.pop('expires_in')
+    expires = datetime.utcnow() + timedelta(seconds=expires_in)
+
+    tok = Token(
+        access_token=token['access_token'],
+        refresh_token=token['refresh_token'],
+        token_type=token['token_type'],
+        _scopes=token['scope'],
+        expires=expires,
+        client_id=request.client.client_id,
+        user_id=request.user.id,
+    )
+    db.session.add(tok)
+    db.session.commit()
+    return tok
