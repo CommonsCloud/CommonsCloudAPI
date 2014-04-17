@@ -45,12 +45,15 @@ def feature_list(storage, extension):
 
     print 'storage', storage
 
+    logging.warning('storage', storage)
     logging.debug('storage', storage)
 
     Feature_ = Feature()
     feature_list = Feature_.feature_list(storage)
     feature_statistics = Feature_.feature_statistic(storage)
 
+    print 'feature_list', type(feature_list), feature_list
+    logging.warning('feature_list', type(feature_list), feature_list)
     logging.debug('feature_list', type(feature_list), feature_list)
 
     arguments = {
