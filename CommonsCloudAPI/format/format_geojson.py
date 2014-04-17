@@ -123,7 +123,7 @@ class GeoJSON(FormatContent):
     # response.headers.add('Pragma', 'max-age=2592000')
     # response.headers.add('Cache-Control', 'max-age=2592000')
 
-    response.headers.add('Access-Control-Allow-Origin', 'http://127.0.0.1:9000')
+    response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept')
 
     response.headers.add('Pragma', 'no-cache')
