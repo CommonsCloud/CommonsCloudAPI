@@ -31,7 +31,7 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/v2/applications.<string:extension>', methods=['GET'])
+@module.route('/v2/applications.<string:extension>', methods=['GET', 'OPTIONS'])
 @oauth.require_oauth()
 def application_list(oauth_request, extension):
 

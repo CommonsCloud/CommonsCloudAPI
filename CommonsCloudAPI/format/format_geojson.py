@@ -125,7 +125,6 @@ class GeoJSON(FormatContent):
 
     response.headers.add('Access-Control-Allow-Origin', 'http://127.0.0.1:9000')
     response.headers.add('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
 
     response.headers.add('Pragma', 'no-cache')
     response.headers.add('Cache-Control', 'no-cache')
