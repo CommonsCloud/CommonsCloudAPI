@@ -85,7 +85,7 @@ def oauth_client():
   item = Client(
     client_id=client_id,
     client_secret=client_secret,
-    _redirect_uris='http://localhost:8000/authorized',
+    _redirect_uris='http://localhost:9000/authorized',
     _default_scopes='email',
     user_id=this_user.id,
   )
