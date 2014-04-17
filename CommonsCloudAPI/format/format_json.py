@@ -81,8 +81,8 @@ class JSON(FormatContent):
       "properties": self.extras
     })
 
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    # response.headers.add('Access-Control-Allow-Origin', '*')
+    # response.headers.add('Access-Control-Allow-Credentials', 'true')
 
     """
     Make sure we're caching the responses for 30 days to speed things up,
@@ -93,7 +93,8 @@ class JSON(FormatContent):
     # response.headers.add('Pragma', 'max-age=2592000')
     # response.headers.add('Cache-Control', 'max-age=2592000')
 
-    # response.headers.add('Pragma', 'no-cache')
-    # response.headers.add('Cache-Control', 'no-cache')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Pragma', 'no-cache')
+    response.headers.add('Cache-Control', 'no-cache')
 
     return response

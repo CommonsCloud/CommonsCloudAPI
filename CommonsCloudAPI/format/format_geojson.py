@@ -118,6 +118,9 @@ class GeoJSON(FormatContent):
     Make sure we're caching the responses for 30 days to speed things up,
     then setting modification and expiration dates appropriately
     """
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+
     # response.headers.add('Last-Modified', today)
     # response.headers.add('Expires', expires)
     # response.headers.add('Pragma', 'max-age=2592000')
@@ -125,7 +128,5 @@ class GeoJSON(FormatContent):
 
     response.headers.add('Pragma', 'no-cache')
     response.headers.add('Cache-Control', 'no-cache')
-
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
+    
     return response
