@@ -71,10 +71,10 @@ class JSON(FormatContent):
       if property_ != 'geometry':
         content[property_] = self.the_content[property_]
 
-    geojson = db.session.scalar(func.ST_AsGeoJSON(self.the_content['geometry'], 4))
-    this_geometry = json.loads(str(geojson))
-
-    content['geometry'] = this_geometry
+    if 'geometry' in self.the_content:
+      geojson = db.session.scalar(func.ST_AsGeoJSON(self.the_content['geometry'], 4))
+      this_geometry = json.loads(str(geojson))
+      content['geometry'] = this_geometry
 
     response = jsonify({
       "response": content,
