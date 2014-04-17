@@ -41,6 +41,8 @@ def feature_list(storage, extension):
     if (extension == 'csv'):
         return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
 
+    print storage
+
     Feature_ = Feature()
     feature_list = Feature_.feature_list(storage)
     feature_statistics = [] #Feature_.feature_statistic(storage)

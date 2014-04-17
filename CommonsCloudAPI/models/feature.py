@@ -299,9 +299,6 @@ class Feature(CommonsModel):
     """
     def get_statistics(self, query_results, template):
 
-      if not template.fields:
-        abort(500)
-
       statistics_list = []
 
       statistic_field_id_list = self._statistic_field_id_list(template.fields)
