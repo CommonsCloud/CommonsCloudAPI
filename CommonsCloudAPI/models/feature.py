@@ -197,8 +197,6 @@ class Feature(CommonsModel):
 
         this_template = Template.query.filter_by(storage=storage).first()
 
-        print this_template
-
         Model_ = self.get_storage(this_template)
 
         query = search(db.session, Model_, search_params)

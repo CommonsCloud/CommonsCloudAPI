@@ -10,8 +10,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import logging
-
 
 """
 Import Flask Dependencies
@@ -43,18 +41,9 @@ def feature_list(storage, extension):
     if (extension == 'csv'):
         return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
 
-    print 'storage', storage
-
-    logging.warning(storage)
-    logging.debug(storage)
-
     Feature_ = Feature()
     feature_list = Feature_.feature_list(storage)
-    feature_statistics = Feature_.feature_statistic(storage)
-
-    print 'feature_list', type(feature_list), feature_list
-    logging.warning(feature_list)
-    logging.debug(feature_list)
+    feature_statistics = [] #Feature_.feature_statistic(storage)
 
     arguments = {
         'the_content': feature_list.get('objects'),
