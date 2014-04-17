@@ -14,6 +14,8 @@ limitations under the License.
 """
 Import Python Dependencies
 """
+import json
+
 from datetime import datetime
 from datetime import timedelta
 
@@ -23,11 +25,16 @@ Import Flask Dependencies
 """
 from flask import jsonify
 
+from geoalchemy2.elements import WKBElement
+import geoalchemy2.functions as func
+
 
 """
 Import CommonsCloudAPI Dependencies
 """
 from . import FormatContent
+
+from CommonsCloudAPI.extensions import db
 
 
 """
@@ -58,12 +65,23 @@ class JSON(FormatContent):
     today = datetime.utcnow()
     expires =  today + timedelta(+30)
 
+    content = {}
+
+    for property_ in self.the_content:
+      if property_ != 'geometry':
+        content[property_] = self.the_content[property_]
+
+    geojson = db.session.scalar(func.ST_AsGeoJSON(self.the_content['geometry'], 4))
+    this_geometry = json.loads(str(geojson))
+
+    content['geometry'] = this_geometry
+
     response = jsonify({
-      "response": self.the_content,
+      "response": content,
       "properties": self.extras
     })
 
-    response.headers.add('Access-Control-Allow-Origin', 'http://127.0.0.1:9000')
+    response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
 
     """

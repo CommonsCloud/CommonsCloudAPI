@@ -14,6 +14,8 @@ limitations under the License.
 """
 Import Python Dependencies
 """
+import json
+
 from datetime import datetime
 from datetime import timedelta
 
@@ -27,11 +29,16 @@ from geojson import dumps
 from geojson import Feature
 from geojson import FeatureCollection
 
+from geoalchemy2.elements import WKBElement
+import geoalchemy2.functions as func
+
 
 """
 Import CommonsCloudAPI Dependencies
 """
 from . import FormatContent
+
+from CommonsCloudAPI.extensions import db
 
 
 """
@@ -95,8 +102,11 @@ class GeoJSON(FormatContent):
           if property_ != 'geometry':
             properties[property_] = self.the_content[property_]
 
+        geojson = db.session.scalar(func.ST_AsGeoJSON(self.the_content['geometry'], 4))
+        this_geometry = json.loads(str(geojson))
+
         arguments = {
-          'geometry': self.the_content['geometry'],
+          'geometry': this_geometry,
           'id': self.the_content['id'],
           'properties': properties
         }

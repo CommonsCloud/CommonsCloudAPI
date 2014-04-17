@@ -98,10 +98,7 @@ def feature_get(storage, feature_id, extension):
         'code': 200
     }
 
-    try:
-        return Feature_.endpoint_response(**arguments)
-    except Exception as e:
-        return status_.status_500(e), 500
+    return Feature_.endpoint_response(**arguments)
 
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>/<string:relationship>.<string:extension>', methods=['GET'])
