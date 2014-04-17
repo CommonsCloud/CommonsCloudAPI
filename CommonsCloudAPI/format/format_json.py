@@ -94,6 +94,7 @@ class JSON(FormatContent):
     # response.headers.add('Cache-Control', 'max-age=2592000')
 
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     response.headers.add('Pragma', 'no-cache')
     response.headers.add('Cache-Control', 'no-cache')
 
