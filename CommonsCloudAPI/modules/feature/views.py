@@ -45,6 +45,8 @@ def feature_list(storage, extension):
     feature_list = Feature_.feature_list(storage)
     feature_statistics = Feature_.feature_statistic(storage)
 
+    print 'feature_list', type(feature_list), feature_list
+
     arguments = {
         'the_content': feature_list.get('objects'),
         'list_name': 'features',

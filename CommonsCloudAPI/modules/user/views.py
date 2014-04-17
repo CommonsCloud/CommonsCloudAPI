@@ -44,12 +44,12 @@ def index():
   return redirect(url_for('user.user_profile_get')), 301
 
 
-@module.route('/v2/user/me', methods=['GET'])
+@module.route('/v2/user/me.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
-def user_me():
+def user_me(oauth_request, extension):
 
   arguments = {
-    'the_content': current_user,
+    'the_content': oauth_request.user,
     'exclude_fields': ['password'],
     'extension': extension
   }
@@ -58,8 +58,8 @@ def user_me():
 
 
 @module.route('/v2/users/list.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-def user_list(extension):
+@oauth.require_oauth()
+def user_list(oauth_request, extension):
 
   User_ = User()
   user_list = User_.user_list()

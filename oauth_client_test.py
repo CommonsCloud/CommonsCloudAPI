@@ -2,8 +2,8 @@ from flask import Flask, url_for, session, request, jsonify, redirect
 from flask_oauthlib.client import OAuth
 
 
-CLIENT_ID = 'WrtxEqKUTGSVbZ6bNUyrtWClGsidR7on3yNrlMy9'
-CLIENT_SECRET = '46tkF78QvYH6VLCxpcm0rxq3Cqh3D0omfdKVk7Dah9mvq6ogIA'
+CLIENT_ID = '0A7Fs4a9AKO0Rqa0dc2FIpHH9s1NWnn6O1PQSvDw'
+CLIENT_SECRET = 'jimsP5dLi25h4YM17Ra2U7jEowSVMvxaOViFPxoVKegUagMKmP'
 
 
 app = Flask(__name__)
@@ -25,9 +25,14 @@ remote = oauth.remote_app(
 
 @app.route('/')
 def index():
+
     if 'remote_oauth' in session:
         resp = remote.get('applications.json')
-        return jsonify(resp.data)
+        if resp.status != 403:
+            return jsonify(resp.data)
+
+        del session['remote_oauth']
+
     next_url = request.args.get('next') or request.referrer or None
     return remote.authorize(
         callback=url_for('authorized', next=next_url, _external=True)
@@ -42,6 +47,7 @@ def authorized(resp):
             request.args['error_reason'],
             request.args['error_description']
         )
+    print "resp['access_token']", resp['access_token']
     session['remote_oauth'] = (resp['access_token'], '')
     return redirect('/')
 

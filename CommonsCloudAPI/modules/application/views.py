@@ -10,6 +10,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+"""
+Import Flask Dependencies
+"""
+from flask import request
+
+from flask.ext.security import current_user
+
 
 """
 Import Application Module Dependencies
@@ -26,10 +33,10 @@ from .permissions import permission_required
 
 @module.route('/v2/applications.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
-def application_list(request, extension):
+def application_list(oauth_request, extension):
 
   Application_ = Application()
-  Application_.current_user = request.user
+  Application_.current_user = oauth_request.user
 
   applications_ = Application_.application_list()
 
@@ -44,12 +51,12 @@ def application_list(request, extension):
 
 @module.route('/v2/applications.<string:extension>', methods=['POST'])
 @oauth.require_oauth()
-def application_post(request, extension):
+def application_post(oauth_request, extension):
 
   Application_ = Application()
-  Application_.current_user = request.user
+  Application_.current_user = oauth_request.user
 
-  new_application = Application_.application_create()
+  new_application = Application_.application_create(request)
 
   arguments = {
     'the_content': new_application,
@@ -63,10 +70,10 @@ def application_post(request, extension):
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
 # @permission_required('can_view')
-def application_get(request, application_id, extension):
+def application_get(oauth_request, application_id, extension):
 
   Application_ = Application()
-  Application_.current_user = request.user
+  Application_.current_user = oauth_request.user
 
   this_application = Application_.application_get(application_id)
 
@@ -84,10 +91,10 @@ def application_get(request, application_id, extension):
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['PUT', 'PATCH'])
 @oauth.require_oauth()
 # @permission_required('can_edit')
-def application_update(request, application_id, extension):
+def application_update(oauth_request, application_id, extension):
 
   Application_ = Application()
-  Application_.current_user = request.user
+  Application_.current_user = oauth_request.user
 
   updated_application = Application_.application_update(application_id, request)
 
@@ -100,12 +107,12 @@ def application_update(request, application_id, extension):
 
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['DELETE'])
-@oauth.require_oauth()
+# @oauth.require_oauth()
 # @permission_required('can_delete')
-def application_delete(request, application_id, extension):
+def application_delete(oauth_request, application_id, extension):
 
   Application_ = Application()
-  Application_.current_user = request.user
+  Application_.current_user = oauth_request.user
 
   Application_.application_delete(application_id)
 

@@ -175,11 +175,16 @@ def load_token(access_token=None, refresh_token=None):
 
 
 @oauth.tokensetter
-def save_token(token, request, *args, **kwargs):
+def save_token(token, oauth_request, *args, **kwargs):
+    # print 'oauth_request.client', oauth_request.client
+    print 'token', dir(token), token
+
+
     toks = Token.query.filter_by(
-        client_id=request.client.client_id,
-        user_id=request.user.id
+        client_id=oauth_request.client.client_id,
+        user_id=current_user.id
     )
+
     # make sure that every client has only one token connected to a user
     for t in toks:
         db.session.delete(t)
@@ -189,12 +194,12 @@ def save_token(token, request, *args, **kwargs):
 
     tok = Token(
         access_token=token['access_token'],
-        refresh_token=token['refresh_token'],
+        # refresh_token=token['refresh_token'],
         token_type=token['token_type'],
         _scopes=token['scope'],
         expires=expires,
-        client_id=request.client.client_id,
-        user_id=request.user.id,
+        client_id=oauth_request.client.client_id,
+        user_id=current_user.id,
     )
     db.session.add(tok)
     db.session.commit()
