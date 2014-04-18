@@ -2,7 +2,7 @@
 
 {% block content %}
 
-      <form method="POST" action="{{ url_for_security('login') }}" id="login_user_form" name="login_user_form">
+      <form method="POST" action="{{ url_for_security('login') }}" class="form-card" id="login_user_form" name="login_user_form">
         {{ login_user_form.hidden_tag() }}
         <legend>Sign in</legend>
         <fieldset>

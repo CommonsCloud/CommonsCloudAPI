@@ -11,7 +11,7 @@ limitations under the License.
 """
 
 
-import md5
+import hashlib
 
 
 """
@@ -66,7 +66,7 @@ Flask-Security module. If you remove it Flask-Security gets fussy.
 """
 class User(db.Model, UserMixin, CommonsModel):
 
-  __public__ = ['id', 'firstname', 'lastname', 'bio', 'email', 'active', 'confirmed_at']
+  __public__ = ['id', 'name', 'email', 'active', 'confirmed_at']
 
   __tablename__ = 'user'
   __table_args__ = {
@@ -78,9 +78,7 @@ class User(db.Model, UserMixin, CommonsModel):
   database for use with our SQLAlchemy model
   """
   id = db.Column(db.Integer, primary_key=True)
-  firstname = db.Column(db.String(255))
-  lastname = db.Column(db.String(255))
-  bio = db.Column(db.String(255))
+  name = db.Column(db.String(255))
   email = db.Column(db.String(255))
   password = db.Column(db.String(255))
   active = db.Column(db.Boolean())
@@ -90,12 +88,10 @@ class User(db.Model, UserMixin, CommonsModel):
   templates = db.relationship('UserTemplates', backref=db.backref('users'))
   fields = db.relationship('UserFields', backref=db.backref('users'))
 
-  def __init__(self, firstname="", lastname="", email="", password="", bio="", active=True, roles=[], permissions=[]):
-    self.firstname = firstname
-    self.lastname = lastname
+  def __init__(self, name="", email="", password="", active=True, roles=[], permissions=[]):
+    self.name = name
     self.email = email
     self.password = password
-    self.bio = bio
     self.active = active
     self.roles = roles
     self.permissions = permissions
@@ -172,7 +168,6 @@ class User(db.Model, UserMixin, CommonsModel):
       fields submitted with the form but not one of the following will be ignored
       - firstname
       - lastname
-      - bio
       - email
       - active
       - roles
@@ -195,9 +190,7 @@ class User(db.Model, UserMixin, CommonsModel):
     """
     Content that needs sanitized
     """
-    user_.firstname = sanitize.sanitize_string(user_object_.get('firstname', current_user.firstname))
-    user_.lastname = sanitize.sanitize_string(user_object_.get('lastname', current_user.lastname))
-    user_.bio = sanitize.sanitize_string(user_object_.get('bio', current_user.bio))
+    user_.name = sanitize.sanitize_string(user_object_.get('name', current_user.name))
     user_.email = sanitize.sanitize_string(user_object_.get('email', current_user.email))
 
     """
@@ -253,9 +246,9 @@ class User(db.Model, UserMixin, CommonsModel):
   def user_picture(self, email):
 
     user_email = email.lower()
-    user_hash = md5.new(user_email)
+    user_hash = hashlib.md5(user_email).hexdigest()
 
-    picture_url = '//www.gravatar.com/avatar/' + user_hash
+    picture_url = '//www.gravatar.com/avatar/' + user_hash + '?s=172'
 
     return picture_url
 
