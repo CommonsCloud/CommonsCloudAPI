@@ -5496,18 +5496,20 @@ form {
   padding: 0;
   max-width: 660px; }
 
-form.standalone-form {
-  background-color: whitesmoke;
-  box-shadow: 0 0.2em 0 gainsboro;
-  margin: 0;
-  padding: 30px 40px; }
-
-form.form-card {
-  background-color: #f2f2f2;
+.card {
+  background-color: rgb(242,242,242);
+  border-bottom: 4px solid rgb(232,232,232);
   box-shadow: none;
-  margin: 96px auto;
+  margin: 0 auto;
   max-width: 480px;
-  padding: 48px; }
+  padding: 48px;
+}
+
+.site-header .card {
+    background-color: transparent;
+    border-bottom: none;
+    padding: 16px 48px;
+}
 
 /**
  * Styling for the labels for our various forms

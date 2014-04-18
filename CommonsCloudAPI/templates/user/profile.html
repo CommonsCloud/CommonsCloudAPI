@@ -2,7 +2,9 @@
 
 {% block content %}
 
-      <form method="POST" action="{{ url_for('user.user_profile_post') }}" class="form-card" id="user_profile_form" name="user_profile_form">
+  <div class="row">
+    <div class="col-xs-12 col-xs-offset-0 col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-3">
+      <form method="POST" action="{{ url_for('user.user_profile_post') }}" class="card" id="user_profile_form" name="user_profile_form">
         <legend class="pull-left">Edit Profile <small class="pull-right">Member Since {{ member_since }}</small></legend>
 
 <!--       	<p>Member since: {{ user.confirmed_at }}</p>
@@ -32,5 +34,7 @@
         </fieldset>
 
       </form>
+    </div>
+  </div>
 
 {% endblock %}
