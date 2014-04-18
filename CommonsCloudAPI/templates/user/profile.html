@@ -2,39 +2,48 @@
 
 {% block content %}
 
-      <h1>Profile</h1>
-
       <form method="POST" action="{{ url_for('user.user_profile_post') }}" id="user_profile_form" name="user_profile_form">
-      	<p>Member since: {{ current_user.confirmed_at }}</p>
+        <legend>Profile</legend>
 
-        <div class="form-group">
-          <label for="email">Email address</label>
-          <input class="text form-control" id="email" name="email" type="text" tabindex="1" value="{{ current_user.email }}" />
-        </div>
+<!--       	<p>Member since: {{ current_user.confirmed_at }}</p>
+ -->
+        <fieldset>
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input class="form-control input-lg" id="email" name="email" type="text" tabindex="1" value="{{ current_user.email }}" />
+          </div>
 
-        <div class="form-group">
-          <label for="firstname">Name</label>
-          <input class="text form-control" id="firstname" name="firstname" type="text" tabindex="2" value="{% if current_user.firstname %}{{ current_user.firstname }}{% endif %}" />
-          <input class="text form-control" id="lastname" name="lastname" type="text" tabindex="3" value="{% if current_user.lastname %}{{ current_user.lastname }}{% endif %}" />
-        </div>
+          <div class="form-group">
+            <label for="firstname">Name</label>
+            <div class="row">
+              <div class="col-xs-6">
+                <input class="form-control input-lg" id="firstname" name="firstname" type="text" tabindex="2" value="{% if current_user.firstname %}{{ current_user.firstname }}{% endif %}" />
+              </div>
+              <div class="col-xs-6">
+                <input class="form-control input-lg" id="lastname" name="lastname" type="text" tabindex="3" value="{% if current_user.lastname %}{{ current_user.lastname }}{% endif %}" />
+              </div>
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="bio">Bio</label>
-          <textarea id="bio" name="bio" tabindex="4">{% if current_user.bio %}{{ current_user.bio }}{% endif %}</textarea>
-        </div>
+          <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea class="form-control" id="bio" name="bio" tabindex="4">{% if current_user.bio %}{{ current_user.bio }}{% endif %}</textarea>
+          </div>
 
-        <div class="form-group">
-          <label for="applications">Applications</label>
-          {% for application in user.applications %}
-            <p>{{ application.name }}</p>
-          {% endfor %}
-        </div>
+          <div class="form-group">
+            <label for="applications">Applications</label>
+            {% for application in user.applications %}
+              <p>{{ application.name }}</p>
+            {% endfor %}
+          </div>
 
-        <hr />
+          <hr />
 
-        <div class="form-actions">
-          <input type="submit" id="submit" name="submit" class="button large" value="Save Changes" tabindex="3" />
-        </div>
+          <div class="form-actions">
+            <input type="submit" id="submit" name="submit" class="button large" value="Save Changes" tabindex="3" />
+          </div>          
+        </fieldset>
+
       </form>
 
 {% endblock %}
