@@ -31,7 +31,19 @@ from . import module
 from .permissions import permission_required
 
 
-@module.route('/v2/applications.<string:extension>', methods=['GET', 'OPTIONS'])
+@module.route('/v2/applications.<string:extension>', methods=['OPTIONS'])
+def application_preflight(extension):
+  arguments = {
+    'the_content': {
+      "preflight": "Request successful"
+    },
+    'extension': extension
+  }
+
+  return Application_.endpoint_response(**arguments)
+
+
+@module.route('/v2/applications.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
 def application_list(oauth_request, extension):
 
