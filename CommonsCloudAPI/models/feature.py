@@ -72,8 +72,9 @@ class Feature(CommonsModel):
         Relationships and Attachments
         """
         attachments = self._get_fields_of_type(Template_, 'file')
-        print 'attachments', attachments
         relationships = self._get_fields_of_type(Template_, 'relationship')
+        print relationships
+        print 'Storage_', dir(Storage_), Storage_
 
         """
         Setup the request object so that we can work with it
@@ -155,7 +156,6 @@ class Feature(CommonsModel):
             return abort(404)
 
         if this_template.is_geospatial and feature.geometry is not None:
-          print 'feature.geometry', feature.geometry
           the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
 
           feature.geometry = json.loads(the_geometry)

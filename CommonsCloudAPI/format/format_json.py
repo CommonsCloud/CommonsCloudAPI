@@ -14,8 +14,6 @@ limitations under the License.
 """
 Import Python Dependencies
 """
-import json
-
 from datetime import datetime
 from datetime import timedelta
 
@@ -24,9 +22,6 @@ from datetime import timedelta
 Import Flask Dependencies
 """
 from flask import jsonify
-
-from geoalchemy2.elements import WKBElement
-import geoalchemy2.functions as func
 
 
 """
@@ -68,13 +63,7 @@ class JSON(FormatContent):
     content = {}
 
     for property_ in self.the_content:
-      if property_ != 'geometry':
-        content[property_] = self.the_content[property_]
-
-    if 'geometry' in self.the_content:
-      geojson = db.session.scalar(func.ST_AsGeoJSON(self.the_content['geometry'], 4))
-      this_geometry = json.loads(str(geojson))
-      content['geometry'] = this_geometry
+      content[property_] = self.the_content[property_]
 
     response = jsonify({
       "response": content,
@@ -91,7 +80,7 @@ class JSON(FormatContent):
     # response.headers.add('Cache-Control', 'max-age=2592000')
 
     response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Authorization, Origin, X-Requested-With, Content-Type, Accept')
+    response.headers.add('Access-Control-Allow-Headers', 'Accept,Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization')
     response.headers.add('Access-Control-Allow-Credentials', True)
     response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, OPTIONS, DELETE')
 
