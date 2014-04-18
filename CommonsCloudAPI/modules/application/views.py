@@ -34,16 +34,7 @@ from .permissions import permission_required
 @module.route('/v2/applications.<string:extension>', methods=['OPTIONS'])
 def application_preflight(extension):
 
-  Application_ = Application()
-
-  arguments = {
-    'the_content': {
-      "preflight": "Request successful"
-    },
-    'extension': extension
-  }
-
-  return Application_.endpoint_response(**arguments)
+  return status_.status_200(), 200
 
 
 @module.route('/v2/applications.<string:extension>', methods=['GET'])
