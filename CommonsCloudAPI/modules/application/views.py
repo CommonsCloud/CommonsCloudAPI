@@ -33,6 +33,9 @@ from .permissions import permission_required
 
 @module.route('/v2/applications.<string:extension>', methods=['OPTIONS'])
 def application_preflight(extension):
+
+  Application_ = Application()
+
   arguments = {
     'the_content': {
       "preflight": "Request successful"
