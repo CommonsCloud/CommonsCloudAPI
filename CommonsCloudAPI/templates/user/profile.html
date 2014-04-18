@@ -8,6 +8,9 @@
 <!--       	<p>Member since: {{ current_user.confirmed_at }}</p>
  -->
         <fieldset>
+
+          <img src="{{ picture }}" alt="" title="" />
+
           <div class="form-group">
             <label for="email">Email address</label>
             <input class="form-control input-lg" id="email" name="email" type="text" tabindex="1" value="{{ current_user.email }}" />

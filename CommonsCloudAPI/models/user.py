@@ -11,6 +11,9 @@ limitations under the License.
 """
 
 
+import md5
+
+
 """
 Import Flask Dependencies
 """
@@ -246,6 +249,15 @@ class User(db.Model, UserMixin, CommonsModel):
       users_id_list.append(user_.user_id)
 
     return users_id_list
+
+  def user_picture(self, email):
+
+    user_email = email.lower()
+    user_hash = md5.new(user_email)
+
+    picture_url = '//www.gravatar.com/avatar/' + user_hash
+
+    return picture_url
 
 
 """

@@ -79,7 +79,10 @@ def user_profile_get():
 
   user_ = User()
   this_user = user_.user_get(current_user.id)
-  return render_template('user/profile.html', user=this_user), 200
+
+  picture = user_picture(this_user.email)
+
+  return render_template('user/profile.html', user=this_user, picture=picture), 200
 
 
 # @module.route('/user/remove/', methods=['GET', 'POST'])
