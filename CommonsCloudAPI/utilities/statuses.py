@@ -213,7 +213,17 @@ class CommonsStatus():
       'details': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
     }
 
-    return jsonify(message) if self.return_type == 'json' else message
+    response = jsonify(message)
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
+    response.headers.add('Access-Control-Allow-Credentials', True)
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE OPTIONS')
+
+    response.headers.add('Pragma', 'no-cache')
+    response.headers.add('Cache-Control', 'no-cache')
+
+    return response
 
 
   """
