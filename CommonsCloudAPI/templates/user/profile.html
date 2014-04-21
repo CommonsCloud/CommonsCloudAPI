@@ -7,29 +7,29 @@
       <form method="POST" action="{{ url_for('user.user_profile_post') }}" class="card" id="user_profile_form" name="user_profile_form">
         <legend class="pull-left">Edit Profile <small class="pull-right">Member Since {{ member_since }}</small></legend>
 
-<!--       	<p>Member since: {{ user.confirmed_at }}</p>
- -->
         <fieldset>
 
           <div class="row">
             <div class="col-xs-12 text-center">
-              <img src="{{ picture }}" alt="" title="" />
+              <img class="decorate" src="{{ picture }}" alt="" title="" />
             </div>
           </div>
 
+          <br/>
+
           <div class="form-group">
-            <input class="form-control input-lg text text-center" id="name" name="name" type="text" tabindex="2" value="{% if user.name %}{{ user.name }}{% endif %}" />
+            <input class="form-control input-lg" id="name" name="name" type="text" tabindex="2" value="{% if user.name %}{{ user.name }}{% endif %}" />
           </div>
 
           <div class="form-group">
-            <input class="form-control input-lg text text-center" id="email" name="email" type="text" tabindex="1" value="{{ user.email }}" />
+            <input class="form-control input-lg" id="email" name="email" type="text" tabindex="1" value="{{ user.email }}" />
           </div>
 
           <hr />
 
           <div class="form-actions">
             <input type="submit" id="submit" name="submit" class="button large pull-right" value="Save Changes" tabindex="3" />
-            <a class="btn btn-link" href="{{ url_for_security('change_password') }}">Change Password</a>
+            <a class="btn btn-link" href="{{ url_for_security('change_password') }}"><small>Change Password</small></a>
           </div>          
         </fieldset>
 

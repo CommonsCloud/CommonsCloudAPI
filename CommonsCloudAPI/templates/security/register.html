@@ -2,7 +2,7 @@
 
 {% block content %}
  
-      <form method="POST" action="{{ url_for_security('register') }}" id="register_user_form" name="register_user_form"  data-validate="parsley" novalidate="novalidate">
+      <form method="POST" action="{{ url_for_security('register') }}" id="register_user_form" name="register_user_form" class="card">
         {{ register_user_form.hidden_tag() }}
         <legend>Register</legend>
         <fieldset>
@@ -23,6 +23,7 @@
     
           <div class="form-actions">
             <input type="submit" class="button large pull-right" value="Register" />
+            <a href="{{ url_for_security('login') }}"><small>Nevermind</small></a>
           </div>
       </form>
 

@@ -162,11 +162,13 @@ html {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 
 body {
+  background-color: rgb(57,220,229);
+  background-image: url(/static/img/background-blurred.png);
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 14px;
   line-height: 1.428571429;
-  color: #333333;
-  background-color: #ffffff; }
+  color: rgb(242,242,242);
+}
 
 input, button, select, textarea {
   font-family: inherit;
@@ -1181,7 +1183,8 @@ legend {
 legend small {
     font-size: 60%;
     font-weight: 200;
-    color: rgb(153, 153, 153);
+    color: rgb(252, 252, 252);
+    color: rgba(252, 252, 252,0.8);
     margin-top: 8px;
 }
 
@@ -5497,15 +5500,55 @@ form {
   max-width: 660px; }
 
 .card {
-  background-color: rgb(242,242,242);
-  border-bottom: 4px solid rgb(232,232,232);
+  background-color: rgba(242, 242, 242, 0.5);
+  border-bottom: 2px solid rgb(30,190,194);
+  padding: 48px;
+  margin-bottom: 16px;
   box-shadow: none;
   margin: 0 auto;
   max-width: 480px;
   padding: 48px;
 }
 
+.card hr {
+  display: none;
+}
+
+.card legend {
+  border-bottom: 0;
+}
+
+.card legend,
+.card label,
+.card .label-control,
+.card .help-block,
+.card a,
+.card a:active,
+.card a:focus,
+.card a:hover,
+.card a:visited {
+  color: rgb(27, 101, 118);
+}
+
+.form-actions {
+  margin-top: 32px;
+}
+
+.form-actions small {
+  margin-right: 16px;
+}
+
+.card .form-control {
+  border: 0;
+}
+
 .site-header .card {
+    background-color: transparent;
+    border-bottom: none;
+    padding: 48px;
+}
+
+.site-footer .card {
     background-color: transparent;
     border-bottom: none;
     padding: 16px 48px;
@@ -5548,15 +5591,16 @@ label.alt {
  */
 .button, .button:hover {
   background-color: #40ac18;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
   border: 1px solid #40ac18;
   color: white;
   display: inline-block;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 200;
   font-style: normal;
+  letter-spacing: 0.05em;
   padding: 6px 24px 7px;
   text-decoration: none;
   text-align: center;
@@ -5912,7 +5956,7 @@ h3 .stat-label {
 .table tfoot > tr > td {
   border-top: none; }
 
-.form-card img {
+.card img.decorate {
     border: 4px solid rgb(252,252,252);
     border-top-color: rgb(232,232,232);
     border-right-color: rgb(232,232,232);
