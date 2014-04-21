@@ -113,7 +113,7 @@ def application_update(oauth_request, application_id, extension):
 
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['DELETE'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 # @permission_required('can_delete')
 def application_delete(oauth_request, application_id, extension):
 
