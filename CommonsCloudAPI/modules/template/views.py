@@ -51,7 +51,7 @@ def application_templates_preflight(application_id, extension):
 
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
-def application_templates_get(application_id, extension):
+def application_templates_get(oauth_request, application_id, extension):
 
   Template_ = Template()
   these_templates = Template_.application_templates_get(application_id)
