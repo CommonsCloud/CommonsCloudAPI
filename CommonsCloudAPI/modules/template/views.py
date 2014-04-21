@@ -30,15 +30,27 @@ from . import module
 from .permissions import permission_required
 
 
+@module.route('/v2/templates.<string:extension>', methods=['OPTIONS'])
+def templates_preflight(extension):
+
+    return status_.status_200(), 200
+
+
 @module.route('/v2/templates.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 def template_list(extension):
 
   return status_.status_303(), 303
 
 
+@module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['OPTIONS'])
+def application_templates_preflight(application_id, extension):
+
+    return status_.status_200(), 200
+
+
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
+@oauth.require_oauth()
 def application_templates_get(application_id, extension):
 
   Template_ = Template()
