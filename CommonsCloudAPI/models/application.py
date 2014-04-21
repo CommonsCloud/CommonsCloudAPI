@@ -293,8 +293,6 @@ class Application(db.Model, CommonsModel):
     db.session.delete(application_)
     db.session.commit()
 
-    return True
-
 
 
 # class Person(db.Model):
