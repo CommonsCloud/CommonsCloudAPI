@@ -137,7 +137,7 @@ def authorize(*args, **kwargs):
     return render_template('oauth/authorize.html', **kwargs)
 
   confirm = request.form.get('confirm', 'no')
-  return confirm == 'yes'
+  return confirm == 'Allow Access'
 
 @oauth.clientgetter
 def load_client(client_id):
