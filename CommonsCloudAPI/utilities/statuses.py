@@ -70,7 +70,7 @@ class CommonsStatus():
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
     response.headers.add('Access-Control-Allow-Credentials', True)
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE OPTIONS')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
 
     response.headers.add('Pragma', 'no-cache')
     response.headers.add('Cache-Control', 'no-cache')
@@ -104,7 +104,7 @@ class CommonsStatus():
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
     response.headers.add('Access-Control-Allow-Credentials', True)
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE OPTIONS')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
 
     response.headers.add('Pragma', 'no-cache')
     response.headers.add('Cache-Control', 'no-cache')
