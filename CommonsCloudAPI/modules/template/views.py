@@ -86,8 +86,8 @@ def template_post(application_id, extension):
 
 
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-@permission_required('can_view')
+@oauth.require_oauth()
+# @permission_required('can_view')
 def template_get(template_id, extension):
 
   Template_ = Template()
@@ -102,8 +102,8 @@ def template_get(template_id, extension):
 
 
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['PUT', 'PATCH'])
-# @oauth.require_oauth()
-@permission_required('can_edit')
+@oauth.require_oauth()
+# @permission_required('can_edit')
 def application_update(template_id, extension):
 
   Template_ = Template()
@@ -118,8 +118,8 @@ def application_update(template_id, extension):
 
 
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['DELETE'])
-# @oauth.require_oauth()
-@permission_required('can_delete')
+@oauth.require_oauth()
+# @permission_required('can_delete')
 def template_delete(template_id, extension):
 
   Template().template_delete(template_id)
