@@ -40,7 +40,7 @@ def features_preflight(storage, extension):
 
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['OPTIONS'])
-def features_preflight(storage, feature_id, extension):
+def features_single_preflight(storage, feature_id, extension):
     return status_.status_200(), 200
 
 
