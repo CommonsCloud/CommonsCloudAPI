@@ -32,11 +32,11 @@ from .permissions import permission_required
 
 
 @module.route('/v2/templates/<int:template_id>/fields.<string:extension>', methods=['OPTIONS'])
-def fields_preflight(extension):
+def fields_preflight(template_id, extension):
     return status_.status_200(), 200
 
 @module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['OPTIONS'])
-def fields_single_preflight(extension):
+def fields_single_preflight(template_id, field_id, extension):
     return status_.status_200(), 200
 
 
