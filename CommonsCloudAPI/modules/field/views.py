@@ -31,9 +31,18 @@ from . import module
 from .permissions import permission_required
 
 
+@module.route('/v2/templates/<int:template_id>/fields.<string:extension>', methods=['OPTIONS'])
+def fields_preflight(extension):
+    return status_.status_200(), 200
+
+@module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['OPTIONS'])
+def fields_single_preflight(extension):
+    return status_.status_200(), 200
+
+
 @module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-def field_get(template_id, field_id, extension):
+@oauth.require_oauth()
+def field_get(oauth_request, template_id, field_id, extension):
 
   Field_ = Field()
   this_field = Field_.field_get(field_id)
@@ -53,8 +62,8 @@ def field_get(template_id, field_id, extension):
 A list of templates that belongs to a specific application
 """
 @module.route('/v2/templates/<int:template_id>/fields.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-def template_fields_get(template_id, extension):
+@oauth.require_oauth()
+def template_fields_get(oauth_request, template_id, extension):
 
   Field_ = Field()
   these_fields = Field_.template_fields_get(template_id)
@@ -73,8 +82,8 @@ def template_fields_get(template_id, extension):
 
 
 @module.route('/v2/templates/<int:template_id>/fields.<string:extension>', methods=['POST'])
-# @oauth.require_oauth()
-def field_post(template_id, extension):
+@oauth.require_oauth()
+def field_post(oauth_request, template_id, extension):
 
   Field_ = Field()
   new_field = Field_.field_create(request, template_id)
@@ -89,9 +98,9 @@ User attempting to access this endpoint must have the `edit`
 permission associated with them in the `user_templates` table
 """
 @module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['PUT', 'PATCH'])
-# @oauth.require_oauth()
-@permission_required('can_edit')
-def field_update(template_id, field_id, extension):
+@oauth.require_oauth()
+# @permission_required('can_edit')
+def field_update(oauth_request, template_id, field_id, extension):
 
   Field_ = Field()
   updated_field = Field_.field_update(request, template_id, field_id)
@@ -105,9 +114,9 @@ def field_update(template_id, field_id, extension):
 
 
 @module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['DELETE'])
-# @oauth.require_oauth()
-@permission_required('can_delete')
-def field_delete(template_id, field_id, extension):
+@oauth.require_oauth()
+# @permission_required('can_delete')
+def field_delete(oauth_request, template_id, field_id, extension):
 
   Field().field_delete(template_id, field_id)
 
