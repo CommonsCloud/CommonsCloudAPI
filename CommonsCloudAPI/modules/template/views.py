@@ -70,8 +70,8 @@ def application_templates_get(oauth_request, application_id, extension):
 
 
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['POST'])
-# @oauth.require_oauth()
-def template_post(application_id, extension):
+@oauth.require_oauth()
+def template_post(oauth_request, application_id, extension):
 
   Template_ = Template()
   new_template = Template_.template_create(request, application_id)
@@ -88,7 +88,7 @@ def template_post(application_id, extension):
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
 # @permission_required('can_view')
-def template_get(template_id, extension):
+def template_get(oauth_request, template_id, extension):
 
   Template_ = Template()
   this_template = Template_.template_get(template_id)
@@ -104,7 +104,7 @@ def template_get(template_id, extension):
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['PUT', 'PATCH'])
 @oauth.require_oauth()
 # @permission_required('can_edit')
-def application_update(template_id, extension):
+def application_update(oauth_request, template_id, extension):
 
   Template_ = Template()
   updated_template = Template_.template_update(template_id, request)
@@ -120,7 +120,7 @@ def application_update(template_id, extension):
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['DELETE'])
 @oauth.require_oauth()
 # @permission_required('can_delete')
-def template_delete(template_id, extension):
+def template_delete(oauth_request, template_id, extension):
 
   Template().template_delete(template_id)
 
