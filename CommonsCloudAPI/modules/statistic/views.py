@@ -40,7 +40,7 @@ def statistic_single_preflight(template_id, statistic_id, extension):
 
 @module.route('/v2/templates/<int:template_id>/statistics.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
-def statistic_post(oauth_request, template_id, extension):
+def statistic_list(oauth_request, template_id, extension):
 
   Statistic_ = Statistic()
   Statistic_.current_user = oauth_request.user
@@ -56,7 +56,7 @@ def statistic_post(oauth_request, template_id, extension):
 
 @module.route('/v2/templates/<int:template_id>/statistics.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
-def statistic_post(oauth_request, template_id, extension):
+def statistic_get(oauth_request, template_id, extension):
 
   Statistic_ = Statistic()
   Statistic_.current_user = oauth_request.user
