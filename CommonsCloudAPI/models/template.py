@@ -26,8 +26,6 @@ from flask import abort
 from flask import request
 from flask import url_for
 
-from flask.ext.security import current_user
-
 
 """
 Import Commons Cloud Dependencies
@@ -196,7 +194,7 @@ class Template(db.Model, CommonsModel):
       'is_admin': True
     }
 
-    self.set_user_template_permissions(template_, permission, current_user)
+    self.set_user_template_permissions(template_, permission, self.current_user)
 
 
     """
@@ -277,7 +275,7 @@ class Template(db.Model, CommonsModel):
 
     templates_ = []
 
-    for template in current_user.templates:
+    for template in self.current_user.templates:
       templates_.append(template.template_id)
 
     return templates_

@@ -55,6 +55,8 @@ def application_templates_preflight(application_id, extension):
 def application_templates_get(oauth_request, application_id, extension):
 
   Template_ = Template()
+  Template_.current_user = oauth_request.user
+
   these_templates = Template_.application_templates_get(application_id)
 
   if type(these_templates) is 'Response':
@@ -74,6 +76,7 @@ def application_templates_get(oauth_request, application_id, extension):
 def template_post(oauth_request, application_id, extension):
 
   Template_ = Template()
+  Template_.current_user = oauth_request.user
   new_template = Template_.template_create(request, application_id)
 
   arguments = {
@@ -91,6 +94,7 @@ def template_post(oauth_request, application_id, extension):
 def template_get(oauth_request, template_id, extension):
 
   Template_ = Template()
+  Template_.current_user = oauth_request.user
   this_template = Template_.template_get(template_id)
 
   arguments = {
@@ -107,6 +111,7 @@ def template_get(oauth_request, template_id, extension):
 def application_update(oauth_request, template_id, extension):
 
   Template_ = Template()
+  Template_.current_user = oauth_request.user
   updated_template = Template_.template_update(template_id, request)
 
   arguments = {
@@ -122,7 +127,9 @@ def application_update(oauth_request, template_id, extension):
 # @permission_required('can_delete')
 def template_delete(oauth_request, template_id, extension):
 
-  Template().template_delete(template_id)
+  Template_ = Template()
+  Template_.current_user = oauth_request.user
+  Template_.template_delete(template_id)
 
   return status_.status_204(), 204
 

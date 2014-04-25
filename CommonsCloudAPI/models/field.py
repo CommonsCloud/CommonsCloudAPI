@@ -26,8 +26,6 @@ from flask import abort
 from flask import request
 from flask import url_for
 
-from flask.ext.security import current_user
-
 
 """
 Import Commons Cloud Dependencies
@@ -188,7 +186,7 @@ class Field(db.Model, CommonsModel):
           'delete': True
         }
 
-        self.set_user_field_permissions(field_, permission, current_user)
+        self.set_user_field_permissions(field_, permission, self.current_user)
 
         self.set_template_field_relationship(field_, Template_)
 

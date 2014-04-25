@@ -45,6 +45,7 @@ def fields_single_preflight(template_id, field_id, extension):
 def field_get(oauth_request, template_id, field_id, extension):
 
   Field_ = Field()
+  Field_.current_user = oauth_request.user
   this_field = Field_.field_get(field_id)
 
   if type(this_field) is 'Response':
@@ -66,6 +67,7 @@ A list of templates that belongs to a specific application
 def template_fields_get(oauth_request, template_id, extension):
 
   Field_ = Field()
+  Field_.current_user = oauth_request.user
   these_fields = Field_.template_fields_get(template_id)
 
   if type(these_fields) is 'Response':
@@ -86,6 +88,7 @@ def template_fields_get(oauth_request, template_id, extension):
 def field_post(oauth_request, template_id, extension):
 
   Field_ = Field()
+  Field_.current_user = oauth_request.user
   new_field = Field_.field_create(request, template_id)
 
   return Field_.endpoint_response(new_field, code=201)
@@ -103,6 +106,7 @@ permission associated with them in the `user_templates` table
 def field_update(oauth_request, template_id, field_id, extension):
 
   Field_ = Field()
+  Field_.current_user = oauth_request.user
   updated_field = Field_.field_update(request, template_id, field_id)
 
   arguments = {
@@ -118,6 +122,8 @@ def field_update(oauth_request, template_id, field_id, extension):
 # @permission_required('can_delete')
 def field_delete(oauth_request, template_id, field_id, extension):
 
-  Field().field_delete(template_id, field_id)
+  Field_ = Field()
+  Field_.current_user = oauth_request.user
+  Field_.field_delete(template_id, field_id)
 
   return status_.status_204(), 204
