@@ -118,7 +118,7 @@ class Statistic(db.Model, CommonsModel):
         and load their information from the database
         """
         statistic_id_list_ = self.statistic_id_list(template_id)
-        statistics_ = Statistic.query.filter(Statistic.id.in_(statistic_id_list)).all()
+        statistics_ = Statistic.query.filter(Statistic.id.in_(statistic_id_list_)).all()
 
         return statistics_
 
