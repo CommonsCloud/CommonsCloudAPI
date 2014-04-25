@@ -542,7 +542,7 @@ class CommonsModel(object):
     """
     Create a new custom table for a Feature Type
     """
-    exisiting_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+    exisitng_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
 
     """
     We must bind the engine to the metadata here in order for our fields to
@@ -553,8 +553,7 @@ class CommonsModel(object):
     """
     Delete the new column just like we would if we were hard coding the model
     """
-    print exisiting_table.c
-    exisiting_table.c[field.name].drop()
+    exisitng_table.c[field.name].drop()
 
     return True
 
