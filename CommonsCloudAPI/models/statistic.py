@@ -192,7 +192,7 @@ class Statistic(db.Model, CommonsModel):
         fields_ = []
 
         for field_ in template_.fields:
-            fields.append(field_.id)
+            fields_.append(field_.id)
 
         return fields_
 
