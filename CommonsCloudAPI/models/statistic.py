@@ -100,14 +100,14 @@ class Statistic(db.Model, CommonsModel):
         return statistic_
 
 
-   def statistic_get(self, statistic_id):
+    def statistic_get(self, statistic_id):
 
-    statistic_ = Statistic.query.get(statistic_id)
+        statistic_ = Statistic.query.get(statistic_id)
 
-    if not hasattr(statistic_, 'id'):
-      return abort(404)
+        if not hasattr(statistic_, 'id'):
+            return abort(404)
 
-    return statistic_
+        return statistic_
 
 
 
