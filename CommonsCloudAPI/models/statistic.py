@@ -28,9 +28,11 @@ from flask import abort
 Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.models.base import CommonsModel
+from CommonsCloudAPI.models.template import Template
 
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import sanitize
+
 
 
 """
@@ -98,6 +100,29 @@ class Statistic(db.Model, CommonsModel):
         return statistic_
 
 
+   def statistic_get(self, statistic_id):
+
+    statistic_ = Statistic.query.get(statistic_id)
+
+    if not hasattr(statistic_, 'id'):
+      return abort(404)
+
+    return statistic_
+
+
+
+    def statistic_list(self, template_id):
+
+        """
+        Get a list of the applications the current user has access to
+        and load their information from the database
+        """
+        statistic_id_list_ = self.statistic_id_list(template_id)
+        statistics_ = Statistic.query.filter(Statistic.id.in_(statistic_id_list)).all()
+
+        return statistics_
+
+
     """
     Update an existing statistic in the CommonsCloudAPI
 
@@ -158,4 +183,16 @@ class Statistic(db.Model, CommonsModel):
         db.session.commit()
 
         return True
+
+
+    def statistic_id_list(self, template_id):
+
+        template_ = Template.query.get(template_id)
+
+        fields_ = []
+
+        for field_ in template_.fields:
+            fields.append(field_.id)
+
+        return fields_
 
