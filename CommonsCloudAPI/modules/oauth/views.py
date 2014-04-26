@@ -86,7 +86,7 @@ def oauth_client():
     client_id=client_id,
     client_secret=client_secret,
     _redirect_uris='http://localhost:9000/authorized',
-    _default_scopes='email',
+    _default_scopes='user,applications',
     user_id=this_user.id,
   )
   #
@@ -152,7 +152,7 @@ def load_grant(client_id, code):
 @oauth.grantsetter
 def save_grant(client_id, code, request, *args, **kwargs):
     # decide the expires time yourself
-    expires = datetime.utcnow() + timedelta(seconds=100)
+    expires = datetime.utcnow() + timedelta(days=1)
     grant = Grant(
         client_id=client_id,
         code=code['code'],
@@ -176,9 +176,6 @@ def load_token(access_token=None, refresh_token=None):
 
 @oauth.tokensetter
 def save_token(token, oauth_request, *args, **kwargs):
-    # print 'oauth_request.client', oauth_request.client
-    print 'token', dir(token), token
-
 
     toks = Token.query.filter_by(
         client_id=oauth_request.client.client_id,
@@ -189,8 +186,7 @@ def save_token(token, oauth_request, *args, **kwargs):
     for t in toks:
         db.session.delete(t)
 
-    expires_in = token.pop('expires_in')
-    expires = datetime.utcnow() + timedelta(seconds=expires_in)
+    expires = datetime.utcnow() + timedelta(days=1)
 
     tok = Token(
         access_token=token['access_token'],
