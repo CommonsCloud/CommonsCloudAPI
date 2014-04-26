@@ -49,6 +49,9 @@ def feature_list(storage, extension):
 
     oauth_request = oauth.require_oauth()
 
+    if not hasattr(oauth_request.user, id):
+        return status_.status_403(), 403
+
     if (extension == 'csv'):
         return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
 
