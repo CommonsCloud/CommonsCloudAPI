@@ -45,15 +45,15 @@ def features_single_preflight(storage, feature_id, extension):
 
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
-def feature_list(oauth_request, storage, extension):
+# @oauth.require_oauth()
+def feature_list(storage, extension):
 
     if (extension == 'csv'):
         return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
 
     Feature_ = Feature()
     feature_list = Feature_.feature_list(storage)
-    feature_statistics = [] #Feature_.feature_statistic(storage)
+    feature_statistics = Feature_.feature_statistic(storage)
 
     arguments = {
         'the_content': feature_list.get('objects'),
