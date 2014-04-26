@@ -23,7 +23,6 @@ from flask import url_for
 """
 Import Application Dependencies
 """
-from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
@@ -46,11 +45,8 @@ def features_single_preflight(storage, feature_id, extension):
 
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
+# @oauth.require_oauth()
 def feature_list(storage, extension):
-
-    oauth_request = oauth.require_oauth()
-
-    logger.debug('OAuth Request: %s', oauth_request)
 
     if (extension == 'csv'):
         return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415

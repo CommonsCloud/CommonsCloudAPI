@@ -209,6 +209,9 @@ class Feature(CommonsModel):
 
         this_template = Template.query.filter_by(storage=storage).first()
 
+        if not this_template.is_public:
+          return abort(403)
+
         Model_ = self.get_storage(this_template, this_template.fields)
 
         endpoint_ = API(db.session, Model_)
