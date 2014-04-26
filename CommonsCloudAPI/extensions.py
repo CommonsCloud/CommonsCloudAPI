@@ -10,6 +10,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import logging
+
+
 """
 Import Flask Dependencies
 """
@@ -33,3 +36,6 @@ oauth = OAuth2Provider()
 principal = Principal()
 status = CommonsStatus()
 sanitize = CommonsSanitize()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
