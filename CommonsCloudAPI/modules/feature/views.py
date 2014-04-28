@@ -92,7 +92,7 @@ def feature_list(storage, extension):
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-def feature_get(oauth_request, storage, feature_id, extension):
+def feature_get(storage, feature_id, extension):
 
     if (extension == 'csv'):
         return status_.status_415('We do not support exporting a single item as a CSV file.'), 415
@@ -111,7 +111,7 @@ def feature_get(oauth_request, storage, feature_id, extension):
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>/<string:relationship>.<string:extension>', methods=['GET'])
 # @oauth.require_oauth()
-def feature_get_relationship(oauth_request, storage, feature_id, relationship, extension):
+def feature_get_relationship(storage, feature_id, relationship, extension):
 
     Feature_ = Feature()
     feature = Feature_.feature_get_relationship(storage, feature_id, relationship)
@@ -133,7 +133,7 @@ def feature_get_relationship(oauth_request, storage, feature_id, relationship, e
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['POST'])
 # @oauth.require_oauth()
-def feature_create(oauth_request, storage, extension):
+def feature_create(storage, extension):
 
     Feature_ = Feature()
     new_feature = Feature_.feature_create(request, storage)
