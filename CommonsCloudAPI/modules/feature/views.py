@@ -139,7 +139,7 @@ def feature_create(storage, extension):
     new_feature = Feature_.feature_create(request, storage)
 
     try:
-        return status_.status_201(), 201
+        return status_.status_201(new_feature.id), 201
     except Exception as e:
         return status_.status_500(e), 500
 

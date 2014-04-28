@@ -88,11 +88,12 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_201(self):
+  def status_201(self, resource_id):
 
     message = {
       'status': '201 Created',
       'code': '201',
+      'resource_id': resource_id
       'message': 'The request has been fulfilled and resulted in a new resource being created.'
     }
 
