@@ -79,6 +79,37 @@ class CommonsStatus():
 
 
   """
+  201 Created
+
+  @param (object) self
+      The object we are acting on behalf of
+
+  @return (method) jsonify || (dict) message
+      Either a jsonfied dictionary or just the dictionary
+
+  """
+  def status_201(self):
+
+    message = {
+      'status': '201 Created',
+      'code': '201',
+      'message': 'The request has been fulfilled and resulted in a new resource being created.'
+    }
+
+    response = jsonify(message)
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
+    response.headers.add('Access-Control-Allow-Credentials', True)
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+
+    response.headers.add('Pragma', 'no-cache')
+    response.headers.add('Cache-Control', 'no-cache')
+
+    return response
+
+
+  """
   204 No Content
 
   @see

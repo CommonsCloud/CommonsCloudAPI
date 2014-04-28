@@ -139,12 +139,7 @@ def feature_create(storage, extension):
     new_feature = Feature_.feature_create(request, storage)
 
     try:
-        arguments = {
-          "storage": storage,
-          "feature_id": new_feature.id,
-          "extension": extension
-        }
-        return redirect(url_for('.feature_get', **arguments))
+        return status_.status_201(), 201
     except Exception as e:
         return status_.status_500(e), 500
 
