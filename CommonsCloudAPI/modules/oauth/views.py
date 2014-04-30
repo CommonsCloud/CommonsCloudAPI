@@ -203,25 +203,3 @@ def save_token(token, oauth_request, *args, **kwargs):
     db.session.add(tok)
     db.session.commit()
     return tok
-
-# @oauth.before_request
-# def is_public():
-
-#   validate = oauth.require_oauth(request)
-
-#   if validate:
-#     logger.info(dir(validate));
-#   logger.info(dir(request))
-#   return
-
-
-
-
-# class MyValidator(OAuth2RequestValidator):
-#   def validate_client_id(self, client_id):
-#     logger.info('custom validator')
-#     return True
-
-# oauth._validator = MyValidator()
-
-
