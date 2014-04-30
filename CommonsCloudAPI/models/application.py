@@ -32,6 +32,7 @@ Import Commons Cloud Dependencies
 from CommonsCloudAPI.models.base import CommonsModel
 
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
@@ -69,7 +70,7 @@ class Application(db.Model, CommonsModel):
   url = db.Column(db.String(255))
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
-  templates = db.relationship('ApplicationTemplates', backref=db.backref('application'))
+  templates = db.relationship('ApplicationTemplates', backref=db.backref('application'), cascade="all,delete")
 
 
   def __init__(self, name="", url="", description=None, created=datetime.utcnow(), status=True, templates=[], current_user_={}):
@@ -143,8 +144,23 @@ class Application(db.Model, CommonsModel):
 
     application_ = Application.query.get(application_id)
 
-    if not hasattr(application_, 'id'):
+    """
+    Before we display the application the user requested, we need to verify
+    we're returing an Application:
+
+    1. That actually exists
+    2. The user is allowed to access
+    """
+    if not hasattr(application_, 'id') or \
+        not getattr(application_, 'id') in self.allowed_applications():
       return abort(404)
+
+
+    # logger.debug('User %d wants to access application %d', self.current_user.id, )
+    # logger.debug('User\'s applications include')
+
+    # for application__ in :
+    #   logger.debug('Application %d', getattr(application__, 'application_id'))
 
     return application_
 
@@ -164,31 +180,8 @@ class Application(db.Model, CommonsModel):
     Get a list of the applications the current user has access to
     and load their information from the database
     """
-    application_id_list_ = self._application_id_list()
+    application_id_list_ = self.allowed_applications()
     applications_ = Application.query.filter(Application.id.in_(application_id_list_)).all()
-
-    return applications_
-
-
-  """
-  Get a list of application ids from the current user and convert
-  them into a list of numbers so that our SQLAlchemy query can
-  understand what's going on
-
-  @param (object) self
-
-  @return (list) applications_
-      A list of applciations the current user has access to
-  """
-  def _application_id_list(self):
-
-    applications_ = []
-
-    if not hasattr(self.current_user, 'id'):
-      return abort(401)
-
-    for application in self.current_user.applications:
-      applications_.append(application.application_id)
 
     return applications_
 
@@ -207,6 +200,10 @@ class Application(db.Model, CommonsModel):
     Part 1: Load the application we wish to make changes to
     """
     application_ = Application.query.get(application_id)
+
+    if not getattr(application_, 'id') in self.allowed_applications('edit'):
+      return abort(401)
+
     application_content = json.loads(request_object.data)
 
 
@@ -290,22 +287,33 @@ class Application(db.Model, CommonsModel):
   def application_delete(self, application_id):
 
     application_ = Application.query.get(application_id)
+
+    if not getattr(application_, 'id') in self.allowed_applications('delete'):
+      return abort(401)
+
     db.session.delete(application_)
     db.session.commit()
 
 
+  """
+  Get a list of application ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
 
-# class Person(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.Unicode, unique=True)
-#     birth_date = db.Column(db.Date)
-#     computers = db.relationship('Computer',
-#                                 backref=db.backref('owner',
-#                                                    lazy='dynamic'))
+  @param (object) self
 
-# class Computer(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.Unicode, unique=True)
-#     vendor = db.Column(db.Unicode)
-#     owner_id = db.Column(db.Integer, db.ForeignKey('person.id'))
-#     purchase_time = db.Column(db.DateTime)
+  @return (list) applications_
+      A list of applciations the current user has access to
+  """
+  def allowed_applications(self, permission_type='view'):
+
+    applications_ = []
+
+    if not hasattr(self.current_user, 'id'):
+      return abort(401)
+
+    for application in self.current_user.applications:
+      if permission_type and getattr(application, permission_type):
+        applications_.append(application.application_id)
+
+    return applications_

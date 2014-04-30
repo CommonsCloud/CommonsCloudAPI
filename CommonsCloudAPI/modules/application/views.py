@@ -44,7 +44,7 @@ def application_single_preflight(application_id, extension):
 
 
 @module.route('/v2/applications.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
+@oauth.require_oauth('applications')
 def application_list(oauth_request, extension):
 
   Application_ = Application()
@@ -61,27 +61,8 @@ def application_list(oauth_request, extension):
   return Application_.endpoint_response(**arguments)
 
 
-@module.route('/v2/applications.<string:extension>', methods=['POST'])
-@oauth.require_oauth()
-def application_post(oauth_request, extension):
-
-  Application_ = Application()
-  Application_.current_user = oauth_request.user
-
-  new_application = Application_.application_create(request)
-
-  arguments = {
-    'the_content': new_application,
-    'extension': extension,
-    'code': 201
-  }
-
-  return Application_.endpoint_response(**arguments)
-
-
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
-# @permission_required('can_view')
+@oauth.require_oauth('applications')
 def application_get(oauth_request, application_id, extension):
 
   Application_ = Application()
@@ -100,9 +81,26 @@ def application_get(oauth_request, application_id, extension):
   return Application_.endpoint_response(**arguments)
 
 
+@module.route('/v2/applications.<string:extension>', methods=['POST'])
+@oauth.require_oauth('applications')
+def application_post(oauth_request, extension):
+
+  Application_ = Application()
+  Application_.current_user = oauth_request.user
+
+  new_application = Application_.application_create(request)
+
+  arguments = {
+    'the_content': new_application,
+    'extension': extension,
+    'code': 201
+  }
+
+  return Application_.endpoint_response(**arguments)
+
+
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['PUT', 'PATCH'])
-@oauth.require_oauth()
-# @permission_required('can_edit')
+@oauth.require_oauth('applications')
 def application_update(oauth_request, application_id, extension):
 
   Application_ = Application()
@@ -119,8 +117,7 @@ def application_update(oauth_request, application_id, extension):
 
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['DELETE'])
-@oauth.require_oauth()
-# @permission_required('can_delete')
+@oauth.require_oauth('applications')
 def application_delete(oauth_request, application_id, extension):
 
   Application_ = Application()
