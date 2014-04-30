@@ -189,7 +189,11 @@ class Application(db.Model, CommonsModel):
   """
   def application_update(self, application_id, request_object):
 
-    if not application_id in self.allowed_applications('edit'):
+    allowed_applications = self.allowed_applications('edit')
+    
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to update Application %d', \
+          self.current_user.id, allowed_applications, application_id)
       return abort(401)
 
     application_ = Application.query.get(application_id)
@@ -227,7 +231,11 @@ class Application(db.Model, CommonsModel):
   """
   def application_delete(self, application_id):
 
-    if not application_id in self.allowed_applications('delete'):
+    allowed_applications = self.allowed_applications('delete')
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to delete Application %d', \
+          self.current_user.id, allowed_applications, application_id)
       return abort(401)
 
     application_ = Application.query.get(application_id)
