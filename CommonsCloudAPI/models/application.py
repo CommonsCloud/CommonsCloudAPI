@@ -49,6 +49,8 @@ class UserApplications(db.Model, CommonsModel):
   view = db.Column(db.Boolean())
   edit = db.Column(db.Boolean())
   delete = db.Column(db.Boolean())
+  is_moderator = db.Column(db.Boolean())
+  is_admin = db.Column(db.Boolean())
   applications = db.relationship('Application', backref=db.backref("user_applications", cascade="all,delete"))
 
 

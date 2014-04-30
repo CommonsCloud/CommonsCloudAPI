@@ -144,17 +144,27 @@ class Template(db.Model, CommonsModel):
   def template_create(self, request_object, application_id):
 
     """
+    Make sure that some data was submitted before proceeding
+    """
+    if not request_object.data:
+      logger.error('User %d new Template request failed because they didn\'t submit any `data` with their request', \
+          self.current_user.id)
+      return status_.status_400('You didn\'t include any `data` with your request.'), 400
+
+    """
     Part 1: Make sure we can use the request data as json
     """
     content_ = json.loads(request_object.data)
 
     """
-    Part 2: Make sure that we have everything we need to created the
+    Make sure that we have everything we need to created the
     template successfully, including things like a Name, an associated
     Application, and a Storage mechanism
     """
     if not application_id:
-      return abort(400)
+      logger.error('User %d new Template request failed because they didn\'t submit an Application ID with their request', \
+          self.current_user.id)
+      return status_.status_400('You didn\'t include an Application to associated with the Template'), 400
 
     """
     Part 3: Make sure we have a table that has been created in the database
@@ -402,28 +412,6 @@ class Template(db.Model, CommonsModel):
 
 
   """
-  Get a list of templates ids for the current application and convert
-  them into a list of numbers so that our SQLAlchemy query can
-  understand what's going on
-
-  @param (object) self
-
-  @return (list) templates_
-      A list of applciations the current user has access to
-  """
-  def _applications_template_id_list(self, application_id):
-
-    application_ = Application.query.get(application_id)
-
-    templates_ = []
-
-    for template in application_.templates:
-      templates_.append(template.template_id)
-
-    return templates_
-
-
-  """
   Get a list of Templates that belong to this Application
 
   """
@@ -444,7 +432,7 @@ class Template(db.Model, CommonsModel):
     """
     All Templates belonging to the requested Application
     """
-    application_templates_ = self._applications_template_id_list(application_id)
+    application_templates_ = self.applications_templates(application_id)
     logger.debug('All Templates for this Application %s', application_templates_)  
 
     """
@@ -456,6 +444,24 @@ class Template(db.Model, CommonsModel):
 
 
     templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
+
+    return templates_
+
+
+
+  """
+  Get a list of templates ids for the current application and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+  """
+  def applications_templates(self, application_id):
+
+    application_ = Application.query.get(application_id)
+
+    templates_ = []
+
+    for template in application_.templates:
+      templates_.append(template.template_id)
 
     return templates_
 
