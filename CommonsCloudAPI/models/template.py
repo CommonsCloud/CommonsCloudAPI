@@ -33,6 +33,7 @@ Import Commons Cloud Dependencies
 from CommonsCloudAPI.models.base import CommonsModel
 
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
@@ -241,47 +242,6 @@ class Template(db.Model, CommonsModel):
 
 
   """
-  Get a list of existing Templates from the CommonsCloudAPI
-
-  @param (object) self
-
-  @return (list) templates
-      A list of templates and their given permissions for the current user
-
-  """
-  def template_list(self):
-
-    """
-    Get a list of the templates the current user has access to
-    and load their information from the database
-    """
-    template_id_list_ = self._template_id_list()
-    templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
-
-    return templates_
-
-
-  """
-  Get a list of template ids from the current user and convert
-  them into a list of numbers so that our SQLAlchemy query can
-  understand what's going on
-
-  @param (object) self
-
-  @return (list) templates_
-      A list of templates the current user has access to
-  """
-  def _template_id_list(self):
-
-    templates_ = []
-
-    for template in self.current_user.templates:
-      templates_.append(template.template_id)
-
-    return templates_
-
-
-  """
   Create a new Template in the CommonsCloudAPI
 
   @param (object) self
@@ -451,7 +411,7 @@ class Template(db.Model, CommonsModel):
   @return (list) templates_
       A list of applciations the current user has access to
   """
-  def _application_templates_id_list(self, application_id):
+  def _applications_template_id_list(self, application_id):
 
     application_ = Application.query.get(application_id)
 
@@ -468,9 +428,67 @@ class Template(db.Model, CommonsModel):
 
   """
   def application_templates_get(self, application_id):
+    
+    """
+    Collect all of the templates the current user has access to, including both
+    explicitly allowed templates and public templates
+    """
+    allowed_templates_ = self.allowed_templates()
+    logger.debug('All Templates user has permission to %s', allowed_templates_)
+
+    public_templates_ = self.public_templates()
+    logger.debug('All Public Templates %s', public_templates_)
+
+    combined_access = allowed_templates_ + public_templates_
+
+    """
+    All Templates belonging to the requested Application
+    """
+    application_templates_ = self._applications_template_id_list(application_id)
+    logger.debug('All Templates for this Application %s', application_templates_)  
+
+    """
+    Using the `combined_template_access` filter the Application Templates (the
+    Templates only for this Application that the user has access to)
+    """
+    template_id_list_ = set(combined_access) & set(application_templates_)
+    logger.debug('Templates to display %s', template_id_list_)
 
 
-    template_id_list = self._application_templates_id_list(application_id)
-    templates_ = Template.query.filter(Template.id.in_(template_id_list)).all()
+    templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
+
+    return templates_
+
+
+  """
+  Get a list of templates that are marked as `is_public`
+  """
+  def public_templates(self):
+
+    templates_ = Template.query.filter_by(is_public=True).all()
+
+    public_ = []
+
+    for template in templates_:
+      public_.append(template.id)
+
+    return public_
+
+
+  """
+  Get a list of template ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+  """
+  def allowed_templates(self, permission_type='view'):
+
+    templates_ = []
+
+    if not hasattr(self.current_user, 'id'):
+      return abort(401)
+
+    for template in self.current_user.templates:
+      if permission_type and getattr(template, permission_type):
+        templates_.append(template.template_id)
 
     return templates_

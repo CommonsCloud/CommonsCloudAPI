@@ -28,8 +28,6 @@ from CommonsCloudAPI.models.application import Application
 
 from . import module
 
-from .permissions import permission_required
-
 
 @module.route('/v2/applications.<string:extension>', methods=['OPTIONS'])
 def application_preflight(extension):

@@ -27,7 +27,6 @@ from CommonsCloudAPI.models.template import Template
 
 from . import module
 
-from .permissions import permission_required
 
 @module.route('/v2/templates.<string:extension>', methods=['OPTIONS'])
 def templates_preflight(extension):
@@ -39,15 +38,15 @@ def templates_single_preflight(template_id, extension):
     return status_.status_200(), 200
 
 
+@module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['OPTIONS'])
+def application_templates_preflight(application_id, extension):
+    return status_.status_200(), 200
+
+
 @module.route('/v2/templates.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
 def template_list(extension):
   return status_.status_303(), 303
-
-
-@module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['OPTIONS'])
-def application_templates_preflight(application_id, extension):
-    return status_.status_200(), 200
 
 
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['GET'])
@@ -90,7 +89,6 @@ def template_post(oauth_request, application_id, extension):
 
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
-# @permission_required('can_view')
 def template_get(oauth_request, template_id, extension):
 
   Template_ = Template()
@@ -107,7 +105,6 @@ def template_get(oauth_request, template_id, extension):
 
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['PUT', 'PATCH'])
 @oauth.require_oauth()
-# @permission_required('can_edit')
 def application_update(oauth_request, template_id, extension):
 
   Template_ = Template()
@@ -124,7 +121,6 @@ def application_update(oauth_request, template_id, extension):
 
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['DELETE'])
 @oauth.require_oauth()
-# @permission_required('can_delete')
 def template_delete(oauth_request, template_id, extension):
 
   Template_ = Template()
