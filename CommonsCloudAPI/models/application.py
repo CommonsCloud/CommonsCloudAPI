@@ -84,22 +84,33 @@ class Application(db.Model, CommonsModel):
 
 
   """
-  Create a new application in the CommonsCloudAPI
-
-  @param (object) self
-
-  @param (dictionary) application_content
-      The content that is being submitted by the user
+  Create a new application in the API
   """
   def application_create(self, request_object):
 
     """
-    Make sure we can use the request data as json
+    Make sure that some data was submitted before proceeding
+    """
+    if not request_object.data:
+      logger.error('User %d new Application request failed because they didn\'t submit any `data` with their request', \
+          self.current_user.id)
+      return status_.status_400('You didn\'t include any `data` with your request.'), 400
+
+    """
+    Prepare the data for use
     """
     application_content = json.loads(request_object.data)
 
     """
-    Part 1: Add the new application to the database
+    Make sure we have at least a name for our Application
+    """
+    if not application_content.get('name', ''):
+      logger.error('User %d new Application request failed because the did not include a `name` in the `data`', \
+          self.current_user.id)
+      return status_.status_400('You didn\'t include a `name` in the `data` of your request. You have to do that with Applications.'), 400
+
+    """
+    Add the new application to the database
     """
     new_application = {
       'name': sanitize.sanitize_string(application_content.get('name', '')),
@@ -112,9 +123,8 @@ class Application(db.Model, CommonsModel):
     db.session.add(application_)
     db.session.commit()
 
-
     """
-    Part 2: Tell the system what user should have permission to
+    Tell the system what user should have permission to
     access the newly created application
     """
     permission = {
@@ -124,6 +134,81 @@ class Application(db.Model, CommonsModel):
     }
 
     self.set_user_application_permissions(application_, permission, self.current_user)
+
+    """
+    Return the newly created Application
+    """
+    return application_
+
+
+  """
+  Get a single, existing Application from the API
+  """
+  def application_get(self, application_id):
+
+    allowed_applications = self.allowed_applications()
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to access Application %d', \
+          self.current_user.id, allowed_applications, application_id)
+      return abort(404)
+
+    return Application.query.get(application_id)
+
+
+  """
+  Get a list of existing Applications from the API
+  """
+  def application_list(self):
+
+    """
+    Get a list of the applications the current user has access to
+    and load their information from the database
+    """
+    allowed_applications = self.allowed_applications()
+
+    """
+    No further check is needed here because we're only return the ID's of the
+    applications that we already know the user has access to. If the list is
+    empty then we don't need to perform a database query and can just return
+    an empty list
+    """
+    if len(allowed_applications) >= 1:
+      return Application.query.filter(Application.id.in_(allowed_applications)).all()
+
+    return []
+
+
+  """
+  Create a new application in the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (dictionary) application_content
+      The content that is being submitted by the user
+  """
+  def application_update(self, application_id, request_object):
+
+    if not application_id in self.allowed_applications('edit'):
+      return abort(401)
+
+    application_ = Application.query.get(application_id)
+
+    application_content = json.loads(request_object.data)
+
+    """
+    Part 2: Update the fields that we have data for
+    """
+    if hasattr(application_, 'name'):
+      application_.name = sanitize.sanitize_string(application_content.get('name', application_.name))
+
+    if hasattr(application_, 'description'):
+      application_.description = sanitize.sanitize_string(application_content.get('description', application_.description))
+
+    if hasattr(application_, 'url'):
+      application_.url = sanitize.sanitize_string(application_content.get('url', application_.url))
+
+    db.session.commit()
 
     return application_
 
@@ -140,89 +225,16 @@ class Application(db.Model, CommonsModel):
       A fully qualified Application object
 
   """
-  def application_get(self, application_id):
+  def application_delete(self, application_id):
 
-    application_ = Application.query.get(application_id)
-
-    """
-    Before we display the application the user requested, we need to verify
-    we're returing an Application:
-
-    1. That actually exists
-    2. The user is allowed to access
-    """
-    if not hasattr(application_, 'id') or \
-        not getattr(application_, 'id') in self.allowed_applications():
-      return abort(404)
-
-
-    # logger.debug('User %d wants to access application %d', self.current_user.id, )
-    # logger.debug('User\'s applications include')
-
-    # for application__ in :
-    #   logger.debug('Application %d', getattr(application__, 'application_id'))
-
-    return application_
-
-
-  """
-  Get a list of existing Applications from the CommonsCloudAPI
-
-  @param (object) self
-
-  @return (list) applications
-      A list of applications and their given permissions for the current user
-
-  """
-  def application_list(self):
-
-    """
-    Get a list of the applications the current user has access to
-    and load their information from the database
-    """
-    application_id_list_ = self.allowed_applications()
-    applications_ = Application.query.filter(Application.id.in_(application_id_list_)).all()
-
-    return applications_
-
-
-  """
-  Create a new application in the CommonsCloudAPI
-
-  @param (object) self
-
-  @param (dictionary) application_content
-      The content that is being submitted by the user
-  """
-  def application_update(self, application_id, request_object):
-
-    """
-    Part 1: Load the application we wish to make changes to
-    """
-    application_ = Application.query.get(application_id)
-
-    if not getattr(application_, 'id') in self.allowed_applications('edit'):
+    if not application_id in self.allowed_applications('delete'):
       return abort(401)
 
-    application_content = json.loads(request_object.data)
+    application_ = Application.query.get(application_id)
 
-
-    """
-    Part 2: Update the fields that we have data for
-    """
-    if hasattr(application_, 'name'):
-      application_.name = sanitize.sanitize_string(application_content.get('name', application_.name))
-
-    if hasattr(application_, 'description'):
-      application_.description = sanitize.sanitize_string(application_content.get('description', application_.description))
-
-    if hasattr(application_, 'url'):
-      application_.url = sanitize.sanitize_string(application_content.get('url', application_.url))
-
-
+    db.session.delete(application_)
     db.session.commit()
 
-    return application_
 
 
   """
@@ -270,29 +282,6 @@ class Application(db.Model, CommonsModel):
     db.session.commit()
 
     return new_permission
-
-
-  """
-  Get an existing Applications from the CommonsCloudAPI
-
-  @param (object) self
-
-  @param (int) application_id
-      The unique ID of the Application to be retrieved from the system
-
-  @return (object) application_
-      A fully qualified Application object
-
-  """
-  def application_delete(self, application_id):
-
-    application_ = Application.query.get(application_id)
-
-    if not getattr(application_, 'id') in self.allowed_applications('delete'):
-      return abort(401)
-
-    db.session.delete(application_)
-    db.session.commit()
 
 
   """

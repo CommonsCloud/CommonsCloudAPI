@@ -16,6 +16,8 @@ import logging
 """
 Import Flask Dependencies
 """
+from flask import current_app
+
 from flask.ext.security import Security
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail
@@ -37,5 +39,5 @@ principal = Principal()
 status = CommonsStatus()
 sanitize = CommonsSanitize()
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

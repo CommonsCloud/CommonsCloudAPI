@@ -185,12 +185,20 @@ class CommonsStatus():
     message = {
       'status': '400 Bad Request',
       'code': '400',
-      'message': 'The request could not be understood by the server due to malformed syntax. You SHOULD NOT repeat the request without modifications.',
-      'details': 'Chances are you forgot to include one of the required variables needed to create a new resource.',
       'error': str(system_message)
     }
 
-    return jsonify(message) if self.return_type == 'json' else message
+    response = jsonify(message)
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
+    response.headers.add('Access-Control-Allow-Credentials', True)
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+
+    response.headers.add('Pragma', 'no-cache')
+    response.headers.add('Cache-Control', 'no-cache')
+
+    return response
 
 
   """

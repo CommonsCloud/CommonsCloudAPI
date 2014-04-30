@@ -90,6 +90,9 @@ def application_post(oauth_request, extension):
 
   new_application = Application_.application_create(request)
 
+  if type(new_application) is tuple:
+    return new_application
+
   arguments = {
     'the_content': new_application,
     'extension': extension,
