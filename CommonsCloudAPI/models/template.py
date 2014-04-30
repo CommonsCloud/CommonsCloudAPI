@@ -166,6 +166,17 @@ class Template(db.Model, CommonsModel):
           self.current_user.id)
       return status_.status_400('You didn\'t include an Application to associated with the Template'), 400
 
+
+    #
+    # @todo
+    # 
+    # Need to make sure the user is an Administrator of the Application that
+    # they're trying to add a template to, otherwise, we can insert rogue
+    # templates into the database for Applications we don't own ... this is
+    # very, very bad.
+    #
+
+
     """
     Part 3: Make sure we have a table that has been created in the database
     to associate our Template features with
