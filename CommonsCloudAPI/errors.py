@@ -18,7 +18,7 @@ from flask import render_template
 
 from CommonsCloudAPI.extensions import status as status_
 
-from oauthlib.oauth2.rfc6749 import errors
+from oauthlib.oauth2 import InvalidScopeError
 
 
 """
@@ -52,7 +52,7 @@ def load_errorhandlers(app):
   def internal_error(error):
     return status_.status_405(), 405
 
-  @app.errorhandler(errors.InvalidScopeError)
+  @app.errorhandler(InvalidScopeError)
   def internal_error(error):
     return status_.status_500('Your OAuth Scopes don\'t match the ones specified for your application'), 500
 
