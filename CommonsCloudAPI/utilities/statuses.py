@@ -214,19 +214,23 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_401(self):
+  def status_401(self, system_message=''):
 
     message = {
       'status': '401 Unauthorized',
       'code': '401',
-      'message': 'The request requires user authentication.',
-      'details': 'You probably just need to login or authenticate via OAuth before accessing this endpoint. Otherwise you do not have permission to access this resource.'
+      'error': str(system_message)
     }
 
     response = jsonify(message)
 
-    response.headers.add('Access-Control-Allow-Origin', 'http://127.0.0.1:9000')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
+    response.headers.add('Access-Control-Allow-Credentials', True)
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+
+    response.headers.add('Pragma', 'no-cache')
+    response.headers.add('Cache-Control', 'no-cache')
 
     return response
 
