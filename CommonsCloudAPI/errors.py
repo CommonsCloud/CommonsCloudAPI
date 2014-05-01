@@ -18,6 +18,8 @@ from flask import render_template
 
 from CommonsCloudAPI.extensions import status as status_
 
+from oauthlib.oauth2.rfc6749 import errors
+
 
 """
 Setup some basic routes to get our application started, even if all
@@ -50,10 +52,13 @@ def load_errorhandlers(app):
   def internal_error(error):
     return status_.status_405(), 405
 
+  @app.errorhandler(errors.InvalidScopeError)
+  def internal_error(error):
+    return status_.status_500('Your OAuth Scopes don\'t match the ones specified for your application'), 500
+
+
   @app.errorhandler(500)
   @app.errorhandler(Exception)
   def internal_error(error):
-    print Exception
-    print error
     return status_.status_500(error), 500
   
