@@ -135,6 +135,16 @@ class Template(db.Model, CommonsModel):
   def template_create(self, request_object, application_id):
 
     """
+    Make sure that we have everything we need to created the
+    template successfully, including things like a Name, an associated
+    Application, and a Storage mechanism
+    """
+    if not application_id:
+      logger.error('User %d new Template request failed because they didn\'t submit an Application ID with their request', \
+          self.current_user.id)
+      return status_.status_400('You didn\'t include an Application to associated with the Template'), 400
+
+    """
     Make sure that some data was submitted before proceeding
     """
     if not request_object.data:
@@ -146,17 +156,6 @@ class Template(db.Model, CommonsModel):
     Part 1: Make sure we can use the request data as json
     """
     content_ = json.loads(request_object.data)
-
-    """
-    Make sure that we have everything we need to created the
-    template successfully, including things like a Name, an associated
-    Application, and a Storage mechanism
-    """
-    if not application_id:
-      logger.error('User %d new Template request failed because they didn\'t submit an Application ID with their request', \
-          self.current_user.id)
-      return status_.status_400('You didn\'t include an Application to associated with the Template'), 400
-
 
     allowed_applications = self.allowed_applications()
 

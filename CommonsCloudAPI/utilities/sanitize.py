@@ -249,6 +249,17 @@ class CommonsSanitize():
 
 
   """
+  Sanitize an Boolean string, removing potentially harmful Boolean from our inputs
+  """
+  def sanitize_integer(self, user_input):
+
+    if type(user_input) is int:
+      return user_input
+
+    return False
+
+
+  """
   Sanitize an Array string, removing potentially harmful Boolean from our inputs
   """
   def sanitize_array(self, user_input):

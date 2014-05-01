@@ -56,7 +56,6 @@ def load_errorhandlers(app):
   def internal_error(error):
     return status_.status_500('Your OAuth Scopes don\'t match the ones specified for your application'), 500
 
-
   @app.errorhandler(500)
   @app.errorhandler(Exception)
   def internal_error(error):

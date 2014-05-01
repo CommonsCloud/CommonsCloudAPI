@@ -23,8 +23,6 @@ from datetime import datetime
 Import Flask Dependencies
 """
 from flask import abort
-from flask import request
-from flask import url_for
 
 
 """
@@ -33,6 +31,7 @@ Import Commons Cloud Dependencies
 from CommonsCloudAPI.models.base import CommonsModel
 
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
@@ -85,7 +84,7 @@ A field that helps make up a Template within CommonsCloudAPI
 """
 class Field(db.Model, CommonsModel):
 
-    __public__ = ['id', 'label', 'name', 'help', 'data_type', 'relationship', 'is_listed', 'is_searchable', 'is_required', 'weight', 'status']
+    __public__ = ['id', 'label', 'name', 'help', 'data_type', 'relationship', 'is_public', 'is_visible', 'is_listed', 'is_searchable', 'is_required', 'weight', 'status']
 
     __tablename__ = 'field'
     __table_args__ = {
@@ -99,20 +98,24 @@ class Field(db.Model, CommonsModel):
     data_type = db.Column(db.String(100))
     relationship = db.Column(db.String(255))
     association = db.Column(db.String(255))
+    is_visible = db.Column(db.Boolean)
+    is_public = db.Column(db.Boolean)
     is_listed = db.Column(db.Boolean)
     is_searchable = db.Column(db.Boolean)
     is_required = db.Column(db.Boolean)
     weight = db.Column(db.Integer)
     status = db.Column(db.Boolean)
-    statistics = db.relationship('Statistic', backref=db.backref('field'))
+    statistics = db.relationship('Statistic', backref=db.backref('field'), cascade="all,delete")
 
-    def __init__(self, label="", name="", help="", data_type="", relationship="", association="", is_listed=True, is_searchable=False, is_required=False, weight="", status=True, templates=[]):
+    def __init__(self, label="", name="", help="", data_type="", relationship="", association="", is_public=True, is_visible=True, is_listed=True, is_searchable=False, is_required=False, weight="", status=True, templates=[]):
         self.label = label
         self.name = name
         self.help = help
         self.data_type = data_type
         self.relationship = relationship
         self.association = association
+        self.is_visible = is_visible
+        self.is_public = is_public
         self.is_listed = is_listed
         self.is_searchable = is_searchable
         self.is_required = is_required
@@ -132,30 +135,87 @@ class Field(db.Model, CommonsModel):
     def field_create(self, request_object, template_id):
 
         """
-        Section 1: Create the a new Field record
+        Make sure that we have everything we need to created the
+        template successfully, including things like a Name, an associated
+        Application, and a Storage mechanism
         """
+        if not template_id:
+          logger.error('User %d new Field request failed because they didn\'t submit an Template ID with their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include a Template to add this field to ... or else you\'re not the admin of this Template'), 400
+
+        """
+        Make sure that some data was submitted before proceeding
+        """
+        if not request_object.data:
+          logger.error('User %d new Field request failed because they didn\'t submit any `data` with their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include any `data` with your request.'), 400
 
         """
         Convert our request object into usable data
         """
         content_ = json.loads(request_object.data)
 
-
         """
         Fields are directly tied to Templates and really have no life of their
         own outside of Templates. Because of that we need to instantiate a
         Template object that we can work with
         """
-        Template_ = Template().query.get(template_id)
+        allowed_fields = self.allowed_fields(template_id)
+        if not template_id in allowed_fields:
+          logger.warning('User %d with Templates %s tried to access Template %d', \
+              self.current_user.id, allowed_fields, template_id)
+          return status_.status_401(), 401
 
+        Template_ = Template().query.get(template_id)
 
         """
         To create a Field you must at least provide a name for your field
         """
         if not content_.get('name', ''):
-            return abort(400)
+          logger.error('User %d new Field request failed because they didn\'t submit any `name` in the `data` of their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include a `name` in the `data` of your request.'), 400
+
+        """
+        To create a Field you must at least provide a data_type for your field
+        """
+        if not content_.get('data_type', ''):
+          logger.error('User %d new Field request failed because they didn\'t submit any `data_type` in the `data` of their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include a `data_type` in the `data` of your request.'), 400
+        elif 'relationship' in content_.get('data_type', '') and not content_.get('relationship', ''):
+          logger.error('User %d new Field request failed because they didn\'t submit any `data_type` in the `data` of their request', \
+              self.current_user.id)
+          return status_.status_400('You can\'t create a Relationship field without specifying the `relationship` ... this starts with type_'), 400
+
 
         user_defined_label = sanitize.sanitize_string(content_.get('name', ''))
+
+        """
+        If someone's creating a relationship the storage string they've specified
+        needs to belong to a template that they are allowed to access
+        """
+        relationship_storage = content_.get('relationship', '')
+        storage_check = Template().query.filter_by(storage=relationship_storage).first()
+
+        if not storage_check.id in allowed_fields:
+          logger.warning('User %d tried to add a Field to a Template %d which they do not own', \
+              self.current_user.id, template_id)
+          return status_.status_401('The Template `relationship` string you entered either doesn\'t exist or you don\'t have permission to use it'), 401
+
+        """
+        Lastly, make sure that an identical relationship doesn't already exist.
+        If the type_ and the template type_ already have a relationship it will
+        cause bad things to happen when searching via the API
+        """
+        duplicate_check = Field().query.filter_by(relationship=relationship_storage).first()
+
+        if duplicate_check.id:
+          logger.warning('User %d tried to add a duplicate relationship type', \
+              self.current_user.id, template_id)
+          return status_.status_400('You already defined a relationship with this Template, you cannot create two relationship fields with the same relationship table.'), 400
 
         new_field = {
           'label': user_defined_label,
@@ -163,11 +223,13 @@ class Field(db.Model, CommonsModel):
           'help': sanitize.sanitize_string(content_.get('help', '')),
           'data_type': sanitize.sanitize_string(content_.get('data_type', 'text')),
           'relationship': sanitize.sanitize_string(content_.get('relationship', None)),
-          'is_listed': content_.get('is_listed', False),
-          'is_searchable': content_.get('is_searchable', True),
-          'is_required': content_.get('is_required', False),
-          'weight': content_.get('created', 1),
-          'status': content_.get('status', True),
+          'is_public': sanitize.sanitize_boolean(content_.get('is_public', False)),
+          'is_visible': sanitize.sanitize_boolean(content_.get('is_visible', False)),
+          'is_listed': sanitize.sanitize_boolean(content_.get('is_listed', False)),
+          'is_searchable': sanitize.sanitize_boolean(content_.get('is_searchable', True)),
+          'is_required': sanitize.sanitize_boolean(content_.get('is_required', False)),
+          'weight': sanitize.sanitize_integer(content_.get('created', 1)),
+          'status': sanitize.sanitize_boolean(content_.get('status', True)),
           'templates': [Template_]
         }
 
@@ -201,16 +263,6 @@ class Field(db.Model, CommonsModel):
             field_.relationship = field_storage['relationship']
             db.session.commit()
 
-
-        """
-        Before attempting to return the field as a JSON object, we need to
-        make sure that we have a saved field to display, otherwise we'll
-        start throwing errors
-        """
-        if not hasattr(field_, 'id'):
-            return abort(404)
-
-
         return field_
 
     """
@@ -224,19 +276,38 @@ class Field(db.Model, CommonsModel):
     def field_update(self, request_object, template_id, field_id):
 
         """
-        Before attempting to return the field as a JSON object, we need to
-        make sure that we have a saved field to display, otherwise we'll
-        start throwing errors
+        Make sure that we have everything we need to created the
+        template successfully, including things like a Name, an associated
+        Application, and a Storage mechanism
         """
         if not field_id:
-            return abort(404)
+          logger.error('User %d update Field request failed because they didn\'t submit a Field ID with their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include a Field ID to update this field with'), 400
 
+        """
+        Fields are directly tied to Templates and really have no life of their
+        own outside of Templates. Because of that we need to instantiate a
+        Template object that we can work with
+        """
+        allowed_fields = self.allowed_fields(permission_type='edit')
+        if not field_id in allowed_fields:
+          logger.warning('User %d with Fields %s tried to access Field %d', \
+              self.current_user.id, allowed_fields, field_id)
+          return status_.status_401('You can\'t edit this Field because it\'s not yours'), 401
+
+        """
+        Make sure that some data was submitted before proceeding
+        """
+        if not request_object.data:
+          logger.error('User %d update Field request failed because they didn\'t submit any `data` with their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include any `data` with your request.'), 400
 
         """
         Convert our request object into usable data
         """
         field_content = json.loads(request_object.data)
-
 
         """
         Fields are directly tied to Templates and really have no life of their
@@ -244,7 +315,6 @@ class Field(db.Model, CommonsModel):
         Template object that we can work with
         """
         field_ = Field().query.get(field_id)
-
 
         """
         Part 2: Update the fields that we have data for
@@ -256,27 +326,19 @@ class Field(db.Model, CommonsModel):
           field_.help = sanitize.sanitize_string(field_content.get('help', field_.help))
 
         if hasattr(field_, 'is_listed'):
-          field_.is_listed = field_content.get('is_listed', field_.is_listed)
+          field_.is_listed = sanitize.sanitize_boolean(field_content.get('is_listed', field_.is_listed))
 
         if hasattr(field_, 'is_searchable'):
-          field_.is_searchable = field_content.get('is_searchable', field_.is_searchable)
+          field_.is_searchable = sanitize.sanitize_boolean(field_content.get('is_searchable', field_.is_searchable))
 
         if hasattr(field_, 'is_required'):
-          field_.is_required = field_content.get('is_required', field_.is_required)
+          field_.is_required = sanitize.sanitize_boolean(field_content.get('is_required', field_.is_required))
 
         if hasattr(field_, 'weight'):
-          field_.weight = field_content.get('weight', field_.weight)
+          field_.weight = sanitize.sanitize_integer(field_content.get('weight', field_.weight))
 
         if hasattr(field_, 'status'):
-          field_.status = field_content.get('status', field_.status)
-
-
-        #
-        # @todo
-        #    We should probably make the 'name' of the field change if the
-        #    user can change the label ... but I'm not sure at the same time.
-        #    Could that mess up existing applications? Does it matter?
-        #
+          field_.status = sanitize.sanitize_boolean(field_content.get('status', field_.status))
 
         #
         # @todo
@@ -286,7 +348,6 @@ class Field(db.Model, CommonsModel):
         # @see
         #    http://www.postgresql.org/docs/9.3/static/sql-altertable.html
         #
-
 
         db.session.commit()
 
@@ -307,10 +368,31 @@ class Field(db.Model, CommonsModel):
     """
     def field_get(self, field_id):
 
-        field_ = Field.query.get(field_id)
+        """
+        Make sure that we have everything we need to created the
+        template successfully, including things like a Name, an associated
+        Application, and a Storage mechanism
+        """
+        if not field_id:
+          logger.error('User %d update Field request failed because they didn\'t submit a Field ID with their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include a Field ID to update this field with'), 400
 
-        if not hasattr(field_, 'id'):
-            return abort(404)
+        """
+        Fields are directly tied to Templates and really have no life of their
+        own outside of Templates. Because of that we need to instantiate a
+        Template object that we can work with
+        """
+        allowed_fields = self.allowed_fields(permission_type='view')
+
+        public_fields_ = self.public_templates()
+
+        if not field_id in allowed_fields + public_fields_:
+          logger.warning('User %d with Fields %s tried to access Field %d', \
+              self.current_user.id, allowed_fields, field_id)
+          return status_.status_401('You can\'t edit this Field because it\'s not yours'), 401
+
+        field_ = Field.query.get(field_id)
 
         return field_
 
@@ -426,12 +508,42 @@ class Field(db.Model, CommonsModel):
     """
     def template_fields_get(self, template_id):
 
+        """
+        Make sure that we have everything we need to created the
+        template successfully, including things like a Name, an associated
+        Application, and a Storage mechanism
+        """
+        if not template_id:
+          logger.error('User %d update Field request failed because they didn\'t submit a Template ID with their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include a Template ID to get a list of fields with'), 400
+
+        """
+        Fields are directly tied to Templates and really have no life of their
+        own outside of Templates. Because of that we need to instantiate a
+        Template object that we can work with
+        """
+        allowed_templates = self.allowed_fields(template_id=template_id)
+
+        if not template_id in allowed_templates:
+          logger.warning('User %d with Templates %s tried to access Template Fields %d', \
+              self.current_user.id, allowed_templates, template_id)
+          return status_.status_401('You can\'t edit this Template because it\'s not yours'), 401
+
         template_ = Template.query.get(template_id)
 
-        if not hasattr(template_, 'id'):
-          return abort(404)
+        allowed_fields = self.allowed_fields()
+        public_fields_ = self.public_templates()
 
-        return list(template_.fields)
+        allowed_fields_list = allowed_fields + public_fields_
+
+        fields_ = []
+
+        for field in template_.fields:
+            if field.id in allowed_fields_list:
+                fields_.append(field)
+
+        return list(fields_)
 
 
     """
@@ -448,6 +560,25 @@ class Field(db.Model, CommonsModel):
     """
     def field_delete(self, template_id, field_id):
 
+        """
+        Fields are directly tied to Templates and really have no life of their
+        own outside of Templates. Because of that we need to instantiate a
+        Template object that we can work with
+        """
+        allowed_templates = self.allowed_fields(template_id=template_id,permission_type='delete')
+
+        if not template_id in allowed_templates:
+          logger.warning('User %d with Templates %s tried to access Template Fields %d', \
+              self.current_user.id, allowed_templates, template_id)
+          return status_.status_401('You can\'t delete this Field because it\'s Template is not yours'), 401
+
+        allowed_fields = self.allowed_fields(permission_type='delete')
+
+        if not field_id in allowed_fields:
+          logger.warning('User %d with Fields %s tried to delete Field %d', \
+              self.current_user.id, allowed_fields, field_id)
+          return status_.status_401('You can\'t delete this Field because it\'s not yours'), 401
+
         template_ = Template.query.get(template_id)
         field_ = Field.query.get(field_id)
 
@@ -457,3 +588,98 @@ class Field(db.Model, CommonsModel):
         db.session.commit()
 
         return True
+
+
+    def allowed_fields(self, template_id='', permission_type='view'):
+
+        if template_id:
+
+            """
+            Collect all of the templates the current user has access to, including both
+            explicitly allowed templates and public templates
+            """
+            explicitly_allowed_templates_ = self.explicitly_allowed_templates(permission_type)
+            logger.debug('All Templates user has permission to %s', explicitly_allowed_templates_)
+
+            public_templates_ = self.public_templates()
+            logger.debug('All Public Templates %s', public_templates_)
+
+            id_list_ = explicitly_allowed_templates_ + public_templates_
+
+        else:
+            id_list_ = self.explicitly_allowed_fields(permission_type)
+            logger.debug('All Fields user has permission to %s', id_list_)
+
+        return id_list_
+
+
+
+    """
+    Get a list of templates that are marked as `is_public`
+    """
+    def public_fields(self):
+
+        fields_ = Field.query.filter_by(is_public=True).all()
+
+        public_ = []
+
+        for field in fields_:
+            public_.append(field.id)
+
+        return public_
+
+    """
+    Get a list of templates that are marked as `is_public`
+    """
+    def public_templates(self):
+
+        templates_ = Template.query.filter_by(is_public=True).all()
+
+        public_ = []
+
+        for template in templates_:
+            public_.append(template.id)
+
+        return public_
+
+
+    """
+    Get a list of template ids from the current user and convert
+    them into a list of numbers so that our SQLAlchemy query can
+    understand what's going on
+    """
+    def explicitly_allowed_templates(self, permission_type='view'):
+
+        templates_ = []
+
+        if not hasattr(self.current_user, 'id'):
+          logger.warning('User did\'t submit their information %s', \
+              self.current_user)
+          return status_.status_401('You need to be logged in to access applications'), 401
+
+        for template in self.current_user.templates:
+          if permission_type and getattr(template, permission_type):
+            templates_.append(template.template_id)
+
+        return templates_
+
+
+    """
+    Get a list of template ids from the current user and convert
+    them into a list of numbers so that our SQLAlchemy query can
+    understand what's going on
+    """
+    def explicitly_allowed_fields(self, permission_type='view'):
+
+        fields_ = []
+
+        if not hasattr(self.current_user, 'id'):
+          logger.warning('User did\'t submit their information %s', \
+              self.current_user)
+          return status_.status_401('You need to be logged in to access applications'), 401
+
+        for field in self.current_user.fields:
+          if permission_type and getattr(field, permission_type):
+            fields_.append(field.field_id)
+
+        return fields_

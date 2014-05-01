@@ -28,8 +28,6 @@ from CommonsCloudAPI.models.field import Field
 
 from . import module
 
-from .permissions import permission_required
-
 
 @module.route('/v2/templates/<int:template_id>/fields.<string:extension>', methods=['OPTIONS'])
 def fields_preflight(template_id, extension):
@@ -48,8 +46,8 @@ def field_get(oauth_request, template_id, field_id, extension):
   Field_.current_user = oauth_request.user
   this_field = Field_.field_get(field_id)
 
-  if type(this_field) is 'Response':
-    return this_field, this_field.code
+  if type(this_field) is tuple:
+    return this_field
 
   arguments = {
     'the_content': this_field,
@@ -70,8 +68,8 @@ def template_fields_get(oauth_request, template_id, extension):
   Field_.current_user = oauth_request.user
   these_fields = Field_.template_fields_get(template_id)
 
-  if type(these_fields) is 'Response':
-    return these_fields, these_fields.code
+  if type(these_fields) is tuple:
+    return these_fields
 
   arguments = {
     'the_content': these_fields,
@@ -91,6 +89,9 @@ def field_post(oauth_request, template_id, extension):
   Field_.current_user = oauth_request.user
   new_field = Field_.field_create(request, template_id)
 
+  if type(new_field) is tuple:
+    return new_field
+
   return Field_.endpoint_response(new_field, code=201)
 
 
@@ -109,6 +110,9 @@ def field_update(oauth_request, template_id, field_id, extension):
   Field_.current_user = oauth_request.user
   updated_field = Field_.field_update(request, template_id, field_id)
 
+  if type(updated_field) is tuple:
+    return updated_field
+
   arguments = {
     'the_content': updated_field,
     'extension': extension
@@ -124,6 +128,9 @@ def field_delete(oauth_request, template_id, field_id, extension):
 
   Field_ = Field()
   Field_.current_user = oauth_request.user
-  Field_.field_delete(template_id, field_id)
+  deleted_field =Field_.field_delete(template_id, field_id)
+
+  if type(deleted_field) is tuple:
+    return deleted_field
 
   return status_.status_204(), 204

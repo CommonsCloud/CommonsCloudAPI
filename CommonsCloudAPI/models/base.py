@@ -89,18 +89,6 @@ class CommonsModel(object):
         if key in self.__public__:
           result[key] = getattr(_content, key)
 
-      #
-      # @todo This needs some work, it's really close, but not quite there
-      #       `result[key].append(item.template_id)` is the only thing that
-      #       needs to be wrapped to make this thing complete.
-      #
-
-      # for key in _content.__mapper__.relationships.keys():
-      #   if key in self.__public_relationships__ and _content.__mapper__.relationships[key].uselist:
-      #     result[key] = []
-      #     for item in getattr(_content, key):
-      #       result[key].append(item.template_id)
-
       return result
 
 
@@ -553,7 +541,8 @@ class CommonsModel(object):
     """
     Delete the new column just like we would if we were hard coding the model
     """
-    exisitng_table.c[field.name].drop()
+    if not field.data_type is 'relationship' or not field.data_type is 'file':
+      exisitng_table.c[field.name].drop()
 
     return True
 
