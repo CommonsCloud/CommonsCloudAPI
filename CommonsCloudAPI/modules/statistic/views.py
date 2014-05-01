@@ -46,21 +46,8 @@ def statistic_list(oauth_request, template_id, extension):
   Statistic_.current_user = oauth_request.user
   statistic_list = Statistic_.statistic_list(template_id)
 
-  arguments = {
-    'the_content': statistic_list,
-    'list_name': 'statistics',
-    'extension': extension
-  }
-
-  return Statistic_.endpoint_response(**arguments)
-
-@module.route('/v2/templates/<int:template_id>/statistics.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
-def statistic_get(oauth_request, template_id, extension):
-
-  Statistic_ = Statistic()
-  Statistic_.current_user = oauth_request.user
-  statistic_list = Statistic_.statistic_list(template_id)
+  if type(statistic_list) is tuple:
+    return statistic_list
 
   arguments = {
     'the_content': statistic_list,
@@ -69,18 +56,39 @@ def statistic_get(oauth_request, template_id, extension):
   }
 
   return Statistic_.endpoint_response(**arguments)
-
 
 @module.route('/v2/templates/<int:template_id>/statistics/<int:statistic_id>.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
-def statistic_post(oauth_request, template_id, statistic_id, extension):
+def statistic_get(oauth_request, template_id, statistic_id, extension):
 
   Statistic_ = Statistic()
   Statistic_.current_user = oauth_request.user
-  statistic__ = Statistic_.statistic_get(statistic_id)
+  statistic_get = Statistic_.statistic_get(template_id, statistic_id)
+
+  if type(statistic_get) is tuple:
+    return statistic_get
 
   arguments = {
-    'the_content': statistic__,
+    'the_content': statistic_get,
+    'extension': extension
+  }
+
+  return Statistic_.endpoint_response(**arguments)
+
+
+@module.route('/v2/templates/<int:template_id>/statistics.<string:extension>', methods=['POST'])
+@oauth.require_oauth()
+def statistic_post(oauth_request, template_id, extension):
+
+  Statistic_ = Statistic()
+  Statistic_.current_user = oauth_request.user
+  new_statistic = Statistic_.statistic_create(template_id, request)
+
+  if type(new_statistic) is tuple:
+    return new_statistic
+
+  arguments = {
+    'the_content': new_statistic,
     'extension': extension
   }
 
@@ -89,11 +97,14 @@ def statistic_post(oauth_request, template_id, statistic_id, extension):
 
 @module.route('/v2/templates/<int:template_id>/statistics/<int:statistic_id>.<string:extension>', methods=['PUT', 'PATCH'])
 @oauth.require_oauth()
-def statistic_update(oauth_request, statistic_id, extension):
+def statistic_update(oauth_request, template_id, statistic_id, extension):
 
   Statistic_ = Statistic()
   Statistic_.current_user = oauth_request.user
-  updated_statistic = Statistic_.statistic_update(statistic_id, request)
+  updated_statistic = Statistic_.statistic_update(template_id, statistic_id, request)
+
+  if type(updated_statistic) is tuple:
+    return updated_statistic
 
   arguments = {
     'the_content': updated_statistic,
@@ -101,16 +112,21 @@ def statistic_update(oauth_request, statistic_id, extension):
     'code': 200
   }
 
+  print 'returned'
+
   return Statistic_.endpoint_response(**arguments)
 
 
 @module.route('/v2/templates/<int:template_id>/statistics/<int:statistic_id>.<string:extension>', methods=['DELETE'])
 @oauth.require_oauth()
-def statistic_delete(oauth_request, statistic_id, extension):
+def statistic_delete(oauth_request, template_id, statistic_id, extension):
 
   Statistic_ = Statistic()
   Statistic_.current_user = oauth_request.user
-  Statistic_.statistic_delete(statistic_id)
+  deleted_statistic = Statistic_.statistic_delete(template_id, statistic_id)
+
+  if type(deleted_statistic) is tuple:
+    return deleted_statistic
 
   return status_.status_204(), 204
 

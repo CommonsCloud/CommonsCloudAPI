@@ -29,9 +29,12 @@ Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.models.base import CommonsModel
 from CommonsCloudAPI.models.template import Template
+from CommonsCloudAPI.models.field import Field
 
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import sanitize
+from CommonsCloudAPI.extensions import status as status_
 
 
 
@@ -71,25 +74,36 @@ class Statistic(db.Model, CommonsModel):
     @param (dictionary) request_object
       The content that is being submitted by the user
     """
-    def statistic_create(self, request_object):
+    def statistic_create(self, template_id, request_object):
+
+        """
+        Make sure that some data was submitted before proceeding
+        """
+        if not request_object.data:
+          logger.error('User %d new Statistic request failed because they didn\'t submit any `data` with their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include any `data` with your request.'), 400
 
         """
         Make sure we can use the request data as json
         """
         statistic_content = json.loads(request_object.data)
 
+        field_id = sanitize.sanitize_integer(statistic_content.get('field_id', ''))
 
-        if not statistic_content.get('field_id', ''):
-            return abort(400, 'A Field ID is required to create a statistic')
+        explicitly_allowed_fields_ = self.explicitly_allowed_fields()
+        template_fields_ = self.template_field_list(template_id)
+        if not field_id in explicitly_allowed_fields_ or \
+              not field_id in template_fields_:
+          logger.error('User %d new Statistic request failed because they are\'t allowed to modify the associated field', \
+              self.current_user.id)
+          return status_.status_400('You are\'t allowed to modify the field you\'re trying to add a statistic to'), 400
 
-        """
-        Part 1: Add the new application to the database
-        """
         new_statistic = {
           'name': sanitize.sanitize_string(statistic_content.get('name', '')),
           'units': sanitize.sanitize_string(statistic_content.get('units', '')),
           'function': sanitize.sanitize_string(statistic_content.get('function', '')),
-          'field_id': statistic_content.get('field_id', '')
+          'field_id': field_id
         }
 
         statistic_ = Statistic(**new_statistic)
@@ -100,12 +114,15 @@ class Statistic(db.Model, CommonsModel):
         return statistic_
 
 
-    def statistic_get(self, statistic_id):
+    def statistic_get(self, template_id, statistic_id):
+
+        explicitly_allowed_templates_ = self.explicitly_allowed_templates('admin')
+        if not template_id in explicitly_allowed_templates_:
+          logger.error('User %d view Statistic request failed because they are\'t allowed to admin the template', \
+              self.current_user.id)
+          return status_.status_401('You are\'t allowed to view this statistic'), 401
 
         statistic_ = Statistic.query.get(statistic_id)
-
-        if not hasattr(statistic_, 'id'):
-            return abort(404)
 
         return statistic_
 
@@ -113,15 +130,12 @@ class Statistic(db.Model, CommonsModel):
 
     def statistic_list(self, template_id):
 
-        """
-        Get a list of the applications the current user has access to
-        and load their information from the database
-        """
-        statistic_id_list_ = self.statistic_id_list(template_id)
-        statistics_ = Statistic.query.filter(Statistic.id.in_(statistic_id_list_)).all()
+        # statistic_id_list_ = self.statistic_id_list(template_id)
+        # statistics_ = Statistic.query.filter(Statistic.id.in_(statistic_id_list_)).all()
 
-        return statistics_
+        # return statistics_
 
+        pass
 
     """
     Update an existing statistic in the CommonsCloudAPI
@@ -131,17 +145,34 @@ class Statistic(db.Model, CommonsModel):
     @param (dictionary) request_object
       The content that is being submitted by the user
     """
-    def statistic_update(self, statistic_id, request_object):
+    def statistic_update(self, template_id, statistic_id, request_object):
+
+        explicitly_allowed_templates_ = self.explicitly_allowed_templates()
+        if not template_id in explicitly_allowed_templates_:
+          logger.error('User %d update Statistic request failed because they are\'t allowed to modify the associated Template', \
+              self.current_user.id)
+          return status_.status_401('You are\'t allowed to modify the Template you\'re trying to add a statistic to'), 401
+
+        """
+        Make sure that some data was submitted before proceeding
+        """
+        if not request_object.data:
+          logger.error('User %d update Statistic request failed because they didn\'t submit any `data` with their request', \
+              self.current_user.id)
+          return status_.status_400('You didn\'t include any `data` with your request.'), 400
 
         """
         Make sure we can use the request data as json
         """
         statistic_ = Statistic.query.get(statistic_id)
+
+        if not statistic_.id:
+          logger.error('User %d Statistic request failed because Statistic does\'t exist', \
+              self.current_user.id)
+          return status_.status_404('The Statistic you\'re looking for doesn\'t exist'), 404
+
         statistic_content = json.loads(request_object.data)
 
-        """
-        Part 2: Update the fields that we have data for
-        """
         if hasattr(statistic_, 'name'):
           statistic_.name = sanitize.sanitize_string(statistic_content.get('name', statistic_.name))
 
@@ -152,11 +183,10 @@ class Statistic(db.Model, CommonsModel):
           statistic_.function = sanitize.sanitize_string(statistic_content.get('function', statistic_.function))
 
         if hasattr(statistic_, 'field_id'):
-          statistic_.field_id = statistic_content.get('field_id', statistic_.field_id)
+          statistic_.field_id = sanitize.sanitize_integer(statistic_content.get('field_id', statistic_.field_id))
 
         if hasattr(statistic_, 'status'):
-          statistic_.status = statistic_content.get('status', statistic_.status)
-
+          statistic_.status = sanitize.sanitize_boolean(statistic_content.get('status', statistic_.status))
 
         db.session.commit()
 
@@ -176,16 +206,69 @@ class Statistic(db.Model, CommonsModel):
         A boolean to indicate if the deletion was succesful
 
     """
-    def statistic_delete(self, statistic_id):
+    def statistic_delete(self, template_id, statistic_id):
+
+        explicitly_allowed_templates_ = self.explicitly_allowed_templates()
+        if not template_id in explicitly_allowed_templates_:
+          logger.error('User %d delete Statistic request failed because they are\'t allowed to modify the associated Template', \
+              self.current_user.id)
+          return status_.status_401('You are\'t allowed to modify the Template you\'re trying to add a statistic to'), 401
 
         statistic_ = Statistic.query.get(statistic_id)
+
+        if not statistic_.id:
+          logger.error('User %d delete Statistic request failed because Statistic does\'t exist', \
+              self.current_user.id)
+          return status_.status_404('The Statistic you\'re looking for doesn\'t exist'), 404
+
         db.session.delete(statistic_)
         db.session.commit()
 
         return True
 
 
-    def statistic_id_list(self, template_id):
+    """
+    Get a list of template ids from the current user and convert
+    them into a list of numbers so that our SQLAlchemy query can
+    understand what's going on
+    """
+    def explicitly_allowed_templates(self, permission_type='view'):
+
+        templates_ = []
+
+        if not hasattr(self.current_user, 'id'):
+          logger.warning('User did\'t submit their information %s', \
+              self.current_user)
+          return status_.status_401('You need to be logged in to access applications'), 401
+
+        for template in self.current_user.templates:
+          if permission_type and getattr(template, permission_type):
+            templates_.append(template.template_id)
+
+        return templates_
+
+
+    """
+    Get a list of template ids from the current user and convert
+    them into a list of numbers so that our SQLAlchemy query can
+    understand what's going on
+    """
+    def explicitly_allowed_fields(self, permission_type='edit'):
+
+        fields_ = []
+
+        if not hasattr(self.current_user, 'id'):
+          logger.warning('User did\'t submit their information %s', \
+              self.current_user)
+          return status_.status_401('You need to be logged in to access applications'), 401
+
+        for field in self.current_user.fields:
+          if permission_type and getattr(field, permission_type):
+            fields_.append(field.field_id)
+
+        return fields_
+
+    def template_field_list(self, template_id):
 
         template_ = Template.query.get(template_id)
 

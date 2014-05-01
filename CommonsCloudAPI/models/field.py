@@ -134,6 +134,8 @@ class Field(db.Model, CommonsModel):
     """
     def field_create(self, request_object, template_id):
 
+        print 'grr'
+
         """
         Make sure that we have everything we need to created the
         template successfully, including things like a Name, an associated
@@ -144,6 +146,7 @@ class Field(db.Model, CommonsModel):
               self.current_user.id)
           return status_.status_400('You didn\'t include a Template to add this field to ... or else you\'re not the admin of this Template'), 400
 
+        print 'grr'
         """
         Make sure that some data was submitted before proceeding
         """
@@ -151,12 +154,14 @@ class Field(db.Model, CommonsModel):
           logger.error('User %d new Field request failed because they didn\'t submit any `data` with their request', \
               self.current_user.id)
           return status_.status_400('You didn\'t include any `data` with your request.'), 400
+        print 'grr'
 
         """
         Convert our request object into usable data
         """
         content_ = json.loads(request_object.data)
 
+        print 'grr'
         """
         Fields are directly tied to Templates and really have no life of their
         own outside of Templates. Because of that we need to instantiate a
@@ -167,6 +172,8 @@ class Field(db.Model, CommonsModel):
           logger.warning('User %d with Templates %s tried to access Template %d', \
               self.current_user.id, allowed_fields, template_id)
           return status_.status_401(), 401
+
+        print 'grr'
 
         Template_ = Template().query.get(template_id)
 
@@ -197,25 +204,27 @@ class Field(db.Model, CommonsModel):
         If someone's creating a relationship the storage string they've specified
         needs to belong to a template that they are allowed to access
         """
-        relationship_storage = content_.get('relationship', '')
-        storage_check = Template().query.filter_by(storage=relationship_storage).first()
+        if content_.get('relationship', ''):
 
-        if not storage_check.id in allowed_fields:
-          logger.warning('User %d tried to add a Field to a Template %d which they do not own', \
-              self.current_user.id, template_id)
-          return status_.status_401('The Template `relationship` string you entered either doesn\'t exist or you don\'t have permission to use it'), 401
+          relationship_storage = content_.get('relationship', '')
+          storage_check = Template().query.filter_by(storage=relationship_storage).first()
 
-        """
-        Lastly, make sure that an identical relationship doesn't already exist.
-        If the type_ and the template type_ already have a relationship it will
-        cause bad things to happen when searching via the API
-        """
-        duplicate_check = Field().query.filter_by(relationship=relationship_storage).first()
+          if not storage_check.id in allowed_fields:
+            logger.warning('User %d tried to add a Field to a Template %d which they do not own', \
+                self.current_user.id, template_id)
+            return status_.status_401('The Template `relationship` string you entered either doesn\'t exist or you don\'t have permission to use it'), 401
 
-        if duplicate_check.id:
-          logger.warning('User %d tried to add a duplicate relationship type', \
-              self.current_user.id, template_id)
-          return status_.status_400('You already defined a relationship with this Template, you cannot create two relationship fields with the same relationship table.'), 400
+          """
+          Lastly, make sure that an identical relationship doesn't already exist.
+          If the type_ and the template type_ already have a relationship it will
+          cause bad things to happen when searching via the API
+          """
+          duplicate_check = Field().query.filter_by(relationship=relationship_storage).first()
+
+          if duplicate_check.id:
+            logger.warning('User %d tried to add a duplicate relationship type', \
+                self.current_user.id, template_id)
+            return status_.status_400('You already defined a relationship with this Template, you cannot create two relationship fields with the same relationship table.'), 400
 
         new_field = {
           'label': user_defined_label,

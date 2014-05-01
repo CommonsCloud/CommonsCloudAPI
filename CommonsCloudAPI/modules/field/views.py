@@ -92,7 +92,13 @@ def field_post(oauth_request, template_id, extension):
   if type(new_field) is tuple:
     return new_field
 
-  return Field_.endpoint_response(new_field, code=201)
+  arguments = {
+    'the_content': new_field,
+    'extension': extension,
+    'code': 201
+  }
+
+  return Field_.endpoint_response(**arguments)
 
 
 """
