@@ -226,14 +226,6 @@ class CommonsSanitize():
 
   """
   Sanitize an HTML string, removing potentially harmful HTML from our inputs
-
-  @param (object) self
-  @param (string) user_input
-      The user input that we will be sanitizing
-
-  @return (unicode)
-      A sanitized version of the original (string) `user_input` parameter
-
   """
   def sanitize_string(self, user_input):
     p = html5lib.HTMLParser(tokenizer=CommonsHTMLSanitizer, tree=treebuilders.getTreeBuilder("dom"))
@@ -244,3 +236,16 @@ class CommonsSanitize():
     s = serializer.htmlserializer.HTMLSerializer(omit_optional_tags=False, quote_attr_values=True)
     return u"".join(s.serialize(stream))
 
+
+  """
+  Sanitize an Boolean string, removing potentially harmful Boolean from our inputs
+  """
+  def sanitize_boolean(self, user_input):
+    pass
+
+
+  """
+  Sanitize an Array string, removing potentially harmful Boolean from our inputs
+  """
+  def sanitize_array(self, user_input):
+    pass

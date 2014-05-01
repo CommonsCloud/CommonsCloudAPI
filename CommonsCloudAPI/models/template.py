@@ -239,22 +239,63 @@ class Template(db.Model, CommonsModel):
   """
   def template_get(self, template_id):
 
-    template_ = Template.query.get(template_id)
+    """
+    If there's no template_id we can't do any, so display a 404
+    """
+    if not template_id:
+      return status_.status_404('That template doesn\'t seem to exist')
 
-    if not hasattr(template_, 'id'):
-      return status_.status('That template doesn\'t seem to exist.')
+    """
+    Before we make a database call to get the template, we should make sure the
+    user is allowed to access that template in the first place. Either because
+    they have explicit permission to access it (i.e., collaborator, owner) or
+    the template is marked as `is_public`
+    """
+    template_id_list_ = self.allowed_templates()
 
-    return template_
+    if not template_id in template_id_list_:
+      return status_.status_401('That isn\'t your template'), 401
+
+    """
+    If we've made it this far, then the user can access the template, just show
+    it to them already.
+    """
+    return Template.query.get(template_id)
 
 
   def template_update(self, template_id, request_object):
 
     """
+    If there's no template_id we can't do any, so display a 404
+    """
+    if not template_id:
+      return status_.status_404('That template doesn\'t seem to exist')
+
+    """
+    Before we make a database call to get the template, we should make sure the
+    user is allowed to access that template in the first place. Either because
+    they have explicit permission to access it (i.e., collaborator, owner) or
+    the template is marked as `is_public`
+    """
+    template_id_list_ = self.allowed_templates()
+
+    if not template_id in template_id_list_:
+      return status_.status_401('That isn\'t your template'), 401
+
+    """
     Part 1: Load the application we wish to make changes to
     """
     template_ = Template.query.get(template_id)
-    template_content = json.loads(request_object.data)
 
+    """
+    Make sure that some data was submitted before proceeding
+    """
+    if not request_object.data:
+      logger.error('User %d updating Template failed because they didn\'t submit any `data` with their request', \
+          self.current_user.id)
+      return status_.status_400('You didn\'t include any `data` with your request.'), 400
+
+    template_content = json.loads(request_object.data)
 
     """
     Part 2: Update the fields that we have data for
@@ -399,45 +440,7 @@ class Template(db.Model, CommonsModel):
   """
   def application_templates_get(self, application_id):
 
-    logger.info('Enterting application_templates_get')
-    
-    """
-    Before doing anything make sure the user is allowed to access the
-    application in the first place.
-    """
-    allowed_applications = self.allowed_applications()
-
-    if not application_id in allowed_applications:
-      logger.warning('User %d with Applications %s tried to access Application %d', \
-          self.current_user.id, allowed_applications, application_id)
-      return status_.status_401('You need to be logged in to access applications'), 401
-
-
-    """
-    Collect all of the templates the current user has access to, including both
-    explicitly allowed templates and public templates
-    """
-    allowed_templates_ = self.allowed_templates()
-    logger.debug('All Templates user has permission to %s', allowed_templates_)
-
-    public_templates_ = self.public_templates()
-    logger.debug('All Public Templates %s', public_templates_)
-
-    combined_access = allowed_templates_ + public_templates_
-
-    """
-    All Templates belonging to the requested Application
-    """
-    application_templates_ = self.applications_templates(application_id)
-    logger.debug('All Templates for this Application %s', application_templates_)  
-
-    """
-    Using the `combined_template_access` filter the Application Templates (the
-    Templates only for this Application that the user has access to)
-    """
-    template_id_list_ = set(combined_access) & set(application_templates_)
-    logger.debug('Templates to display %s', template_id_list_)
-
+    template_id_list_ = self.allowed_templates(application_id)
 
     templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
 
@@ -462,6 +465,65 @@ class Template(db.Model, CommonsModel):
     return templates_
 
 
+  def allowed_templates(self, application_id=''):
+
+    if application_id:
+
+      """
+      Before doing anything make sure the user is allowed to access the
+      application in the first place.
+      """
+      allowed_applications = self.allowed_applications()
+
+      if not application_id in allowed_applications:
+        logger.warning('User %d with Applications %s tried to access Application %d', \
+            self.current_user.id, allowed_applications, application_id)
+        return status_.status_401('You need to be logged in to access applications'), 401
+
+      """
+      Collect all of the templates the current user has access to, including both
+      explicitly allowed templates and public templates
+      """
+      explicitly_allowed_templates_ = self.explicitly_allowed_templates()
+      logger.debug('All Templates user has permission to %s', explicitly_allowed_templates_)
+
+      public_templates_ = self.public_templates()
+      logger.debug('All Public Templates %s', public_templates_)
+
+      combined_access = explicitly_allowed_templates_ + public_templates_
+
+      """
+      All Templates belonging to the requested Application
+      """
+      application_templates_ = self.applications_templates(application_id)
+      logger.debug('All Templates for this Application %s', application_templates_)  
+
+      """
+      Using the `combined_template_access` filter the Application Templates (the
+      Templates only for this Application that the user has access to)
+      """
+      template_id_list_ = set(combined_access) & set(application_templates_)
+      logger.debug('Templates to display %s', template_id_list_)
+
+    else:
+
+      """
+      Collect all of the templates the current user has access to, including both
+      explicitly allowed templates and public templates
+      """
+      explicitly_allowed_templates_ = self.explicitly_allowed_templates()
+      logger.debug('All Templates user has permission to %s', explicitly_allowed_templates_)
+
+      public_templates_ = self.public_templates()
+      logger.debug('All Public Templates %s', public_templates_)
+
+      template_id_list_ = explicitly_allowed_templates_ + public_templates_
+
+
+    return template_id_list_
+
+
+
   """
   Get a list of templates that are marked as `is_public`
   """
@@ -482,9 +544,7 @@ class Template(db.Model, CommonsModel):
   them into a list of numbers so that our SQLAlchemy query can
   understand what's going on
   """
-  def allowed_templates(self, permission_type='view'):
-
-    print 'getting allowed_templates'
+  def explicitly_allowed_templates(self, permission_type='view'):
 
     templates_ = []
 
