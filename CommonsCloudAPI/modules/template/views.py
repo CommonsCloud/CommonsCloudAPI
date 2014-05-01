@@ -58,8 +58,8 @@ def application_templates_get(oauth_request, application_id, extension):
 
   these_templates = Template_.application_templates_get(application_id)
 
-  if type(these_templates) is 'Response':
-    return these_templates, these_templates.code
+  if type(these_templates) is tuple:
+    return these_templates
 
   arguments = {
     'the_content': these_templates,

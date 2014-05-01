@@ -50,6 +50,9 @@ def application_list(oauth_request, extension):
 
   applications_ = Application_.application_list()
 
+  if type(applications_) is tuple:
+    return applications_
+
   arguments = {
     'the_content': applications_,
     'list_name': 'applications',
@@ -68,8 +71,8 @@ def application_get(oauth_request, application_id, extension):
 
   this_application = Application_.application_get(application_id)
 
-  if type(this_application) is 'Response':
-    return this_application, this_application.code
+  if type(this_application) is tuple:
+    return this_application
 
   arguments = {
     'the_content': this_application,
@@ -109,6 +112,9 @@ def application_update(oauth_request, application_id, extension):
 
   updated_application = Application_.application_update(application_id, request)
 
+  if type(updated_application) is tuple:
+    return updated_application
+
   arguments = {
     'the_content': updated_application,
     'extension': extension
@@ -124,7 +130,10 @@ def application_delete(oauth_request, application_id, extension):
   Application_ = Application()
   Application_.current_user = oauth_request.user
 
-  Application_.application_delete(application_id)
+  application_deleted = Application_.application_delete(application_id)
+
+  if type(application_deleted) is tuple:
+    return application_deleted
 
   return status_.status_204(), 204
 
