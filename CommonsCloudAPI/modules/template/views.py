@@ -98,6 +98,9 @@ def template_get(oauth_request, template_id, extension):
   Template_.current_user = oauth_request.user
   this_template = Template_.template_get(template_id)
 
+  if type(this_template) is tuple:
+    return this_template
+
   arguments = {
     'the_content': this_template,
     'extension': extension
@@ -114,6 +117,9 @@ def application_update(oauth_request, template_id, extension):
   Template_.current_user = oauth_request.user
   updated_template = Template_.template_update(template_id, request)
 
+  if type(updated_template) is tuple:
+    return updated_template
+
   arguments = {
     'the_content': updated_template,
     'extension': extension
@@ -128,7 +134,10 @@ def template_delete(oauth_request, template_id, extension):
 
   Template_ = Template()
   Template_.current_user = oauth_request.user
-  Template_.template_delete(template_id)
+  deleted_template = Template_.template_delete(template_id)
+
+  if type(deleted_template) is tuple:
+    return deleted_template
 
   return status_.status_204(), 204
 
