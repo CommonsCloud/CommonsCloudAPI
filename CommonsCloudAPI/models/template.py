@@ -15,16 +15,7 @@ limitations under the License.
 Import Python Dependencies
 """
 import json
-import requests
 from datetime import datetime
-
-
-"""
-Import Flask Dependencies
-"""
-from flask import abort
-from flask import request
-from flask import url_for
 
 
 """
@@ -221,10 +212,6 @@ class Template(db.Model, CommonsModel):
     Tell the system what Application this template belongs to
     """
     application_ = Application().query.get(application_id)
-
-    if not hasattr(application_, 'id'):
-      return abort(400)
-
     self.set_application_template_relationship(template_, application_)
 
 
@@ -255,7 +242,7 @@ class Template(db.Model, CommonsModel):
     template_ = Template.query.get(template_id)
 
     if not hasattr(template_, 'id'):
-      return abort(404)
+      return status_.status('That template doesn\'t seem to exist.')
 
     return template_
 
@@ -423,7 +410,7 @@ class Template(db.Model, CommonsModel):
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to access Application %d', \
           self.current_user.id, allowed_applications, application_id)
-      return abort(404)
+      return status_.status_401('You need to be logged in to access applications'), 401
 
 
     """
@@ -504,7 +491,7 @@ class Template(db.Model, CommonsModel):
     if not hasattr(self.current_user, 'id'):
       logger.warning('User did\'t submit their information %s', \
           self.current_user)
-      return abort(401)
+      return status_.status_401('You need to be logged in to access applications'), 401
 
     for template in self.current_user.templates:
       if permission_type and getattr(template, permission_type):
@@ -530,7 +517,7 @@ class Template(db.Model, CommonsModel):
     if not hasattr(self.current_user, 'id'):
       logger.warning('User did\'t submit their information %s', \
           self.current_user)
-      return abort(401)
+      return status_.status_401('You need to be logged in to access applications'), 401
 
     for application in self.current_user.applications:
       if permission_type and getattr(application, permission_type):

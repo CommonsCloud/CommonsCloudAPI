@@ -20,13 +20,6 @@ from datetime import datetime
 
 
 """
-Import Flask Dependencies
-"""
-from flask import abort
-from flask import request
-
-
-"""
 Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.models.base import CommonsModel
@@ -155,7 +148,7 @@ class Application(db.Model, CommonsModel):
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to access Application %d', \
           self.current_user.id, allowed_applications, application_id)
-      return abort(404)
+      return status_.status_401('You need to be logged in to access applications'), 401
 
     return Application.query.get(application_id)
 
@@ -198,7 +191,7 @@ class Application(db.Model, CommonsModel):
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to update Application %d', \
           self.current_user.id, allowed_applications, application_id)
-      return abort(401)
+      return status_.status_401('You need to be logged in to access applications'), 401
 
     application_ = Application.query.get(application_id)
 
@@ -240,7 +233,7 @@ class Application(db.Model, CommonsModel):
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to delete Application %d', \
           self.current_user.id, allowed_applications, application_id)
-      return abort(401)
+      return status_.status_401('You need to be logged in to access applications'), 401
 
     application_ = Application.query.get(application_id)
 
@@ -313,7 +306,7 @@ class Application(db.Model, CommonsModel):
     if not hasattr(self.current_user, 'id'):
       logger.warning('User did\'t submit their information %s', \
           self.current_user)
-      return abort(401)
+      return status_.status_401('You need to be logged in to access applications'), 401
 
     for application in self.current_user.applications:
       if permission_type and getattr(application, permission_type):
