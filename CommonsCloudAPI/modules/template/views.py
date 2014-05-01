@@ -50,7 +50,7 @@ def template_list(extension):
 
 
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
+@oauth.require_oauth('applications')
 def application_templates_get(oauth_request, application_id, extension):
 
   Template_ = Template()
@@ -77,6 +77,9 @@ def template_post(oauth_request, application_id, extension):
   Template_ = Template()
   Template_.current_user = oauth_request.user
   new_template = Template_.template_create(request, application_id)
+
+  if type(new_template) is tuple:
+    return new_template
 
   arguments = {
     'the_content': new_template,

@@ -311,6 +311,8 @@ class Application(db.Model, CommonsModel):
     applications_ = []
 
     if not hasattr(self.current_user, 'id'):
+      logger.warning('User did\'t submit their information %s', \
+          self.current_user)
       return abort(401)
 
     for application in self.current_user.applications:

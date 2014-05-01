@@ -167,12 +167,12 @@ class Template(db.Model, CommonsModel):
       return status_.status_400('You didn\'t include an Application to associated with the Template'), 400
 
 
-    allowed_applications = Application().allowed_applications()
+    allowed_applications = self.allowed_applications()
 
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to access Application %d', \
           self.current_user.id, allowed_applications, application_id)
-      return status_.status_403(), 403
+      return status_.status_401(), 401
 
 
     """
@@ -411,12 +411,14 @@ class Template(db.Model, CommonsModel):
 
   """
   def application_templates_get(self, application_id):
+
+    logger.info('Enterting application_templates_get')
     
     """
     Before doing anything make sure the user is allowed to access the
     application in the first place.
     """
-    allowed_applications = Application().allowed_applications()
+    allowed_applications = self.allowed_applications()
 
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to access Application %d', \
@@ -495,9 +497,13 @@ class Template(db.Model, CommonsModel):
   """
   def allowed_templates(self, permission_type='view'):
 
+    print 'getting allowed_templates'
+
     templates_ = []
 
     if not hasattr(self.current_user, 'id'):
+      logger.warning('User did\'t submit their information %s', \
+          self.current_user)
       return abort(401)
 
     for template in self.current_user.templates:
@@ -505,3 +511,29 @@ class Template(db.Model, CommonsModel):
         templates_.append(template.template_id)
 
     return templates_
+
+
+  """
+  Get a list of application ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+
+  @param (object) self
+
+  @return (list) applications_
+      A list of applciations the current user has access to
+  """
+  def allowed_applications(self, permission_type='view'):
+
+    applications_ = []
+
+    if not hasattr(self.current_user, 'id'):
+      logger.warning('User did\'t submit their information %s', \
+          self.current_user)
+      return abort(401)
+
+    for application in self.current_user.applications:
+      if permission_type and getattr(application, permission_type):
+        applications_.append(application.application_id)
+
+    return applications_
