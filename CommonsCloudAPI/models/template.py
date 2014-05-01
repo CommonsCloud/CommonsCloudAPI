@@ -277,7 +277,7 @@ class Template(db.Model, CommonsModel):
     they have explicit permission to access it (i.e., collaborator, owner) or
     the template is marked as `is_public`
     """
-    template_id_list_ = self.allowed_templates()
+    template_id_list_ = self.allowed_templates(permission_type='edit')
 
     if not template_id in template_id_list_:
       return status_.status_401('That isn\'t your template'), 401
@@ -343,6 +343,23 @@ class Template(db.Model, CommonsModel):
 
   """
   def template_delete(self, template_id):
+
+    """
+    If there's no template_id we can't do any, so display a 404
+    """
+    if not template_id:
+      return status_.status_404('That template doesn\'t seem to exist')
+
+    """
+    Before we make a database call to get the template, we should make sure the
+    user is allowed to access that template in the first place. Either because
+    they have explicit permission to access it (i.e., collaborator, owner) or
+    the template is marked as `is_public`
+    """
+    template_id_list_ = self.allowed_templates(permission_type='delete')
+
+    if not template_id in template_id_list_:
+      return status_.status_401('That isn\'t your template'), 401
 
     template_ = Template.query.get(template_id)
     db.session.delete(template_)
@@ -465,7 +482,7 @@ class Template(db.Model, CommonsModel):
     return templates_
 
 
-  def allowed_templates(self, application_id=''):
+  def allowed_templates(self, application_id='', permission_type='view'):
 
     if application_id:
 
@@ -484,7 +501,7 @@ class Template(db.Model, CommonsModel):
       Collect all of the templates the current user has access to, including both
       explicitly allowed templates and public templates
       """
-      explicitly_allowed_templates_ = self.explicitly_allowed_templates()
+      explicitly_allowed_templates_ = self.explicitly_allowed_templates(permission_type)
       logger.debug('All Templates user has permission to %s', explicitly_allowed_templates_)
 
       public_templates_ = self.public_templates()
@@ -511,7 +528,7 @@ class Template(db.Model, CommonsModel):
       Collect all of the templates the current user has access to, including both
       explicitly allowed templates and public templates
       """
-      explicitly_allowed_templates_ = self.explicitly_allowed_templates()
+      explicitly_allowed_templates_ = self.explicitly_allowed_templates(permission_type)
       logger.debug('All Templates user has permission to %s', explicitly_allowed_templates_)
 
       public_templates_ = self.public_templates()

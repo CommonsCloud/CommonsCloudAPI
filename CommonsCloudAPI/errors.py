@@ -51,6 +51,7 @@ def load_errorhandlers(app):
     return status_.status_405(), 405
 
   @app.errorhandler(500)
+  @app.errorhandler(Exception)
   def internal_error(error):
     return status_.status_500(), 500
   
