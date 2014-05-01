@@ -117,7 +117,7 @@ class Template(db.Model, CommonsModel):
   is_geospatial = db.Column(db.Boolean)
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
-  fields = db.relationship('Field', secondary='template_fields', backref=db.backref('template'))
+  fields = db.relationship('Field', secondary='template_fields', backref=db.backref('template'), cascade="all,delete")
 
 
   def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, is_geospatial=True, created=datetime.now(), status=True):
@@ -167,14 +167,12 @@ class Template(db.Model, CommonsModel):
       return status_.status_400('You didn\'t include an Application to associated with the Template'), 400
 
 
-    #
-    # @todo
-    # 
-    # Need to make sure the user is an Administrator of the Application that
-    # they're trying to add a template to, otherwise, we can insert rogue
-    # templates into the database for Applications we don't own ... this is
-    # very, very bad.
-    #
+    allowed_applications = Application().allowed_applications()
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to access Application %d', \
+          self.current_user.id, allowed_applications, application_id)
+      return status_.status_403(), 403
 
 
     """
@@ -262,20 +260,6 @@ class Template(db.Model, CommonsModel):
     return template_
 
 
-  """
-  Create a new Template in the CommonsCloudAPI
-
-  @param (object) self
-
-  @param (int) template_id
-      The ID of the Template to be updated
-
-  @param (dictionary) request_object
-      The request object as submitted by the user
-
-  @return (object) application_
-      A fully qualified Application object
-  """
   def template_update(self, template_id, request_object):
 
     """
@@ -428,6 +412,18 @@ class Template(db.Model, CommonsModel):
   """
   def application_templates_get(self, application_id):
     
+    """
+    Before doing anything make sure the user is allowed to access the
+    application in the first place.
+    """
+    allowed_applications = Application().allowed_applications()
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to access Application %d', \
+          self.current_user.id, allowed_applications, application_id)
+      return abort(404)
+
+
     """
     Collect all of the templates the current user has access to, including both
     explicitly allowed templates and public templates

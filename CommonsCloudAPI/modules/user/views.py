@@ -33,9 +33,6 @@ from CommonsCloudAPI.models.user import User
 from . import module
 
 
-from CommonsCloudAPI.modules.template.permissions import permission_required
-
-
 """
 Basic route for currently logged in user
 """
@@ -45,7 +42,7 @@ def index():
 
 
 @module.route('/v2/user/me.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
+@oauth.require_oauth('user')
 def user_me(oauth_request, extension):
 
   arguments = {
@@ -58,7 +55,7 @@ def user_me(oauth_request, extension):
 
 
 @module.route('/v2/users/list.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
+@oauth.require_oauth('admin')
 def user_list(oauth_request, extension):
 
   User_ = User()
@@ -100,20 +97,3 @@ def user_profile_post():
   user_.user_update(request.form)
 
   return redirect(url_for('user.user_profile_get')), 301
-
-
-@module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['GET'])
-# @oauth.require_oauth()
-@permission_required('is_admin')
-def template_users(template_id, extension):
-
-  user_ = User()
-  template_users = user_.template_users(template_id)
-
-  arguments = {
-    'the_content': template_users,
-    'list_name': 'users',
-    'extension': extension
-  }
-
-  return user_.endpoint_response(**arguments)

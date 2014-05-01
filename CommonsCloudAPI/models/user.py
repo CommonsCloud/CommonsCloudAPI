@@ -154,29 +154,6 @@ class User(db.Model, UserMixin, CommonsModel):
     return users_
 
 
-  """
-  Save user information to the database for an existing user, this will not
-  work for new users, please use the `user_create` method instead
-
-  @requires
-      from CommonsCloudAPI.extensions import db
-
-  @param (object) self
-
-  @param (dictionary) user_object_
-      A dictionary containing the name of the field and the value to be updated,
-      fields submitted with the form but not one of the following will be ignored
-      - firstname
-      - lastname
-      - email
-      - active
-      - roles
-      - permissions
-
-  @return (object) user_
-      A complete and updated User object
-
-  """
   def user_update(self, user_object_):
 
     """
@@ -221,27 +198,6 @@ class User(db.Model, UserMixin, CommonsModel):
   def user_remove(self):
     pass
 
-
-  def template_users(self, template_id):    
-
-    user_id_list = self._template_user_id_list(template_id)
-    users_list = User.query.filter(User.id.in_(user_id_list)).all()
-
-    print users_list
-
-    return users_list
-
-
-  def _template_user_id_list(self, template_id):
-
-    users_ = UserTemplates.query.filter_by(template_id=template_id).all()
-
-    users_id_list = []
-
-    for user_ in users_:
-      users_id_list.append(user_.user_id)
-
-    return users_id_list
 
   def user_picture(self, email):
 
