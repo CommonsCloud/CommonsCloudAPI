@@ -132,7 +132,9 @@ class Application(db.Model, CommonsModel):
     permission = {
       'view': True,
       'edit': True,
-      'delete': True
+      'delete': True,
+      'is_admin': True,
+      'is_moderator': True
     }
 
     self.set_user_application_permissions(application_, permission, self.current_user)
