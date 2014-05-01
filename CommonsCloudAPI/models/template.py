@@ -179,13 +179,13 @@ class Template(db.Model, CommonsModel):
       'name': sanitize.sanitize_string(content_.get('name', 'Untitled Template from %s' % (datetime.today()) )),
       'help': sanitize.sanitize_string(content_.get('help', '')),
       'storage': storage_name,
-      'is_public': content_.get('is_public', True),
-      'is_crowdsourced': content_.get('is_crowdsourced', False),
-      'is_moderated': content_.get('is_moderated', True),
-      'is_listed': content_.get('is_listed', True),
-      'is_geospatial': content_.get('is_geospatial', True),
-      'created': content_.get('created', datetime.now()),
-      'status': content_.get('status', True)
+      'is_public': sanitize.sanitize_boolean(content_.get('is_public', True)),
+      'is_crowdsourced': sanitize.sanitize_boolean(content_.get('is_crowdsourced', False)),
+      'is_moderated': sanitize.sanitize_boolean(content_.get('is_moderated', True)),
+      'is_listed': sanitize.sanitize_boolean(content_.get('is_listed', True)),
+      'is_geospatial': sanitize.sanitize_boolean(content_.get('is_geospatial', True)),
+      'created': datetime.now(),
+      'status': sanitize.sanitize_boolean(content_.get('status', True))
     }
 
     template_ = Template(**new_template)
@@ -307,22 +307,22 @@ class Template(db.Model, CommonsModel):
       template_.help = sanitize.sanitize_string(template_content.get('help', template_.help))
 
     if hasattr(template_, 'is_crowdsourced'):
-      template_.is_crowdsourced = template_content.get('is_crowdsourced', template_.is_crowdsourced)
+      template_.is_crowdsourced = sanitize.sanitize_boolean(template_content.get('is_crowdsourced', template_.is_crowdsourced))
 
     if hasattr(template_, 'is_listed'):
-      template_.is_listed = template_content.get('is_listed', template_.is_listed)
+      template_.is_listed = sanitize.sanitize_boolean(template_content.get('is_listed', template_.is_listed))
 
     if hasattr(template_, 'is_moderated'):
-      template_.is_moderated = template_content.get('is_moderated', template_.is_moderated)
+      template_.is_moderated = sanitize.sanitize_boolean(template_content.get('is_moderated', template_.is_moderated))
 
     if hasattr(template_, 'is_public'):
-      template_.is_public = template_content.get('is_public', template_.is_public)
+      template_.is_public = sanitize.sanitize_boolean(template_content.get('is_public', template_.is_public))
 
     if hasattr(template_, 'is_geospatial'):
-      template_.is_geospatial = template_content.get('is_geospatial', template_.is_geospatial)
+      template_.is_geospatial = sanitize.sanitize_boolean(template_content.get('is_geospatial', template_.is_geospatial))
 
     if hasattr(template_, 'status'):
-      template_.status = template_content.get('status', template_.status)
+      template_.status = sanitize.sanitize_boolean(template_content.get('status', template_.status))
 
 
     db.session.commit()

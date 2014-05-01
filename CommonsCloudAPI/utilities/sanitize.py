@@ -241,7 +241,11 @@ class CommonsSanitize():
   Sanitize an Boolean string, removing potentially harmful Boolean from our inputs
   """
   def sanitize_boolean(self, user_input):
-    pass
+
+    if type(user_input) is bool:
+      return user_input
+
+    return False
 
 
   """
