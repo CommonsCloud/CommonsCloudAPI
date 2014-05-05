@@ -43,7 +43,7 @@ Define our individual models
 """
 class Statistic(db.Model, CommonsModel):
 
-    __public__ = ['id', 'name', 'units', 'function', 'created', 'status']
+    __public__ = ['id', 'name', 'units', 'function', 'created', 'status', 'field_id']
     __tablename__ = 'statistic'
     __table_args__ = {
         'extend_existing': True
