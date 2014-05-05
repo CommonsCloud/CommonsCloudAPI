@@ -130,12 +130,10 @@ class Statistic(db.Model, CommonsModel):
 
     def statistic_list(self, template_id):
 
-        # statistic_id_list_ = self.statistic_id_list(template_id)
-        # statistics_ = Statistic.query.filter(Statistic.id.in_(statistic_id_list_)).all()
+        statistic_id_list_ = self.statistic_id_list(template_id)
+        statistics_ = Statistic.query.filter(Statistic.id.in_(statistic_id_list_)).all()
 
-        # return statistics_
-
-        pass
+        return statistics_
 
     """
     Update an existing statistic in the CommonsCloudAPI
