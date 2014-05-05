@@ -130,8 +130,12 @@ class Statistic(db.Model, CommonsModel):
 
     def statistic_list(self, template_id):
 
-        statistic_id_list_ = self.statistic_id_list(template_id)
-        statistics_ = Statistic.query.filter(Statistic.id.in_(statistic_id_list_)).all()
+        explicitly_allowed_fields_ = self.explicitly_allowed_fields()
+        template_fields_ = self.template_field_list(template_id)
+
+        field_id_list_ = set(explicitly_allowed_fields_) & set(template_fields_)
+
+        statistics_ = Statistic.query.filter(Statistic.field_id.in_(field_id_list_)).all()
 
         return statistics_
 
@@ -276,4 +280,5 @@ class Statistic(db.Model, CommonsModel):
             fields_.append(field_.id)
 
         return fields_
+
 
