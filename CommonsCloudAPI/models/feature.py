@@ -216,6 +216,11 @@ class Feature(CommonsModel):
 
         endpoint_ = API(db.session, Model_)
 
+        results = endpoint_._search()
+
+        # @todo loop over these and make sure we're dropping anything that isn't
+        # set to 'public' unless the user has the appropriate permissions
+
         return endpoint_._search()
 
     def feature_delete(self, storage_, feature_id):
