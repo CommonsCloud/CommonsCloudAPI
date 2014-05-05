@@ -116,7 +116,7 @@ class Statistic(db.Model, CommonsModel):
 
     def statistic_get(self, template_id, statistic_id):
 
-        explicitly_allowed_templates_ = self.explicitly_allowed_templates('admin')
+        explicitly_allowed_templates_ = self.explicitly_allowed_templates('is_admin')
         if not template_id in explicitly_allowed_templates_:
           logger.error('User %d view Statistic request failed because they are\'t allowed to admin the template', \
               self.current_user.id)
