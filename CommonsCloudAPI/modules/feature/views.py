@@ -128,7 +128,7 @@ def feature_create(oauth_request, storage, extension):
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['DELETE'])
 @oauth.require_oauth()
-def feature_delete(oauth_request, oauth_request, storage, feature_id, extension):
+def feature_delete(oauth_request, storage, feature_id, extension):
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
