@@ -1,0 +1,31 @@
+{% extends "default.html" %}
+
+{% block content %}
+ 
+      <form method="POST" action="{{ url_for_security('register') }}" id="register_user_form" name="register_user_form" class="card">
+        {{ register_user_form.hidden_tag() }}
+        <legend>Register</legend>
+        <fieldset>
+          <div class="form-group">
+            <label for="email" class="control-label">Email Address</label>
+            <input class="text form-control" id="email" name="email" type="email" data-trigger="change" data-required="true" />
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="control-label">Password</label>
+            <input class="password form-control" id="password" name="password" type="password" data-equalto="#password" data-required="true" />
+          </div>
+
+          <div class="form-group">
+            <label for="password_confirm" class="control-label">Confirm Password</label>
+            <input class="password form-control" id="password_confirm" name="password_confirm" type="password" data-equalto="#password" data-required="true" />
+          </div>
+    
+          <div class="form-actions">
+            <input type="submit" class="button large pull-right" value="Register" />
+            <a href="{{ url_for_security('login') }}"><small>Nevermind</small></a>
+          </div>
+      </form>
+
+{% endblock %}
+

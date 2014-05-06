@@ -1,0 +1,32 @@
+{% extends "default.html" %}
+
+{% block content %}
+
+      <form method="POST" action="/oauth/authorize" class="card">
+        <input type="hidden" name="client_id" value="{{ client.client_id }}">
+        <input type="hidden" name="scope" value="{{ scopes|join(' ') }}">
+        <input type="hidden" name="response_type" value="{{ response_type }}">
+        {% if state %}
+        <input type="hidden" name="state" value="{{ state }}">
+        {% endif %}
+
+        <legend>CommonsCloud would like to access</legend>
+
+        <fieldset>
+          <div class="form-group">
+            {% for scope in scopes: %}
+              scope: {{ scope }}
+            {% endfor %}
+          </div>
+          
+          <hr />
+
+          <div class="form-actions form-group">
+            <a href="http://www.commonscloud.org/" class="pull-left"><small>Nevermind</small></a>
+
+            <input type="submit" id="confirm" name="confirm" class="button large pull-right" value="Allow Access" tabindex="3" />
+          </div>
+        </fieldset>
+      </form>
+
+{% endblock %}
