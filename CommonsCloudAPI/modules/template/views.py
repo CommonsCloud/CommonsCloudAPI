@@ -28,15 +28,6 @@ from CommonsCloudAPI.models.template import Template
 from . import module
 
 
-@module.route('/v2/grr.<string:extension>', methods=['OPTIONS'])
-def grr_options_preflight(extension):
-    return status_.status_200(), 200
-
-@module.route('/v2/grr.<string:extension>', methods=['GET'])
-def grr_get_preflight(extension):
-    return status_.status_200(), 200
-
-
 @module.route('/v2/templates.<string:extension>', methods=['OPTIONS'])
 def templates_preflight(extension):
     return status_.status_200(), 200
