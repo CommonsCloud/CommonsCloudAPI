@@ -50,7 +50,7 @@ def template_list(extension):
 
 
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['GET'])
-@oauth.require_oauth('applications')
+@oauth.require_oauth('user')
 def application_templates_get(oauth_request, application_id, extension):
 
   Template_ = Template()
