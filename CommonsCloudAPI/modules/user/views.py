@@ -40,6 +40,10 @@ Basic route for currently logged in user
 def index():
   return redirect(url_for('user.user_profile_get')), 301
 
+@module.route('/v2/user.<string:extension>', methods=['OPTIONS'])
+def user_preflight(extension):
+    return status_.status_200(), 200
+
 
 @module.route('/v2/user/me.<string:extension>', methods=['OPTIONS'])
 def user_me_preflight(extension):
