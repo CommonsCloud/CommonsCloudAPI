@@ -53,13 +53,16 @@ def user_list_preflight(extension):
 @oauth.require_oauth('user')
 def user_me(oauth_request, extension):
 
+  User_ = User()
+  User_.current_user = oauth_request.user
+
   arguments = {
-    'the_content': oauth_request.user,
+    'the_content': User_.current_user,
     'exclude_fields': ['password'],
     'extension': extension
   }
 
-  return User().endpoint_response(**arguments)
+  return User_.endpoint_response(**arguments)
 
 
 @module.route('/v2/users/list.<string:extension>', methods=['GET'])
