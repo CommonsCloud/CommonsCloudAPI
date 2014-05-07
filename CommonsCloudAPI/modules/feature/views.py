@@ -37,6 +37,10 @@ def features_preflight(storage, extension):
 def features_single_preflight(storage, feature_id, extension):
     return status_.status_200(), 200
 
+@module.route('/v2/type_<string:storage>/<int:feature_id>/<string:relationship>.<string:extension>', methods=['OPTIONS'])
+def features_relationship_preflight(storage, feature_id, relationship, extension):
+    return status_.status_200(), 200
+
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
