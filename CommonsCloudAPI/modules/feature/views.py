@@ -109,6 +109,7 @@ def feature_get_relationship(oauth_request, storage, feature_id, relationship, e
 
     arguments = {
         "the_content": feature,
+        "list_name": "features",
         "extension": extension,
         "code": 200
     }
