@@ -149,7 +149,10 @@ def feature_update(oauth_request, storage, feature_id, extension):
       "extension": extension
     }
 
-    return Feature_.endpoint_response(**arguments)
+    try:
+        return Feature_.endpoint_response(**arguments)
+    except Exception as e:
+        return status_.status_500(e), 500
 
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['DELETE'])
