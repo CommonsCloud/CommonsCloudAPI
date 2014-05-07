@@ -80,6 +80,9 @@ def feature_get(oauth_request, storage, feature_id, extension):
     Feature_.current_user = oauth_request.user
     feature = Feature_.feature_get(storage, feature_id)
 
+    if type(feature) is tuple:
+        return feature
+
     arguments = {
         'the_content': feature,
         "extension": extension,
@@ -97,6 +100,9 @@ def feature_get_relationship(oauth_request, storage, feature_id, relationship, e
     Feature_.current_user = oauth_request.user
     feature = Feature_.feature_get_relationship(storage, feature_id, relationship)
 
+    if type(feature) is tuple:
+        return feature
+
     arguments = {
         "the_content": feature,
         "extension": extension,
@@ -106,10 +112,7 @@ def feature_get_relationship(oauth_request, storage, feature_id, relationship, e
     if (extension == 'csv'):
         return status_.status_415("We do not support exporting a single item or it's relationships as a CSV file."), 415
 
-    try:
-        return Feature_.endpoint_response(**arguments)
-    except Exception as e:
-        return status_.status_500(e), 500
+    return Feature_.endpoint_response(**arguments)
 
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['POST'])
@@ -126,13 +129,32 @@ def feature_create(oauth_request, storage, extension):
         return status_.status_500(e), 500
 
 
+@module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['PATCH','PUT'])
+@oauth.require_oauth()
+def feature_create(oauth_request, storage, feature_id, extension):
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    updated_feature = Feature_.feature_update(request, storage, feature_id)
+
+    if type(updated_feature) is tuple:
+        return updated_feature
+
+    arguments = {
+      "the_content": updated_feature,
+      "extension": extension
+    }
+
+    return Feature_.endpoint_response(**arguments)
+
+
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['DELETE'])
 @oauth.require_oauth()
 def feature_delete(oauth_request, storage, feature_id, extension):
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
-    Feature().feature_delete(storage, feature_id)
+    Feature_.feature_delete(storage, feature_id)
 
     try:
         return status_.status_204(), 204

@@ -46,6 +46,7 @@ from CommonsCloudAPI.models.field import Field
 from CommonsCloudAPI.models.statistic import Statistic
 
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
@@ -186,8 +187,11 @@ class Feature(CommonsModel):
 
         return relationships
 
-    def feature_update(self, request_object, template_id, feature_id):
-        pass
+    def feature_update(self, request_object, storage_, feature_id):
+
+      logger.warning('Feature %s; %s; %s;', request_object, storage_, feature_id)
+
+      pass
 
     def feature_statistic(self, storage_):
 
