@@ -189,9 +189,106 @@ class Feature(CommonsModel):
 
     def feature_update(self, request_object, storage_, feature_id):
 
-      logger.warning('Feature %s; %s; %s;', request_object, storage_, feature_id)
+      """
+      Prepare a dynamic model so we can submit Features to the database
+      """
+      storage = self.validate_storage(storage_)
+      Template_ = Template.query.filter_by(storage=storage).first()
+      Storage_ = self.get_storage(Template_)
 
-      pass
+      feature_ = Storage_.query.get(feature_id)
+
+      logger.warning('Feature to be updated %s', dir(feature_))
+      logger.warning('Owner %d', feature_.owner)
+
+      """
+      Get a list of File and Relationship fields that belong to our dynamic
+      model, but weren't loaded during the model creation above
+      """
+      attachments = self._get_fields_of_type(Template_, 'file')
+      relationships = self._get_fields_of_type(Template_, 'relationship')
+
+      """
+      Setup the request object so that we can work with it
+      """
+      if request_object.data:
+        content_ = json.loads(request_object.data)
+        logger.warning('JSON Data %s', content_)
+
+      elif request_object.form:
+        content_ = json.loads(request_object.form['data'])
+        files_ = request_object.files
+
+        logger.warning('Form Content %s', content_)
+        logger.warning('Form Files %s', files_)
+
+      """
+      Check for a geometry and if it exists, we need to add a new geometry
+      key to the content_ dictionary
+      """
+      geometry_ = content_.get('geometry', None)
+      if geometry_ is not None:
+        content_['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
+        logger.warning('Geometry %s', content_['geometry'])
+      else:
+        logger.warning('No geometry was attached')
+
+
+      """
+      Update the content of the Feature.
+
+          1. This first grouping of fields are ones that every Feature has.
+          2. The second grouping (loop) are user defined fields that our Model_
+             knows about, but ones we cannot hard code.
+      """
+      if hasattr(feature_, 'status'):
+        feature_.status = sanitize.sanitize_string(content_.get('status', feature_.status))
+
+      if hasattr(feature_, 'geometry'):
+        feature_.geometry = content_.get('geometry', feature_.geometry)
+
+      #
+      # @todo We should be able to transfer the ownership of a feature, but
+      #       only if we are the current owner, an admin or a moderator
+      #
+      # @todo We should also make sure the owner ID exists before allowing them
+      #       to save or else we could end up with orphaned Features
+      #
+      if hasattr(feature_, 'owner'):
+        feature_.owner = feature_.owner # content_.get('owner', feature_.owner)
+
+      for field_ in content_:
+        if field_ not in relationships and field_ not in attachments:
+          if hasattr(feature_, field_):
+
+            # Use the existing value as the default value, if the user has not
+            # updated the content of the field
+            existing_value = getattr(feature_, field_)
+            new_value = content_.get(field_, existing_value)
+
+            setattr(feature_, field_, new_value)
+
+      db.session.commit()
+
+
+      """
+      Save relationships and attachments
+      """
+      for field_ in content_:
+        if field_ in relationships:
+      
+          assoc_ = self._feature_relationship_associate(Template_, field_)
+      
+          details = {
+            "parent_id": feature_id,
+            "child_table": field_,
+            "content": content_.get(field_, None),
+            "assoc_": assoc_
+          }
+      
+          new_feature_relationships = self.feature_relationships(**details)
+
+      return self.feature_get(storage_, feature_id)
 
     def feature_statistic(self, storage_):
 
@@ -252,6 +349,17 @@ class Feature(CommonsModel):
       table has been loaded, prior to attempting to save data to it.
       """
       Storage_ = self.get_storage(str(assoc_))
+
+      """
+      The only way we can reliably keep lists of relationships is to submit
+      all relationships with every update. Because of that, we'd get duplicates
+      so we wipe away all of the existing relationships with this parent and
+      then re-save all relationships based on user submitted content
+      """
+      existing_relationships = Storage_.query.filter_by(parent_id=parent_id).all()
+      for relationship_ in existing_relationships:
+        db.session.delete(relationship_)
+        db.session.commit()
 
       """
       This is a little complicated.
