@@ -198,9 +198,6 @@ class Feature(CommonsModel):
 
       feature_ = Storage_.query.get(feature_id)
 
-      logger.warning('Feature to be updated %s', dir(feature_))
-      logger.warning('Owner %d', feature_.owner)
-
       """
       Get a list of File and Relationship fields that belong to our dynamic
       model, but weren't loaded during the model creation above
