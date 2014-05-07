@@ -131,7 +131,7 @@ def feature_create(oauth_request, storage, extension):
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['PATCH','PUT'])
 @oauth.require_oauth()
-def feature_create(oauth_request, storage, feature_id, extension):
+def feature_update(oauth_request, storage, feature_id, extension):
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
