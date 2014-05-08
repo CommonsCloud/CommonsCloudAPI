@@ -46,10 +46,10 @@ def features_relationship_preflight(storage, feature_id, relationship, extension
 @oauth.require_oauth()
 def feature_list(oauth_request, storage, extension):
 
-    if (extension == 'csv'):
-        return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
-    elif (extension == 'shp'):
-        return status_.status_415('We do not support exporting a feature list as a SHP file yet, but we\'re working on it.'), 415
+    # if (extension == 'csv'):
+    #     return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
+    # elif (extension == 'shp'):
+    #     return status_.status_415('We do not support exporting a feature list as a SHP file yet, but we\'re working on it.'), 415
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
@@ -77,8 +77,8 @@ def feature_list(oauth_request, storage, extension):
 @oauth.require_oauth()
 def feature_get(oauth_request, storage, feature_id, extension):
 
-    if (extension == 'csv'):
-        return status_.status_415('We do not support exporting a single item as a CSV file.'), 415
+    # if (extension == 'csv'):
+    #     return status_.status_415('We do not support exporting a single item as a CSV file.'), 415
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
