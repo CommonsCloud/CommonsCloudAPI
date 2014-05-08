@@ -16,13 +16,17 @@ Import Python Dependencies
 """
 import boto
 import json
+import os.path
 
 from datetime import datetime
+from uuid import uuid4
 
 
 """
 Import Flask Dependencies
 """
+from werkzeug import secure_filename
+
 from flask import abort
 from flask import request
 from flask import current_app
@@ -74,8 +78,6 @@ class Feature(CommonsModel):
         """
         attachments = self._get_fields_of_type(Template_, 'file')
         relationships = self._get_fields_of_type(Template_, 'relationship')
-        print relationships
-        print 'Storage_', dir(Storage_), Storage_
 
         """
         Setup the request object so that we can work with it
@@ -84,7 +86,6 @@ class Feature(CommonsModel):
           content_ = json.loads(request_object.data)
         elif request_object.form:
           content_ = json.loads(request_object.form['data'])
-          print 'content_', content_
         else:
           return abort(400)
 
@@ -120,10 +121,15 @@ class Feature(CommonsModel):
         """
         Save relationships and attachments
         """
+        # logger.warning('start saving relationships and attachments')
+        # logger.warning('request_object.files')
+        # logger.warning(request_object.files)
         for field_ in content_:
-          print 'field_', field_
+          # logger.warning('relationships %s', relationships)
+          # logger.warning('attachments %s', attachments)
+          # logger.warning('current field %s', field_)
           if field_ in relationships:
-        
+            # logger.warning('looping relationships', field_.relationship)
             assoc_ = self._feature_relationship_associate(Template_, field_)
         
             details = {
@@ -134,12 +140,42 @@ class Feature(CommonsModel):
             }
         
             new_feature_relationships = self.feature_relationships(**details)
-          elif field_ in attachments:
-            s3 = self.get_s3_connection()
-            print 'request_object.files', request_object.files
-            print dir(s3)
-            print s3
-            pass
+          # elif field_ in attachments:
+          #   logger.warning('looping attachments', field_.relationship)
+          #   logger.warning(content_.get(field_, None))
+            # s3 = self.get_s3_connection()
+            # logger.warning('request_object.files %s', request_object.files)
+
+
+        """
+        Saving attachments
+        """
+        for attachment in attachments:
+
+          assoc_ = self._feature_relationship_associate(Template_, attachment)
+
+          field_attachments = request_object.files.getlist(attachment)
+
+          logger.warning('loop over these %s', str(field_attachments))
+
+          for file_ in field_attachments:
+        
+            if file_ and self.allowed_file(file_.filename):
+              logger.warning('upload that file %s', file_.filename)
+
+              details = {
+                "parent_id": new_feature.id,
+                "child_table": attachment,
+                "content": file_,
+                "assoc_": assoc_
+              }
+
+              output = self.s3_upload(file_)
+
+              # new_feature_relationships = self.feature_relationships(**details)
+
+              logger.warning('details %s', str(details))
+              logger.warning('output %s', output)
 
         return new_feature
 
@@ -406,10 +442,8 @@ class Feature(CommonsModel):
 
       for field in template_.fields:
         if field.data_type == type_:
-          if type_ == 'relationship':
+          if type_ == 'relationship' or type_ == 'file':
             fields_.append(field.relationship)
-          else:
-            fields_.append(field.name)
 
       return fields_
 
@@ -478,4 +512,50 @@ class Feature(CommonsModel):
       }
 
       return boto.connect_s3(**arguments)
+
+    """
+    Check the file name's extension to ensure it is in our safe list
+    """
+    def allowed_file(self, filename):
+      return '.' in filename and \
+        filename.rsplit('.', 1)[1] in ['png', 'jpg']
+
+
+    """
+    Upload files directly to S3
+    """
+    def s3_upload(self, source_file, acl='public-read'):
+        ''' Uploads WTForm File Object to Amazon S3
+
+            Expects following current_app.config attributes to be set:
+                S3_KEY              :   S3 API Key
+                S3_SECRET           :   S3 Secret Key
+                S3_BUCKET           :   What bucket to upload to
+                S3_UPLOAD_DIRECTORY :   Which S3 Directory.
+
+            The default sets the access rights on the uploaded file to
+            public-read.  It also generates a unique filename via
+            the uuid4 function combined with the file extension from
+            the source file.
+        '''
+
+        source_filename = secure_filename(source_file.filename)
+        source_extension = os.path.splitext(source_filename)[1]
+
+        destination_filename = uuid4().hex + source_extension
+
+        # Connect to S3 and upload file.
+        conn = boto.connect_s3(current_app.config["S3_KEY"], current_app.config["S3_SECRET"])
+        b = conn.get_bucket(current_app.config["S3_BUCKET"])
+
+        sml = b.new_key("/".join([current_app.config["S3_UPLOAD_DIRECTORY"],destination_filename]))
+        sml.set_metadata('Content-Type', source_file.mimetype)
+        sml.set_contents_from_string(source_file.read())
+        sml.set_acl(acl)
+
+        return "/".join([current_app.config["S3_BUCKET"],current_app.config["S3_UPLOAD_DIRECTORY"],destination_filename])
+
+
+
+
 
