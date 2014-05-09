@@ -13,11 +13,15 @@
         <legend>CommonsCloud would like to access</legend>
 
         <fieldset>
-          <div class="form-group">
-            {% for scope in scopes: %}
-              scope: {{ scope }}
-            {% endfor %}
+          {% for scope in scopes: %}
+          <div class="form-group scope">
+            {% if 'user' in scope: %}
+            <p><span class="glyphicon glyphicon-user"></span> Your User Account for CommonsCloud</p>
+            {% elif 'applications' in scope: %}
+            <p><span class="glyphicon glyphicon-cloud"></span> Your Applications hosted on CommonsCloud</p>
+            {% endif %}
           </div>
+          {% endfor %}
           
           <hr />
 
