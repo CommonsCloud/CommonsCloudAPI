@@ -228,6 +228,9 @@ class CommonsModel(object):
 
     new_table = db.Table(attachment_table_name, db.metadata,
       db.Column('id', db.Integer, primary_key=True),
+      db.Column('caption', db.String(255)),
+      db.Column('credit', db.String(255)),
+      db.Column('credit_link', db.String(255)),
       db.Column('filename', db.String(255)),
       db.Column('filepath', db.String(255)),
       db.Column('filetype', db.String(255)),
