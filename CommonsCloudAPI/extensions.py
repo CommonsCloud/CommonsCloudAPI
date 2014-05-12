@@ -39,5 +39,5 @@ principal = Principal()
 status = CommonsStatus()
 sanitize = CommonsSanitize()
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
