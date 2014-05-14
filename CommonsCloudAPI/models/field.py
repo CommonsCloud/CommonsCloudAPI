@@ -207,17 +207,17 @@ class Field(db.Model, CommonsModel):
                 self.current_user.id, template_id)
             return status_.status_401('The Template `relationship` string you entered either doesn\'t exist or you don\'t have permission to use it'), 401
 
-        """
-        Lastly, make sure that an identical relationship doesn't already exist.
-        If the type_ and the template type_ already have a relationship it will
-        cause bad things to happen when searching via the API
-        """
-        duplicate_check = Field().query.filter_by(relationship=relationship_storage).first()
+          """
+          Lastly, make sure that an identical relationship doesn't already exist.
+          If the type_ and the template type_ already have a relationship it will
+          cause bad things to happen when searching via the API
+          """
+          duplicate_check = Field().query.filter_by(relationship=relationship_storage).first()
 
-        if hasattr(duplicate_check, 'id'):
-          logger.warning('User %d tried to add a duplicate relationship type', \
-              self.current_user.id, template_id)
-          return status_.status_400('You already defined a relationship with this Template, you cannot create two relationship fields with the same relationship table.'), 400
+          if hasattr(duplicate_check, 'id'):
+            logger.warning('User %d tried to add a duplicate relationship type', \
+                self.current_user.id, template_id)
+            return status_.status_400('You already defined a relationship with this Template, you cannot create two relationship fields with the same relationship table.'), 400
 
         new_field = {
           'label': user_defined_label,
