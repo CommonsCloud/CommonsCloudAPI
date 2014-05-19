@@ -132,6 +132,11 @@ class Feature(CommonsModel):
             # logger.warning('looping relationships', field_.relationship)
             assoc_ = self._feature_relationship_associate(Template_, field_)
         
+            logger.warning('parent_id', new_feature.id)
+            logger.warning('child_table', field_)
+            logger.warning('content', content_.get(field_, None))
+            logger.warning('assoc_', assoc_)
+
             details = {
               "parent_id": new_feature.id,
               "child_table": field_,
