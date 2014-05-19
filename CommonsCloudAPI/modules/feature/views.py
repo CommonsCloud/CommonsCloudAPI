@@ -54,9 +54,11 @@ def feature_list(oauth_request, storage, extension, is_public):
     elif (extension == 'shp'):
         return status_.status_415('We do not support exporting a feature list as a SHP file yet, but we\'re working on it.'), 415
 
+    results_per_page = request.args.get('results_per_page')
+
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
-    feature_list = Feature_.feature_list(storage)
+    feature_list = Feature_.feature_list(storage, results_per_page)
     feature_statistics = Feature_.feature_statistic(storage)
 
     if type(feature_list) is tuple:
@@ -69,7 +71,7 @@ def feature_list(oauth_request, storage, extension, is_public):
         'current_page': feature_list.get('page'),
         'total_pages': feature_list.get('total_pages'),
         'total_features': feature_list.get('num_results'),
-        'features_per_page': feature_list.get('limit'),
+        'features_per_page': results_per_page or 25,
         'statistics': feature_statistics
     }
 

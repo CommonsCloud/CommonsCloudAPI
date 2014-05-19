@@ -415,7 +415,7 @@ class Feature(CommonsModel):
 
         return self.get_statistics(query.all(), this_template)
 
-    def feature_list(self, storage_):
+    def feature_list(self, storage_, results_per_page=25):
 
         storage = self.validate_storage(storage_)
 
@@ -423,7 +423,7 @@ class Feature(CommonsModel):
 
         Model_ = self.get_storage(this_template, this_template.fields)
 
-        endpoint_ = API(db.session, Model_)
+        endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
 
         results = endpoint_._search()
 
