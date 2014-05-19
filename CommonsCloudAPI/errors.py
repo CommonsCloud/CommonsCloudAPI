@@ -36,43 +36,43 @@ def load_errorhandlers(app):
   @app.errorhandler(400)
   def internal_error(error):
     logger.error('Error 400, %s', error)
-    logger.exception()
+    logger.exception(error)
     return status_.status_400(), 400
 
   @app.errorhandler(401)
   def internal_error(error):
     logger.error('Error 401, %s', error)
-    logger.exception()
+    logger.exception(error)
     return status_.status_401(), 401
 
   @app.errorhandler(403)
   def internal_error(error):
     logger.error('Error 403, %s', error)
-    logger.exception()
+    logger.exception(error)
     return status_.status_403(), 403
 
   @app.errorhandler(404)
   def internal_error(error):
     logger.error('Error 404, %s', error)
-    logger.exception()
+    logger.exception(error)
     return status_.status_404(), 404
 
   @app.errorhandler(405)
   def internal_error(error):
     logger.error('Error 405, %s', error)
-    logger.exception()
+    logger.exception(error)
     return status_.status_405(), 405
 
   @app.errorhandler(InvalidScopeError)
   def internal_error(error):
     logger.error('InvalidScopeError, %s', error)
-    logger.exception()
+    logger.exception(error)
     return status_.status_500('Your OAuth Scopes don\'t match the ones specified for your application'), 500
 
   @app.errorhandler(500)
   @app.errorhandler(Exception)
   def internal_error(error):
     logger.error('Error 500, %s', error)
-    logger.exception()
+    logger.exception(error)
     return status_.status_500(error), 500
   
