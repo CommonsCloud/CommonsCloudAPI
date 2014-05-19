@@ -24,6 +24,8 @@ from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.feature import Feature
+from CommonsCloudAPI.models.feature import is_public
+from CommonsCloudAPI.models.feature import is_crowdsourced
 
 from . import module
 
@@ -43,8 +45,9 @@ def features_relationship_preflight(storage, feature_id, relationship, extension
 
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
-def feature_list(oauth_request, storage, extension):
+@is_public()
+@oauth.oauth_or_public()
+def feature_list(oauth_request, storage, extension, is_public):
 
     if (extension == 'csv'):
         return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
@@ -74,7 +77,8 @@ def feature_list(oauth_request, storage, extension):
 
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
+@is_public()
+@oauth.oauth_or_public()
 def feature_get(oauth_request, storage, feature_id, extension):
 
     if (extension == 'csv'):
@@ -97,7 +101,8 @@ def feature_get(oauth_request, storage, feature_id, extension):
 
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>/<string:relationship>.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
+@is_public()
+@oauth.oauth_or_public()
 def feature_get_relationship(oauth_request, storage, feature_id, relationship, extension):
 
     Feature_ = Feature()
@@ -121,8 +126,9 @@ def feature_get_relationship(oauth_request, storage, feature_id, relationship, e
 
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['POST'])
-@oauth.require_oauth()
-def feature_create(oauth_request, storage, extension):
+@is_crowdsourced()
+@oauth.oauth_or_crowdsourced()
+def feature_create(oauth_request, storage, extension, is_crowdsourced):
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user

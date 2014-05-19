@@ -21,6 +21,7 @@ import os.path
 from datetime import datetime
 from uuid import uuid4
 
+from functools import wraps
 
 """
 Import Flask Dependencies
@@ -51,10 +52,83 @@ from CommonsCloudAPI.models.statistic import Statistic
 
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import logger
+from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.utilities.geometry import ST_GeomFromGeoJSON
+
+class is_public(object):
+
+    def __init__(self):
+      pass
+
+    def __call__(self, f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+
+          print 'Checking if template is public'
+
+          storage = self.validate_storage(kwargs['storage'])
+
+          this_template = Template.query.filter_by(storage=storage).first()
+
+          keywords = kwargs
+
+          if not this_template.is_public:
+            keywords['is_public'] = False
+          else:
+            keywords['is_public'] = True
+
+          return f(*args, **keywords)
+     
+        return decorated_function
+
+    """
+    Storage name
+    """
+    def validate_storage(self, storage_name):
+
+      if not storage_name.startswith('type_'):
+        storage_name = str('type_' + storage_name)
+
+      return storage_name
+
+class is_crowdsourced(object):
+
+    def __init__(self):
+      pass
+
+    def __call__(self, f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+
+          print 'Checking if template is public'
+
+          storage = self.validate_storage(kwargs['storage'])
+
+          this_template = Template.query.filter_by(storage=storage).first()
+
+          keywords = kwargs
+
+          if not this_template.is_crowdsourced:
+            keywords['is_crowdsourced'] = False
+          else:
+            keywords['is_crowdsourced'] = True
+
+          return f(*args, **keywords)
+     
+        return decorated_function
+
+    """
+    Storage name
+    """
+    def validate_storage(self, storage_name):
+
+      if not storage_name.startswith('type_'):
+        storage_name = str('type_' + storage_name)
+
+      return storage_name
 
 
 """
@@ -134,7 +208,7 @@ class Feature(CommonsModel):
         
             logger.warning('parent_id %s', new_feature.id)
             logger.warning('child_table %s', field_)
-            logger.warning('content %s', content_.get(field_, None))
+            logger.warning('Array of ID Objects %s', content_.get(field_, None))
             logger.warning('assoc_ %s', assoc_)
 
             details = {
@@ -147,11 +221,6 @@ class Feature(CommonsModel):
             logger.warning('Details', details)
         
             new_feature_relationships = self.feature_relationships(**details)
-          # elif field_ in attachments:
-          #   logger.warning('looping attachments', field_.relationship)
-          #   logger.warning(content_.get(field_, None))
-            # s3 = self.get_s3_connection()
-            # logger.warning('request_object.files %s', request_object.files)
 
 
         """
@@ -351,9 +420,6 @@ class Feature(CommonsModel):
         storage = self.validate_storage(storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
-
-        if not this_template.is_public:
-          return abort(403)
 
         Model_ = self.get_storage(this_template, this_template.fields)
 

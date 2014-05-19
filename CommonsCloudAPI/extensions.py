@@ -21,11 +21,12 @@ from flask import current_app
 from flask.ext.security import Security
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail
-from flask.ext.oauthlib.provider import OAuth2Provider
 from flask.ext.principal import Principal
 
 from CommonsCloudAPI.utilities.sanitize import CommonsSanitize
 from CommonsCloudAPI.utilities.statuses import CommonsStatus
+
+from CommonsCloudAPI.utilities.oauth import CommonsOAuth2Provider
 
 
 """
@@ -34,7 +35,7 @@ Flask Dependencies
 db = SQLAlchemy()
 security = Security()
 mail = Mail()
-oauth = OAuth2Provider()
+oauth = CommonsOAuth2Provider()
 principal = Principal()
 status = CommonsStatus()
 sanitize = CommonsSanitize()
