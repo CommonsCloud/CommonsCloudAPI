@@ -138,6 +138,8 @@ class Feature(CommonsModel):
               "content": content_.get(field_, None),
               "assoc_": assoc_
             }
+
+            logger.warning('Details', details)
         
             new_feature_relationships = self.feature_relationships(**details)
           # elif field_ in attachments:
