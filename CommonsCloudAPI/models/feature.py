@@ -239,19 +239,47 @@ class Feature(CommonsModel):
             if file_ and self.allowed_file(file_.filename):
               logger.warning('upload that file %s', file_.filename)
 
-              details = {
-                "parent_id": new_feature.id,
-                "child_table": attachment,
-                "content": file_,
-                "assoc_": assoc_
-              }
-
               output = self.s3_upload(file_)
 
-              # new_feature_relationships = self.feature_relationships(**details)
+              # There's two steps to get a file related to the feature.
+              #
+              # Step 1: Create a record in the attachment_ so that we have
+              #         an ID for our attachment
+              #
+              # logger.warning('output %s', output)
+              #
+              # attachment_details = {
+              #   'caption': ,
+              #   'credit': ,
+              #   'credit_link': ,
+              #   'filename': ,
+              #   'filepath': ,
+              #   'filetype': ,
+              #   'filesize': ,
+              #   'created': ,
+              #   'status': ,
+              # }
+              #
+              # new_attachment = Attachment_(**attachment_details)
+              # db.session.add(new_attachment)
+              # db.session.commit()
 
-              logger.warning('details %s', str(details))
-              logger.warning('output %s', output)
+              #
+              # Step 2: Take that Attachment ID and pass it along in the
+              #         `details` dictionary
+              # details = {
+              #   "parent_id": new_feature.id,
+              #   "child_table": attachment,
+              #   "content": new_attachment.id,
+              #   "assoc_": assoc_
+              # }
+              #
+              #
+              # Step 3: Finally, we create the relationship between the new
+              #         attachment and the new feature
+              #
+              # new_feature_relationships = self.feature_relationships(**details)
+              #
 
         return new_feature
 
