@@ -229,6 +229,9 @@ class Feature(CommonsModel):
         for attachment in attachments:
 
           assoc_ = self._feature_relationship_associate(Template_, attachment)
+          logger.warning('assoc_ %s', attachment)
+          Attachment_ = self.get_storage(str(attachment))
+          logger.warning('model %s', Attachment_)
 
           field_attachments = request_object.files.getlist(attachment)
 
@@ -240,46 +243,44 @@ class Feature(CommonsModel):
               logger.warning('upload that file %s', file_.filename)
 
               output = self.s3_upload(file_)
+              logger.warning('file details %s', dir(file_))
 
               # There's two steps to get a file related to the feature.
               #
               # Step 1: Create a record in the attachment_ so that we have
               #         an ID for our attachment
-              #
-              # logger.warning('output %s', output)
-              #
-              # attachment_details = {
-              #   'caption': ,
-              #   'credit': ,
-              #   'credit_link': ,
-              #   'filename': ,
-              #   'filepath': ,
-              #   'filetype': ,
-              #   'filesize': ,
-              #   'created': ,
-              #   'status': ,
-              # }
-              #
-              # new_attachment = Attachment_(**attachment_details)
-              # db.session.add(new_attachment)
-              # db.session.commit()
+              #              
+              attachment_details = {
+                'caption': sanitize.sanitize_string(''),
+                'credit': sanitize.sanitize_string(''),
+                'credit_link': sanitize.sanitize_string(''),
+                'filename': sanitize.sanitize_string(file_.filename),
+                'filepath': output,
+                'filetype': sanitize.sanitize_string(file_.mimetype),
+                'filesize': file_.content_length,
+                'created': datetime.now(),
+                'status': 'public',
+              }
+              
+              new_attachment = Attachment_(**attachment_details)
+              db.session.add(new_attachment)
+              db.session.commit()
 
               #
               # Step 2: Take that Attachment ID and pass it along in the
               #         `details` dictionary
-              # details = {
-              #   "parent_id": new_feature.id,
-              #   "child_table": attachment,
-              #   "content": new_attachment.id,
-              #   "assoc_": assoc_
-              # }
-              #
+              details = {
+                "parent_id": new_feature.id,
+                "child_table": attachment,
+                "content": new_attachment.id,
+                "assoc_": assoc_
+              }
+
               #
               # Step 3: Finally, we create the relationship between the new
               #         attachment and the new feature
               #
-              # new_feature_relationships = self.feature_relationships(**details)
-              #
+              new_feature_attachments = self.feature_attachments(**details)
 
         return new_feature
 
@@ -478,6 +479,18 @@ class Feature(CommonsModel):
 
         return True
 
+    def feature_attachments(self, child_table, content, parent_id, assoc_):
+      """
+      We have to make sure that our dynamically typed Model for the association
+      table has been loaded, prior to attempting to save data to it.
+      """
+      Storage_ = self.get_storage(str(assoc_))
+
+      relationship_ = Storage_(parent_id=parent_id, child_id=content)
+      db.session.add(relationship_)
+
+      db.session.commit()
+
     def feature_relationships(self, child_table, content, parent_id, assoc_):
 
       """
@@ -527,15 +540,6 @@ class Feature(CommonsModel):
       for field in template.fields:
         if field.relationship == relationship:
           return field.association
-
-    def feature_attachments(self):
-      pass
-
-    def _feature_attachment_associate(self):
-      pass
-
-    def _feature_attachment_create(self):
-      pass
 
     def _get_fields_of_type(self, template_, type_):
 
