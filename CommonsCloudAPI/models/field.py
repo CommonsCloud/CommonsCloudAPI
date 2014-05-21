@@ -498,8 +498,6 @@ class Field(db.Model, CommonsModel):
 
         template_ = Template.query.get(template_id)
 
-        print template_.fields
-
         fields_ = []
 
         for field in template_.fields:

@@ -112,8 +112,6 @@ def statistic_update(oauth_request, template_id, statistic_id, extension):
     'code': 200
   }
 
-  print 'returned'
-
   return Statistic_.endpoint_response(**arguments)
 
 

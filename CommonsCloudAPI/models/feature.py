@@ -67,8 +67,6 @@ class is_public(object):
         @wraps(f)
         def decorated_function(*args, **kwargs):
 
-          print 'Checking if template is public'
-
           storage = self.validate_storage(kwargs['storage'])
 
           this_template = Template.query.filter_by(storage=storage).first()
@@ -102,8 +100,6 @@ class is_crowdsourced(object):
     def __call__(self, f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-
-          print 'Checking if template is public'
 
           storage = self.validate_storage(kwargs['storage'])
 
@@ -588,7 +584,7 @@ class Feature(CommonsModel):
           return self.get_statistic_value_sum(query_results, field)
 
       except Exception as e:
-        print e
+        logger.warning(e)
           
     def get_statistic_value_sum(self, query_results, field, product = 0):
 
