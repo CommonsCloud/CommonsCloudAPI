@@ -81,7 +81,7 @@ def feature_list(oauth_request, storage, extension, is_public):
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()
-def feature_get(oauth_request, storage, feature_id, extension):
+def feature_get(oauth_request, storage, feature_id, extension, is_public):
 
     if (extension == 'csv'):
         return status_.status_415('We do not support exporting a single item as a CSV file.'), 415
@@ -105,7 +105,7 @@ def feature_get(oauth_request, storage, feature_id, extension):
 @module.route('/v2/type_<string:storage>/<int:feature_id>/<string:relationship>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()
-def feature_get_relationship(oauth_request, storage, feature_id, relationship, extension):
+def feature_get_relationship(oauth_request, storage, feature_id, relationship, extension, is_public):
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
