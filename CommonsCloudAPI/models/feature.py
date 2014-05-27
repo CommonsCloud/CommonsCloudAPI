@@ -153,7 +153,12 @@ class Feature(CommonsModel):
         Setup the request object so that we can work with it
         """
         logger.warning('REQUEST OBJECT %s', dir(request_object))
-        
+
+        get_json = request_object.get_json();
+        get_data = request_object.get_data();
+        logger.warning('REQUEST JSON %s', dir(get_json))
+        logger.warning('REQUEST DATA %s', dir(get_data))
+
         if request_object.data:
           content_ = json.loads(request_object.data)
         elif request_object.form:
