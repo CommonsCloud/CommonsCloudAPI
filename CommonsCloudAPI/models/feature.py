@@ -152,12 +152,14 @@ class Feature(CommonsModel):
         """
         Setup the request object so that we can work with it
         """
+        logger.warning('REQUEST OBJECT %s', dir(request_object))
+        
         if request_object.data:
           content_ = json.loads(request_object.data)
         elif request_object.form:
           content_ = json.loads(request_object.form['data'])
         else:
-          return abort(400)
+          return status_.status_400('No data was submitted with your request'), 400
 
         """
         Check for a geometry and if it exists, we need to add a new geometry

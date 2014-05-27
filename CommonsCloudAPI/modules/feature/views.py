@@ -136,6 +136,9 @@ def feature_create(oauth_request, storage, extension, is_crowdsourced):
     Feature_.current_user = oauth_request.user
     new_feature = Feature_.feature_create(request, storage)
 
+    if type(new_feature) is tuple:
+        return new_feature
+
     try:
         return status_.status_201(new_feature.id), 201
     except Exception as e:
