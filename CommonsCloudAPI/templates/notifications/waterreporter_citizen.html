@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h2 style="color: #3F3A38;display: block;font-family: Helvetica, Arial, sans-serif;font-size: 24px;font-weight: bold;line-height: 100%;letter-spacing: normal;margin-top: 0;margin-right: 0;margin-bottom: 0;margin-left: 0;text-align: left;">Thanks for helping out!</h2>
+<h2 style="color: #3F3A38;display: block;font-family: Helvetica, Arial, sans-serif;font-size: 24px;font-weight: bold;line-height: 100%;letter-spacing: normal;margin-top: 0;margin-right: 0;margin-bottom: 0;margin-left: 0;text-align: left;">Thanks for sharing your {{ data.feature.type_8f432efc18c545ea9578b4bdea860b4c[0].name }}!</h2>
 <br>
 <p>We emailed your report to [[ waterkeeper_name ]] from the [[ jursidiction ]]. An email just like this was sent to them as well. If you'd like can follow up by emailing them at [[ waterkeeper_email ]].</p>
 <p><img src="http://api.tiles.mapbox.com/v3/examples.map-zr0njcqy/-73.99,40.70,13/500x300.png" alt="" title="" /></p>
@@ -11,7 +11,7 @@
 </p>
 <p>{{ data.feature.geometry }}</p>
 <br>
-<p>{{ data.feature.type_8f432efc18c545ea9578b4bdea860b4c[0] }}</p>
+<p>{{ data.feature.type_8f432efc18c545ea9578b4bdea860b4c[0].name }}</p>
 <p>[[ activity_type ]][[ pollution_type ]]</p>
 
 {% if data.feature.comments: %}
