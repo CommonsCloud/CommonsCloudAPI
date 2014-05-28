@@ -32,8 +32,6 @@ from flask import abort
 from flask import request
 from flask import current_app
 
-from flask.ext.security import current_user
-
 from geoalchemy2.functions import ST_AsGeoJSON
 
 from flask.ext.restless.views import API
@@ -58,6 +56,14 @@ from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.utilities.geometry import ST_GeomFromGeoJSON
 
+from CommonsCloudAPI.signals import trigger_feature_created
+
+
+
+"""
+is_public allows us to check if feature collections are supposed to public, if
+they are, then we don't need to check for OAuth crednetials to allow access
+"""
 class is_public(object):
 
     def __init__(self):
@@ -135,7 +141,7 @@ class Feature(CommonsModel):
     __public__ = ['id', 'name', 'created', 'status', 'geometry']
 
     def __init__(self):
-        pass
+      pass
 
     def feature_create(self, request_object, storage_):
 
@@ -152,16 +158,12 @@ class Feature(CommonsModel):
         """
         Setup the request object so that we can work with it
         """
-        logger.warning('REQUEST OBJECT %s', dir(request_object))
-
-        get_data = request_object.get_data();
-        logger.warning('REQUEST DATA %s', get_data)
-
         if request_object.data:
           content_ = json.loads(request_object.data)
         elif request_object.form:
           content_ = json.loads(request_object.form['data'])
         else:
+          logger.error('A request was submitted to %s with no data', storage)
           return status_.status_400('No data was submitted with your request'), 400
 
         """
@@ -196,30 +198,16 @@ class Feature(CommonsModel):
         """
         Save relationships and attachments
         """
-        # logger.warning('start saving relationships and attachments')
-        # logger.warning('request_object.files')
-        # logger.warning(request_object.files)
         for field_ in content_:
-          # logger.warning('relationships %s', relationships)
-          # logger.warning('attachments %s', attachments)
-          # logger.warning('current field %s', field_)
           if field_ in relationships:
-            # logger.warning('looping relationships', field_.relationship)
             assoc_ = self._feature_relationship_associate(Template_, field_)
         
-            logger.warning('parent_id %s', new_feature.id)
-            logger.warning('child_table %s', field_)
-            logger.warning('Array of ID Objects %s', content_.get(field_, None))
-            logger.warning('assoc_ %s', assoc_)
-
             details = {
               "parent_id": new_feature.id,
               "child_table": field_,
               "content": content_.get(field_, None),
               "assoc_": assoc_
             }
-
-            logger.warning('Details', details)
         
             new_feature_relationships = self.feature_relationships(**details)
 
@@ -230,21 +218,15 @@ class Feature(CommonsModel):
         for attachment in attachments:
 
           assoc_ = self._feature_relationship_associate(Template_, attachment)
-          logger.warning('assoc_ %s', attachment)
           Attachment_ = self.get_storage(str(attachment))
-          logger.warning('model %s', Attachment_)
 
           field_attachments = request_object.files.getlist(attachment)
-
-          logger.warning('loop over these %s', str(field_attachments))
 
           for file_ in field_attachments:
         
             if file_ and self.allowed_file(file_.filename):
-              logger.warning('upload that file %s', file_.filename)
 
               output = self.s3_upload(file_)
-              logger.warning('file details %s', dir(file_))
 
               # There's two steps to get a file related to the feature.
               #
@@ -282,6 +264,12 @@ class Feature(CommonsModel):
               #         attachment and the new feature
               #
               new_feature_attachments = self.feature_attachments(**details)
+
+
+        trigger_feature_created.send(current_app._get_current_object(),
+                             storage=storage, template=Template_, feature=new_feature)
+        logger.info('A new feature was created in %s with an id of %d', 
+            storage, new_feature.id)
 
         return new_feature
 
@@ -660,7 +648,6 @@ class Feature(CommonsModel):
         sml.set_acl(acl)
 
         return "/".join([current_app.config["S3_BUCKET"],current_app.config["S3_UPLOAD_DIRECTORY"],destination_filename])
-
 
 
 

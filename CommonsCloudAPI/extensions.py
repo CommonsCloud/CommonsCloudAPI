@@ -16,6 +16,8 @@ import logging
 """
 Import Flask Dependencies
 """
+from flask.signals import Namespace
+
 from flask import current_app
 
 from flask.ext.security import Security
@@ -40,5 +42,18 @@ principal = Principal()
 status = CommonsStatus()
 sanitize = CommonsSanitize()
 
+
+"""
+Signals
+
+For more information @see http://flask.pocoo.org/docs/signals/
+"""
+signals = Namespace()
+
+
+"""
+Logging
+"""
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
