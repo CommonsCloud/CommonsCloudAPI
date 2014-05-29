@@ -58,6 +58,9 @@ class Action(db.Model):
 
 def execute_notification(signal_type, app, **data):
 
+  if not 'type_2c1bd72acccf416aada3a6824731acc9' in data.storage:
+    return {}
+
   logger.debug('Notification Executed from %s, with %s containing data %s', signal_type, app, dir(data))
 
   # @todo
