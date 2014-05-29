@@ -59,6 +59,10 @@ from CommonsCloudAPI.utilities.geometry import ST_GeomFromGeoJSON
 
 from CommonsCloudAPI.signals import trigger_feature_created
 
+from geoalchemy2.elements import WKBElement
+import geoalchemy2.functions as func
+
+
 """
 is_public allows us to check if feature collections are supposed to public, if
 they are, then we don't need to check for OAuth crednetials to allow access
@@ -285,6 +289,11 @@ class Feature(CommonsModel):
         if not hasattr(feature, 'id'):
             return abort(404)
 
+        # if this_template.is_geospatial and feature.geometry is not None:
+        #   the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
+
+        #   feature.geometry = json.loads(the_geometry)
+
         return feature
 
     def feature_get_relationship(self, storage_, feature_id, relationship):
@@ -461,6 +470,22 @@ class Feature(CommonsModel):
         db.session.commit()
 
         return True
+
+    def feature_get_intersection(self, storage_, geometry):
+
+        storage = self.validate_storage(storage_)
+
+        this_template = Template.query.filter_by(storage=storage).first()
+
+        Storage_ = self.get_storage(this_template)
+
+        # features = Storage_.query(func.ST_Intersects(geometry, 4)).all()
+
+        point = str('SRID=4326;POINT(%s)' % geometry)
+
+        features = db.session.execute(db.select([Storage_]).select_from(Storage_).where(func.ST_Intersects(point, Storage_.geometry))).fetchall()
+
+        return features
 
     def feature_attachments(self, child_table, content, parent_id, assoc_):
       """
