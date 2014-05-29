@@ -17,6 +17,7 @@ Import Python Dependencies
 import boto
 import json
 import os.path
+import uuid
 
 from datetime import datetime
 from uuid import uuid4
@@ -57,8 +58,6 @@ from CommonsCloudAPI.extensions import status as status_
 from CommonsCloudAPI.utilities.geometry import ST_GeomFromGeoJSON
 
 from CommonsCloudAPI.signals import trigger_feature_created
-
-
 
 """
 is_public allows us to check if feature collections are supposed to public, if
@@ -285,11 +284,6 @@ class Feature(CommonsModel):
 
         if not hasattr(feature, 'id'):
             return abort(404)
-
-        if this_template.is_geospatial and feature.geometry is not None:
-          the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
-
-          feature.geometry = json.loads(the_geometry)
 
         return feature
 

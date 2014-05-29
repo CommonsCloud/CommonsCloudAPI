@@ -58,6 +58,9 @@ from CommonsCloudAPI.format.format_csv import CSV
 from CommonsCloudAPI.format.format_geojson import GeoJSON
 from CommonsCloudAPI.format.format_json import JSON
 
+from geoalchemy2.elements import WKBElement
+import geoalchemy2.functions as func
+
 
 class CommonsModel(object):
 
@@ -85,9 +88,21 @@ class CommonsModel(object):
 
       result = OrderedDict()
 
+      to_geojson = func.ST_AsGeoJSON
+      to_json = json.loads
+      use_scalar = db.session.scalar
+
       for key in _content.__mapper__.c.keys():
-        if key in self.__public__:
-          result[key] = getattr(_content, key)
+        value = getattr(_content, key)
+        if key in self.__public__ and value is not None:
+          if isinstance(value, WKBElement):
+            if db.session is not None:
+              geojson = str(use_scalar(to_geojson(value, 4)))
+              result[key] = to_json(geojson)
+            else:
+              result[key] = str(value)
+          else:
+            result[key] = str(getattr(_content, key))
 
       return result
 
