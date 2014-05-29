@@ -58,29 +58,29 @@ class Action(db.Model):
 
 def execute_notification(signal_type, app, **data):
 
-  if  data.storage != 'type_2c1bd72acccf416aada3a6824731acc9':
-    logger.debug('No notification present for this condition')
-    return {}
+  # if hasattr(d) data.storage != 'type_2c1bd72acccf416aada3a6824731acc9':
+  #   logger.debug('No notification present for this condition')
+  #   return {}
 
-  logger.debug('Notification Executed from %s, with %s containing data %s', signal_type, app, dir(data))
+  # logger.debug('Notification Executed from %s, with %s containing data %s', signal_type, app, dir(data))
 
-  # @todo
-  #
-  # 1. Look through the Notification table's `trigger` column for the
-  #    `signal_type` that we've identified above
-  #
-  # 2. Once Notifications have been found ensure they meet the `condition`
-  #    requirements
+  # # @todo
+  # #
+  # # 1. Look through the Notification table's `trigger` column for the
+  # #    `signal_type` that we've identified above
+  # #
+  # # 2. Once Notifications have been found ensure they meet the `condition`
+  # #    requirements
 
-  options = {
-    "subject": "Your report was submitted",
-    "recipient": "Joshua Powell <joshua@viableindustries.com>",
-    "sender": "WaterReporter <report@waterreporter.org>",
-    "template": 'waterreporter_citizen',
-    "data": data
-  }
+  # options = {
+  #   "subject": "Your report was submitted",
+  #   "recipient": "Joshua Powell <joshua@viableindustries.com>",
+  #   "sender": "WaterReporter <report@waterreporter.org>",
+  #   "template": 'waterreporter_citizen',
+  #   "data": data
+  # }
 
-  send_notification_email(**options)
+  # send_notification_email(**options)
 
   return {}
 
