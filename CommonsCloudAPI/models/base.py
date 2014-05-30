@@ -142,19 +142,17 @@ class CommonsModel(object):
         else:
           logger.warning('object_.keys() %s', object_.keys())
           for key in object_.keys():
-            value = getattr(object_, key)
-            if key in self.__public__:
-              if isinstance(value, WKBElement):
-                if db.session is not None:
-                  geojson = str(use_scalar(to_geojson(value, 4)))
-                  result[key] = to_json(geojson)
+            if hasattr(object_, key):
+              value = getattr(object_, key)
+              if key in self.__public__:
+                if isinstance(value, WKBElement):
+                  if db.session is not None:
+                    geojson = str(use_scalar(to_geojson(value, 4)))
+                    result[key] = to_json(geojson)
+                  else:
+                    result[key] = str(value)
                 else:
-                  result[key] = str(value)
-              else:
-                result[key] = str(getattr(object_, key))
-            # if key in self.__public__:
-            #   result[key] = getattr(object_, key)
-              # result[key] = object_.get(key)
+                  result[key] = str(getattr(object_, key))
 
         list_.append(result)
 
