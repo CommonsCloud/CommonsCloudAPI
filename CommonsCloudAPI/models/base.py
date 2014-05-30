@@ -148,10 +148,12 @@ class CommonsModel(object):
                 logger.warning('process that geometry')
                 if isinstance(value, WKBElement) and db.session is not None:
                   geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
-                else:
+                  result[key] = json.loads(geojson)
+                elif isinstance(value, str):
                   geojson = value
-
-                result[key] = json.loads(geojson)
+                  result[key] = json.loads(geojson)
+                else:
+                  result[key] = value
               elif isinstance(value, (int, long, float, complex)):
                 result[key] = value
               else:
