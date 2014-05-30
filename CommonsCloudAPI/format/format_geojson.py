@@ -80,8 +80,8 @@ class GeoJSON(FormatContent):
             'geometry': feature.get('geometry', None),
             'id': feature.get('id', None)
           }
-
-          features.append(Feature(**arguments))
+          this_feature = Feature(**arguments)
+          features.append(this_feature)
 
           arguments = {
             'properties': self.extras
