@@ -204,7 +204,14 @@ class Feature(CommonsModel):
         for field_ in content_:
           if field_ in relationships:
             assoc_ = self._feature_relationship_associate(Template_, field_)
-        
+
+            logger.warning('%s', type(content_.get(field_, None)))
+
+            # @todo
+            #
+            # Check to see if the values being passed are a list or a dictionary
+            #
+
             details = {
               "parent_id": new_feature.id,
               "child_table": field_,
@@ -580,9 +587,6 @@ class Feature(CommonsModel):
            create it before we save it to the assocation table
       """
       logger.warning('content %s', type(content))
-
-      if content is unicode:
-        content = [ item.encode('ascii') for item in ast.literal_eval(content) ]
 
       for child_feature in content:
         if 'id' in child_feature:
