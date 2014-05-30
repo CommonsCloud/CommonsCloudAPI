@@ -149,13 +149,10 @@ class CommonsModel(object):
                 if isinstance(value, WKBElement) and db.session is not None:
                   geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
                   result[key] = json.loads(geojson)
-                elif isinstance(value, str):
-                  if db.session.scalar(func.ST_IsValid(json.loads(value), 4)):
-                    result[key] = json.loads(value)
-                elif isinstance(value, dict):
+                elif isinstance(value, str) and value is not None:
+                  result[key] = json.loads(value)
+                elif isinstance(value, dict) and value is not None:
                   result[key] = value
-                else:
-                  result[key] = None
               elif isinstance(value, int):
                 result[key] = int(value)
               elif isinstance(value, float):
