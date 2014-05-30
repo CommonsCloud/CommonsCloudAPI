@@ -164,6 +164,7 @@ class Feature(CommonsModel):
         if request_object.data:
           content_ = json.loads(request_object.data)
         elif request_object.form:
+          logger.warning("request_object.form['data'] %s", request_object.form['data'])
           content_ = json.loads(request_object.form['data'])
         else:
           logger.error('A request was submitted to %s with no data', storage)
@@ -472,7 +473,7 @@ class Feature(CommonsModel):
             #         attachment and the new feature
             #
             new_feature_attachments = self.feature_attachments(**details)
-              
+
       return self.feature_get(storage_, feature_id)
 
     def feature_statistic(self, storage_):
