@@ -171,17 +171,6 @@ class Feature(CommonsModel):
           content_ = request_object.form
           logger.warning("request_object.form %s", request_object.form)
 
-            # logger.warning("request_object %s", dir(request_object))
-        # if hasattr(request_object, 'form'):
-        #   content_ = request_object.form
-        #   logger.warning("request_object.form %s", request_object.form)
-        # elif hasattr(request_object, 'data'):
-        #   content_ = json.loads(request_object.data)
-        #   logger.warning("request_object.data %s", dir(request_object.data))
-        # else:
-        #   logger.error('A request was submitted to %s with no data', storage)
-        #   return status_.status_400('No data was submitted with your request'), 400
-        
         new_content = {}
         
         for field_ in content_.keys():
@@ -589,6 +578,8 @@ class Feature(CommonsModel):
       [el] Else we are assuming that the child doesn't exist and we need to
            create it before we save it to the assocation table
       """
+      logger.warning('content %s', type(content))
+
       for child_feature in content:
         if 'id' in child_feature:
           relationship_ = Storage_(parent_id=parent_id, child_id=child_feature['id'])
