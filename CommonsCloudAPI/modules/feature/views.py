@@ -73,7 +73,7 @@ def feature_list(oauth_request, storage, extension, is_public):
         'current_page': feature_list.get('page'),
         'total_pages': feature_list.get('total_pages'),
         'total_features': feature_list.get('num_results'),
-        'features_per_page': int(results_per_page) or 25,
+        'features_per_page': results_per_page or 25,
         'statistics': feature_statistics
     }
 
