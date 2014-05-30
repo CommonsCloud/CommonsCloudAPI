@@ -161,9 +161,9 @@ class Feature(CommonsModel):
         """
         Setup the request object so that we can work with it
         """
-        if request_object.data:
+        if hasattr(request_object, data):
           content_ = json.loads(request_object.data)
-        elif request_object.form:
+        elif hasattr(request_object, form):
           content_ = request_object.form
           logger.warning("request_object.form %s", request_object.form)
         else:
