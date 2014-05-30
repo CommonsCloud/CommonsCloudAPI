@@ -163,6 +163,7 @@ class Feature(CommonsModel):
         """
         logger.warning("request_object %s", dir(request_object))
         if hasattr(request_object, 'data'):
+          logger.warning("request_object.data %s", dir(request_object.data))
           content_ = json.loads(request_object.data)
         elif hasattr(request_object, 'form'):
           content_ = request_object.form
