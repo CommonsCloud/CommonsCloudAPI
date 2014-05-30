@@ -210,7 +210,9 @@ class Feature(CommonsModel):
             if type(content_.get(field_, None)) is not list:
               logger.warning('We need to do something else with this value %s', type(content_.get(field_, None)))
               list_of_relationships = json.loads(content_.get(field_, None))
-              logger.warning('We updated it to %s', list_of_relationships)
+              logger.warning('We updated it to %s', type(list_of_relationships))
+            else:
+              list_of_relationships = content_.get(field_, None)
 
             # @todo
             #
@@ -220,7 +222,7 @@ class Feature(CommonsModel):
             details = {
               "parent_id": new_feature.id,
               "child_table": field_,
-              "content": content_.get(field_, None),
+              "content": list_of_relationships,
               "assoc_": assoc_
             }
         
