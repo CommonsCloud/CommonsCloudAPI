@@ -209,6 +209,8 @@ class Feature(CommonsModel):
 
             if type(content_.get(field_, None)) is not list:
               logger.warning('We need to do something else with this value %s', type(content_.get(field_, None)))
+              list_of_relationships = json.loads(content_.get(field_, None))
+              logger.warning('We updated it to %s', list_of_relationships)
 
             # @todo
             #
