@@ -77,7 +77,7 @@ class GeoJSON(FormatContent):
               properties[property_] = feature[property_]
 
           arguments = {
-            'geometry': feature.get('geometry', None),
+            'geometry': feature.get('geometry', "null"),
             'id': feature.get('id', None),
             'properties': properties
           }
