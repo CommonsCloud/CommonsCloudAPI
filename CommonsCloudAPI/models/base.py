@@ -141,6 +141,7 @@ class CommonsModel(object):
               result[key] = getattr(object_, key)
         else:
           logger.warning('object_.keys() %s', object_.keys())
+          logger.warning('object_ %s', object_)
           for key in object_.keys():
             if hasattr(object_, key):
               value = getattr(object_, key)
