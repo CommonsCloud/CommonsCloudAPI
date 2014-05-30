@@ -85,7 +85,7 @@ class GeoJSON(FormatContent):
           try:
             this_feature = Feature(**arguments)
           except Exception, e:
-            logger.warning("Couldn't create object for GeoJSON %s", feature.get('id', None))
+            logger.warning("Couldn't create object for GeoJSON %s > %s", feature.get('id', None), **arguments)
             this_feature = None
 
           features.append(this_feature)
