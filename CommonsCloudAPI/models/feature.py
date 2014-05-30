@@ -161,16 +161,23 @@ class Feature(CommonsModel):
         """
         Setup the request object so that we can work with it
         """
-        logger.warning("request_object %s", dir(request_object))
-        if hasattr(request_object, 'form'):
-          content_ = request_object.form
-          logger.warning("request_object.form %s", request_object.form)
-        elif hasattr(request_object, 'data'):
+        try:
           content_ = json.loads(request_object.data)
           logger.warning("request_object.data %s", dir(request_object.data))
-        else:
-          logger.error('A request was submitted to %s with no data', storage)
-          return status_.status_400('No data was submitted with your request'), 400
+        except ValueError, e:
+          content_ = request_object.form
+          logger.warning("request_object.form %s", request_object.form)
+
+            # logger.warning("request_object %s", dir(request_object))
+        # if hasattr(request_object, 'form'):
+        #   content_ = request_object.form
+        #   logger.warning("request_object.form %s", request_object.form)
+        # elif hasattr(request_object, 'data'):
+        #   content_ = json.loads(request_object.data)
+        #   logger.warning("request_object.data %s", dir(request_object.data))
+        # else:
+        #   logger.error('A request was submitted to %s with no data', storage)
+        #   return status_.status_400('No data was submitted with your request'), 400
         
         new_content = {}
         
