@@ -169,27 +169,20 @@ class Feature(CommonsModel):
         else:
           logger.error('A request was submitted to %s with no data', storage)
           return status_.status_400('No data was submitted with your request'), 400
-
-        """
-        Check for a geometry and if it exists, we need to add a new geometry
-        key to the content_ dictionary
-        """
-        geometry_ = content_.get('geometry', None)
-        if geometry_ is not None:
-            content_['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
-        
-        """
-        Set our created and status attributes based on user input or at least
-        setup the default
-        """
-        content_['created'] = content_.get('created', datetime.now())
-        content_['status'] = content_.get('status', 'public')
         
         new_content = {}
         
         for field_ in content_:
           logger.warning('Processing Field %s', field_)
-          if field_ not in relationships and field_ not in attachments:
+          if field_ == 'geometry':
+            geometry_ = content_.get('geometry', None)
+            if geometry_ is not None:
+                new_content['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
+          elif field_ == 'created':
+            new_content['created'] = content_.get('created', datetime.now())
+          elif field_ == 'status':
+            new_content['status'] = content_.get('status', 'public')
+          elif field_ not in relationships and field_ not in attachments:
             new_content[field_] = content_.get(field_, None)
         
         """
