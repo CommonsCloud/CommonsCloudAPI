@@ -188,6 +188,7 @@ class Feature(CommonsModel):
         new_content = {}
         
         for field_ in content_:
+          logger.warning('Processing Field %s', field_)
           if field_ not in relationships and field_ not in attachments:
             new_content[field_] = content_.get(field_, None)
         
