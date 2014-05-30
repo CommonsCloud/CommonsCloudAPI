@@ -33,6 +33,7 @@ Import CommonsCloudAPI Dependencies
 from . import FormatContent
 
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 
 
 """
