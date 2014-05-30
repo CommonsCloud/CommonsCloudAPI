@@ -172,7 +172,7 @@ class Feature(CommonsModel):
         
         new_content = {}
         
-        for field_ in content_:
+        for field_ in content_.keys():
           logger.warning('Processing Field %s', field_)
           if field_ == 'geometry':
             geometry_ = content_.get('geometry', None)
