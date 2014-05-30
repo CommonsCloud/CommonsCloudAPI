@@ -144,15 +144,9 @@ class CommonsModel(object):
             logger.warning('value %s', value)
             if key in self.__public__:
               logger.warning('value type %s for key %s', type(value), key)
-              if key == 'geometry' and isinstance(value, (str, WKBElement, dict)):
+              if key == 'geometry':
                 logger.warning('process that geometry')
-                if isinstance(value, WKBElement) and db.session is not None:
-                  geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
-                  result[key] = json.loads(geojson)
-                elif isinstance(value, str) and value is not None:
-                  result[key] = json.loads(value)
-                elif isinstance(value, dict) and value is not None:
-                  result[key] = value
+                result[key] = value
               elif isinstance(value, int):
                 result[key] = int(value)
               elif isinstance(value, float):
