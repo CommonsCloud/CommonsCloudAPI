@@ -52,6 +52,7 @@ from flask.ext.restless.helpers import to_dict
 Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.format.format_csv import CSV
