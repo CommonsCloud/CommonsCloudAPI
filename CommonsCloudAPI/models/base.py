@@ -150,7 +150,7 @@ class CommonsModel(object):
                   geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
                   result[key] = json.loads(geojson)
                 elif isinstance(value, str):
-                  if db.session.scalar(func.ST_IsValid(json.loads(value), 4))):
+                  if db.session.scalar(func.ST_IsValid(json.loads(value), 4)):
                     result[key] = json.loads(value)
                 elif isinstance(value, dict):
                   result[key] = value
