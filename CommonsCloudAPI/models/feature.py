@@ -14,6 +14,7 @@ limitations under the License.
 """
 Import Python Dependencies
 """
+import ast
 import boto
 import json
 import os.path
@@ -579,6 +580,9 @@ class Feature(CommonsModel):
            create it before we save it to the assocation table
       """
       logger.warning('content %s', type(content))
+
+      if content is unicode:
+        content = [ item.encode('ascii') for item in ast.literal_eval(content) ]
 
       for child_feature in content:
         if 'id' in child_feature:
