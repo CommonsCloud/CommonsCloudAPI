@@ -23,7 +23,6 @@ Import Flask Dependencies
 """
 from flask import jsonify
 
-from geojson import dumps
 from geojson import Feature
 from geojson import FeatureCollection
 
@@ -78,10 +77,11 @@ class GeoJSON(FormatContent):
 
           arguments = {
             'geometry': feature.get('geometry', None),
-            'id': feature.get('id', None)
+            'id': feature.get('id', None),
+            'properties': properties
           }
-          this_feature = Feature(**arguments)
-          features.append(this_feature)
+
+          features.append(Feature(**arguments))
 
           arguments = {
             'properties': self.extras

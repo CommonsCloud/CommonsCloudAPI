@@ -129,7 +129,7 @@ class CommonsModel(object):
 
       for object_ in _content:
 
-        result = OrderedDict()
+        result = {}
 
         if hasattr(object_, '__mapper__'):
           for key in object_.__mapper__.c.keys():
@@ -626,8 +626,6 @@ class CommonsModel(object):
       return this_data.create(), code
 
     elif (extension == 'geojson'):
-
-      logger.warning('the_content %s', the_content)
 
       this_data = GeoJSON(the_content, list_name=list_name, exclude_fields=exclude_fields, **extras)
       return this_data.create(), code
