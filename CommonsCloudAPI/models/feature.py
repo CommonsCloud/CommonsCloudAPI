@@ -175,20 +175,21 @@ class Feature(CommonsModel):
         new_content = {}
         
         for field_ in content_.keys():
-          if field_ == 'geometry':
-            logger.warning('Processing Field (geometry) %s', field_)
-            geometry_ = content_.get('geometry', None)
-            if geometry_ is not None:
-                new_content['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
-          elif field_ == 'created':
-            logger.warning('Processing Field (created) %s', field_)
-            new_content['created'] = content_.get('created', datetime.now())
-          elif field_ == 'status':
-            logger.warning('Processing Field (status) %s', field_)
-            new_content['status'] = content_.get('status', 'public')
-          elif field_ not in relationships and field_ not in attachments:
-            logger.warning('Processing Field (other) %s', field_)
-            new_content[field_] = content_.get(field_, None)
+          if field_ in content_.keys():
+            if field_ == 'geometry':
+              logger.warning('Processing Field (geometry) %s', field_)
+              geometry_ = content_.get('geometry', None)
+              if geometry_ is not None:
+                  new_content['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
+            elif field_ == 'created':
+              logger.warning('Processing Field (created) %s', field_)
+              new_content['created'] = content_.get('created', datetime.now())
+            elif field_ == 'status':
+              logger.warning('Processing Field (status) %s', field_)
+              new_content['status'] = content_.get('status', 'public')
+            elif field_ not in relationships and field_ not in attachments:
+              logger.warning('Processing Field (other) %s', field_)
+              new_content[field_] = content_.get(field_, None)
         
         """
         Create the new feature and save it to the database
