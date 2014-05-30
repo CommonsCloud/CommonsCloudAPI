@@ -207,7 +207,7 @@ class Feature(CommonsModel):
 
             logger.warning('%s', type(content_.get(field_, None)))
 
-            if content_.get(field_, None) is not list:
+            if type(content_.get(field_, None)) is not list:
               logger.warning('We need to do something else with this value %s', type(content_.get(field_, None)))
 
             # @todo
