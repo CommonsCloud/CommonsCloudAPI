@@ -43,31 +43,6 @@ def features_single_preflight(storage, feature_id, extension):
 def features_relationship_preflight(storage, feature_id, relationship, extension):
     return status_.status_200(), 200
 
-
-@module.route('/v2/type_<string:storage>/intersects.<string:extension>', methods=['GET'])
-@is_public()
-@oauth.oauth_or_public()
-def feature_intersects(oauth_request, storage, extension, is_public):
-
-    geometry = request.args.get('geometry')
-    results_per_page = request.args.get('results_per_page')
-
-    Feature_ = Feature()
-    Feature_.current_user = oauth_request.user
-    feature_list = Feature_.feature_get_intersection(storage, geometry)
-
-    if type(feature_list) is tuple:
-        return feature_list
-
-    arguments = {
-        'the_content': feature_list,
-        'list_name': 'features',
-        'extension': extension
-    }
-
-    return Feature_.endpoint_response(**arguments)
-
-
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()
@@ -203,3 +178,26 @@ def feature_delete(oauth_request, storage, feature_id, extension):
         return status_.status_204(), 204
     except Exception as e:
         return status_.status_500(e), 500
+
+@module.route('/v2/type_<string:storage>/intersects.<string:extension>', methods=['GET'])
+@is_public()
+@oauth.oauth_or_public()
+def feature_intersects(oauth_request, storage, extension, is_public):
+
+    geometry = request.args.get('geometry')
+    results_per_page = request.args.get('results_per_page')
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    feature_list = Feature_.feature_get_intersection(storage, geometry)
+
+    if type(feature_list) is tuple:
+        return feature_list
+
+    arguments = {
+        'the_content': feature_list,
+        'list_name': 'features',
+        'extension': extension
+    }
+
+    return Feature_.endpoint_response(**arguments)
