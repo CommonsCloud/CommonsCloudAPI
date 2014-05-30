@@ -14,6 +14,9 @@ limitations under the License.
 """
 Import Flask dependencies
 """
+
+from werkzeug.exceptions import BadRequestKeyError
+
 from flask import render_template
 
 from CommonsCloudAPI.extensions import logger
@@ -62,6 +65,12 @@ def load_errorhandlers(app):
     logger.error('Error 405, %s', error)
     logger.exception(error)
     return status_.status_405(), 405
+
+  @app.errorhandler(BadRequestKeyError)
+  def internal_error(error):
+    logger.error('BadRequestKeyError, %s', error)
+    logger.exception(error)
+    return status_.status_400(), 400
 
   @app.errorhandler(InvalidScopeError)
   def internal_error(error):

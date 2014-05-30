@@ -420,6 +420,59 @@ class Feature(CommonsModel):
       
           new_feature_relationships = self.feature_relationships(**details)
 
+      """
+      Saving attachments
+      """
+      for attachment in attachments:
+
+        assoc_ = self._feature_relationship_associate(Template_, attachment)
+        Attachment_ = self.get_storage(str(attachment))
+
+        field_attachments = request_object.files.getlist(attachment)
+
+        for file_ in field_attachments:
+      
+          if file_ and self.allowed_file(file_.filename):
+
+            output = self.s3_upload(file_)
+
+            # There's two steps to get a file related to the feature.
+            #
+            # Step 1: Create a record in the attachment_ so that we have
+            #         an ID for our attachment
+            #              
+            attachment_details = {
+              'caption': sanitize.sanitize_string(''),
+              'credit': sanitize.sanitize_string(''),
+              'credit_link': sanitize.sanitize_string(''),
+              'filename': sanitize.sanitize_string(file_.filename),
+              'filepath': output,
+              'filetype': sanitize.sanitize_string(file_.mimetype),
+              'filesize': file_.content_length,
+              'created': datetime.now(),
+              'status': 'public',
+            }
+            
+            new_attachment = Attachment_(**attachment_details)
+            db.session.add(new_attachment)
+            db.session.commit()
+
+            #
+            # Step 2: Take that Attachment ID and pass it along in the
+            #         `details` dictionary
+            details = {
+              "parent_id": feature_id,
+              "child_table": attachment,
+              "content": new_attachment.id,
+              "assoc_": assoc_
+            }
+
+            #
+            # Step 3: Finally, we create the relationship between the new
+            #         attachment and the new feature
+            #
+            new_feature_attachments = self.feature_attachments(**details)
+              
       return self.feature_get(storage_, feature_id)
 
     def feature_statistic(self, storage_):
