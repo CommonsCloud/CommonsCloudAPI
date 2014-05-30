@@ -149,7 +149,7 @@ class CommonsModel(object):
                   result[key] = json.loads(geojson)
                 else:
                   result[key] = str(value)
-              elif isinstance(value, (int, long, float, complex))
+              elif isinstance(value, (int, long, float, complex)):
                 result[key] = value
               else:
                 result[key] = str(value)
