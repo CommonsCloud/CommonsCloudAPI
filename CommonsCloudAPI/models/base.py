@@ -127,10 +127,6 @@ class CommonsModel(object):
 
       list_ = []
 
-      to_geojson = func.ST_AsGeoJSON
-      to_json = json.loads
-      use_scalar = db.session.scalar
-
       for object_ in _content:
 
         result = OrderedDict()
@@ -142,14 +138,15 @@ class CommonsModel(object):
         else:
           logger.warning('object_.keys() %s', object_.keys())
           logger.warning('object_ %s', object_)
+          logger.warning('public keys %s', self.__public__)
           for key in object_.keys():
             if hasattr(object_, key):
               value = getattr(object_, key)
               if key in self.__public__:
                 if isinstance(value, WKBElement):
                   if db.session is not None:
-                    geojson = str(use_scalar(to_geojson(value, 4)))
-                    result[key] = to_json(geojson)
+                    geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
+                    result[key] = json.loads(geojson)
                   else:
                     result[key] = str(value)
                 else:
