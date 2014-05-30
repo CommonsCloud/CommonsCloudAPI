@@ -164,8 +164,8 @@ class Feature(CommonsModel):
         if request_object.data:
           content_ = json.loads(request_object.data)
         elif request_object.form:
-          logger.warning("%s %s", type(content_), request_object.form)
           content_ = request_object.form
+          logger.warning("%s %s", type(content_), request_object.form)
         else:
           logger.error('A request was submitted to %s with no data', storage)
           return status_.status_400('No data was submitted with your request'), 400
