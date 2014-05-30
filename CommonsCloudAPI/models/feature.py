@@ -156,7 +156,10 @@ class Feature(CommonsModel):
         Relationships and Attachments
         """
         attachments = self._get_fields_of_type(Template_, 'file')
+        logger.warning("attachments %s", attachments)
+
         relationships = self._get_fields_of_type(Template_, 'relationship')
+        logger.warning("relationships %s", relationships)
 
         """
         Setup the request object so that we can work with it
