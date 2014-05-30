@@ -68,7 +68,7 @@ class GeoJSON(FormatContent):
 
         features = []
 
-        for feature in self.the_content.iteritems():
+        for feature in self.the_content:
 
           properties = {}
 
@@ -93,7 +93,7 @@ class GeoJSON(FormatContent):
 
         properties = {}
 
-        for property_ in self.the_content.iteritems():
+        for property_ in self.the_content:
           if property_ != 'geometry':
             properties[property_] = self.the_content[property_]
 
