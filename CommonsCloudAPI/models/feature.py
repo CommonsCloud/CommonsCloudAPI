@@ -183,7 +183,7 @@ class Feature(CommonsModel):
               logger.warning('geometry type %s', type(geometry_))
               if type(geometry_) is unicode:
                 convert_geometry = ST_GeomFromGeoJSON(json.dumps(str(geometry_)))
-                logger.warning('unicode conversion %s', convert_geometry)
+                logger.warning('unicode conversion %s', json.dumps(geometry_))
               else:
                 new_content['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
                 logger.warning('other conversion %s', new_content['geometry'])
