@@ -184,8 +184,9 @@ class Feature(CommonsModel):
               logger.warning('json.loads(str(geometry_)) %s', json.loads(str(geometry_)))
               logger.warning('json.dumps(geometry_) %s', json.dumps(geometry_))
               logger.warning('json.dumps(str(geometry_)) %s', json.dumps(str(geometry_)))
-              logger.warning('ST_GeomFromGeoJSON(json.loads(geometry_)) %s', ST_GeomFromGeoJSON(json.loads(geometry_)))
-              logger.warning('db.session.scalar(ST_GeomFromGeoJSON(json.loads(geometry_))) %s', db.session.scalar(ST_GeomFromGeoJSON(json.loads(geometry_))))
+              logger.warning('ST_GeomFromGeoJSON(geometry_) %s', ST_GeomFromGeoJSON(geometry_))
+              # logger.warning('ST_GeomFromGeoJSON(json.loads(geometry_)) %s', ST_GeomFromGeoJSON(json.loads(geometry_)))
+              # logger.warning('db.session.scalar(ST_GeomFromGeoJSON(json.loads(geometry_))) %s', db.session.scalar(ST_GeomFromGeoJSON(json.loads(geometry_))))
               new_content['geometry'] = ST_GeomFromGeoJSON(json.loads(geometry_))
           elif field_ == 'created':
             logger.warning('Processing Field (created) %s', field_)
