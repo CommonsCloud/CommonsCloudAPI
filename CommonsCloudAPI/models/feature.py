@@ -179,6 +179,7 @@ class Feature(CommonsModel):
             logger.warning('Processing Field (geometry) %s', field_)
             geometry_ = content_.get('geometry', None)
             if geometry_ is not None:
+              logger.warning('geometry_ %s', geometry_)
               logger.warning('json.loads(geometry_) %s', json.loads(geometry_))
               logger.warning('json.loads(str(geometry_)) %s', json.loads(str(geometry_)))
               logger.warning('json.dumps(geometry_) %s', json.dumps(geometry_))
