@@ -178,9 +178,10 @@ class Feature(CommonsModel):
           if field_ == 'geometry':
             logger.warning('Processing Field (geometry) %s', field_)
             geometry_ = content_.get('geometry', None)
+            logger.warning('geometry type %s', type(geometry_))
             if geometry_ is not None:
               logger.warning('geometry type %s', type(geometry_))
-                new_content['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
+              new_content['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
           elif field_ == 'created':
             logger.warning('Processing Field (created) %s', field_)
             new_content['created'] = content_.get('created', datetime.now())
