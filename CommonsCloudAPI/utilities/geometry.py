@@ -19,3 +19,4 @@ from geoalchemy2.functions import GenericFunction
 
 class ST_GeomFromGeoJSON(GenericFunction):
     name = 'ST_GeomFromGeoJSON'
+    type = Geometry

@@ -178,15 +178,8 @@ class Feature(CommonsModel):
           if field_ == 'geometry':
             logger.warning('Processing Field (geometry) %s', field_)
             geometry_ = content_.get('geometry', None)
-            logger.warning('geometry type %s', type(geometry_))
             if geometry_ is not None:
-              logger.warning('geometry type %s', type(geometry_))
-              if type(geometry_) is unicode:
-                new_content['geometry'] = db.session.scalar(ST_GeomFromGeoJSON(json.dumps(str(geometry_))))
-                logger.warning('unicode conversion %s', new_content['geometry'])
-              else:
-                new_content['geometry'] = ST_GeomFromGeoJSON(json.loads(geometry_))
-                logger.warning('other conversion %s', new_content['geometry'])
+                new_content['geometry'] = ST_GeomFromGeoJSON(json.dumps(geometry_))
           elif field_ == 'created':
             logger.warning('Processing Field (created) %s', field_)
             new_content['created'] = content_.get('created', datetime.now())
