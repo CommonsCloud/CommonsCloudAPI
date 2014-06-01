@@ -34,8 +34,8 @@ class Notification(db.Model):
   label = db.Column(db.String(255))
   signal = db.Column(db.String(255))
   application = db.Column(db.Integer, db.ForeignKey('application.id'))
-  conditions = db.relationship('Condition', backref=db.backref("notification", cascade="all,delete"))
-  actions = db.relationship('Action', backref=db.backref("notification", cascade="all,delete"))
+  conditions = db.relationship('Condition', backref=db.backref('notification'), cascade="all,delete")
+  actions = db.relationship('Action', backref=db.backref('notification'), cascade="all,delete")
 
 
 class Condition(db.Model):
