@@ -33,6 +33,7 @@ class Notification(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   label = db.Column(db.String(255))
   signal = db.Column(db.String(255))
+  application = db.Column(db.Integer, db.ForeignKey('application.id'))
   conditions = db.relationship('Condition', backref=db.backref("condition", cascade="all,delete"))
   actions = db.relationship('Action', backref=db.backref("action", cascade="all,delete"))
 
