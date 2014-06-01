@@ -34,8 +34,8 @@ class Notification(db.Model):
   label = db.Column(db.String(255))
   signal = db.Column(db.String(255))
   application = db.Column(db.Integer, db.ForeignKey('application.id'))
-  conditions = db.relationship('Condition', backref=db.backref("condition", cascade="all,delete"))
-  actions = db.relationship('Action', backref=db.backref("action", cascade="all,delete"))
+  conditions = db.relationship('Condition', backref=db.backref("notification", cascade="all,delete"))
+  actions = db.relationship('Action', backref=db.backref("notification", cascade="all,delete"))
 
 
 class Condition(db.Model):
@@ -70,6 +70,10 @@ class Action(db.Model):
 def execute_notification(signal_type, app, **data):
 
   # 1. Get a list of Notifications that match the `signal_type`
+  notifications = Notification.query.all()
+
+  for notification in notifications:
+    logger.warning(notification.label)
 
   # 2. Loop over Notifications 
 
