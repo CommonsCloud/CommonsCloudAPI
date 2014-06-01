@@ -55,21 +55,21 @@ trigger_feature_created = signals.signal("feature-created")
 trigger_feature_updated = signals.signal("feature-updated")
 trigger_feature_deleted = signals.signal("feature-deleted")
 
-def action_feature_created(app, **data):
+def _trigger_feature_created(app, **data):
     logger.warning('SIGNAL: capture_feature_created')
     execute_notification('feature-created', app, **data)
 
-def action_feature_updated(app, **data):
+def _trigger_feature_updated(app, **data):
     logger.warning('SIGNAL: action_feature_updated')
     # feature_created.append(data)
 
-def action_feature_deleted(app, **data):
+def _trigger_feature_deleted(app, **data):
     logger.warning('SIGNAL: action_feature_deleted')
     # feature_created.append(data)
 
-trigger_feature_created.connect(action_feature_created)
-trigger_feature_updated.connect(action_feature_updated)
-trigger_feature_deleted.connect(action_feature_deleted)
+trigger_feature_created.connect(_trigger_feature_created)
+trigger_feature_updated.connect(_trigger_feature_updated)
+trigger_feature_deleted.connect(_trigger_feature_deleted)
 
 
 """

@@ -31,7 +31,10 @@ class Notification(db.Model):
   }
 
   id = db.Column(db.Integer, primary_key=True)
-  trigger = db.Column(db.String(255))
+  label = db.Column(db.String(255))
+  signal = db.Column(db.String(255))
+  conditions = db.relationship('Condition', backref=db.backref("condition", cascade="all,delete"))
+  actions = db.relationship('Action', backref=db.backref("action", cascade="all,delete"))
 
 
 class Condition(db.Model):
@@ -42,7 +45,11 @@ class Condition(db.Model):
   }
 
   id = db.Column(db.Integer, primary_key=True)
-  condition = db.Column(db.String(255))
+  label = db.Column(db.String(255))
+  name = db.Column(db.String(255))
+  operator = db.Column(db.String(255))
+  value = db.Column(db.String(255))
+  notification = db.Column(db.Integer, db.ForeignKey('notification.id'))
 
 
 class Action(db.Model):
@@ -53,10 +60,28 @@ class Action(db.Model):
   }
 
   id = db.Column(db.Integer, primary_key=True)
+  label = db.Column(db.String(255))
   action = db.Column(db.String(255)) # send_notification_email, etc. An actual python method would be preferrable
+  options = db.Column(db.Text)
+  notification = db.Column(db.Integer, db.ForeignKey('notification.id'))
 
 
 def execute_notification(signal_type, app, **data):
+
+  # 1. Get a list of Notifications that match the `signal_type`
+
+  # 2. Loop over Notifications 
+
+  # 3. Get all conditions that match this Notification
+
+  # 4. Loop over conditions and execute each
+
+  # 5. If ALL return true, then get all Actions matching this Notification
+
+    # 6. Loop over Actions and execute each
+
+  # 7. Else just exit
+
 
   # if hasattr(d) data.storage != 'type_2c1bd72acccf416aada3a6824731acc9':
   #   logger.debug('No notification present for this condition')
@@ -84,8 +109,28 @@ def execute_notification(signal_type, app, **data):
 
   return {}
 
+def condition_storage_type(required_value, **data):
 
-def send_notification_email(subject, recipient, sender, template, **context):
+  if hasattr(data, storage):
+
+    if required_value in data.storage:
+      return True
+
+  return False
+
+
+
+"""
+Send an email notification
+
+subject (str)
+recipients (list)
+sender (str) "FirstName LastName <email@address.com>"
+template (str) Defines the html/txt template's to be used
+context (kwargs) Dictionary of data or anything else you need passed along
+
+"""
+def send_notification_email(subject, recipients, sender, template, **context):
     """Send an email via the Flask-Mail extension.
 
     :param subject: Email subject
@@ -95,7 +140,7 @@ def send_notification_email(subject, recipient, sender, template, **context):
     """
     msg = Message(subject,
                   sender=sender,
-                  recipients=[recipient])
+                  recipients=[recipients])
 
     # setattr(context, feature_details, 'grr')
 
