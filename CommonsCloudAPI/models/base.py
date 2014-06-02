@@ -146,7 +146,12 @@ class CommonsModel(object):
               logger.warning('value type %s for key %s', type(value), key)
               if key == 'geometry':
                 logger.warning('process that geometry')
-                result[key] = value
+                if isinstance(value, WKBElement):
+                  if db.session is not None:
+                    geojson = str(use_scalar(to_geojson(value, 4)))
+                    result[key] = to_json(geojson)
+                else:
+                  result[key] = value
               elif isinstance(value, int):
                 result[key] = int(value)
               elif isinstance(value, float):

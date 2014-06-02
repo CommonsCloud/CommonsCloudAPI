@@ -2,37 +2,31 @@
 
 {% block content %}
 
-<h2 style="color: #3F3A38;display: block;font-family: Helvetica, Arial, sans-serif;font-size: 24px;font-weight: bold;line-height: 100%;letter-spacing: normal;margin-top: 0;margin-right: 0;margin-bottom: 0;margin-left: 0;text-align: left;">Thanks for sharing your {{ data.feature.type_8f432efc18c545ea9578b4bdea860b4c[0].name }}!</h2>
-<br>
-<p>We emailed your report to [[ waterkeeper_name ]] from the [[ jursidiction ]]. An email just like this was sent to them as well. If you'd like can follow up by emailing them at [[ waterkeeper_email ]].</p>
+{% if data.feature.type_8f432efc18c545ea9578b4bdea860b4c: %}
+<h2 style="color: #505050;display: block;font-family: Helvetica, Arial, sans-serif;font-size: 24px;font-weight: bold;line-height: 100%;letter-spacing: normal;margin-top: 0;margin-right: 0;margin-bottom: 0;margin-left: 0;text-align: left;">Thanks for sharing your {% for report_type in data.feature.type_8f432efc18c545ea9578b4bdea860b4c: %}{{ report_type.name }}{% endfor %}</h2>
+{% endif %}
+
+<p>
+  We emailed your report to
+  {% for recipient in recipient_data %}
+    {% if loop.index == 1: %}
+      <a href="mailto:{{ recipient.email }}" title="Send an email to {{ recipient.email }}">{{ recipient.first_name }} {{ recipient.last_name }} at {{ recipient.organization }}</a>
+    {% elif loop.index > 1 and loop.length != loop.index: %}
+      , <a href="mailto:{{ recipient.email }}" title="Send an email to {{ recipient.email }}">{{ recipient.first_name }} {{ recipient.last_name }} at {{ recipient.organization }}</a>
+    {% elif loop.index > 1 and loop.length == 2: %}
+      and <a href="mailto:{{ recipient.email }}" title="Send an email to {{ recipient.email }}">{{ recipient.first_name }} {{ recipient.last_name }} at {{ recipient.organization }}</a>
+    {% elif loop.index > 1 and loop.length == loop.index: %}
+      , and <a href="mailto:{{ recipient.email }}" title="Send an email to {{ recipient.email }}">{{ recipient.first_name }} {{ recipient.last_name }} at {{ recipient.organization }}</a>
+    {% endif %}.
+  {% endfor %}
+</p>
+<p>You submitted this {% for report_type in data.feature.type_8f432efc18c545ea9578b4bdea860b4c: %}{{ report_type.name }}{% endfor %} on {{ data.feature_json.date }}. You categorized it under {% for activity_type in data.feature.type_0e9423a9a393481f82c4f22ff5954567: %}{{ activity_type.name }}{% endfor %}{% for pollution_type in data.feature.type_05a300e835024771a51a6d3114e82abc: %}{{ pollution_type.name }}{% endfor %}{% if data.feature.comments: %} and also wanted us to know "{{ data.feature.comments }}"{% endif %}.</p>
+
 <p><img src="http://api.tiles.mapbox.com/v3/developedsimple.i53fp4f1/pin-s+4db4ee({{ data.feature_json.geometry.geometries[0].coordinates[0] }},{{ data.feature_json.geometry.geometries[0].coordinates[1] }})/{{ data.feature_json.geometry.geometries[0].coordinates[0] }},{{ data.feature_json.geometry.geometries[0].coordinates[1] }},16/500x300.png" alt="" title="" /></p>
 <p style="text-align: center; padding-top:24px;padding-bottom: 16px;">
-  <a style="border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-bottom: 3px solid #09A9C2;color: white;background-color:#4db4ee;font-weight:normal;text-decoration:none;text-transform:uppercase;font-size: 13px; padding: 16px 24px;text-align: center;" href="[[ report_link ]]" target="_blank">Visit this location</a>
+  <a style="border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-bottom: 3px solid #09A9C2;color: white;background-color:#4db4ee;font-weight:normal;text-decoration:none;text-transform:uppercase;font-size: 13px; padding: 16px 24px;text-align: center;" href="https://www.google.com/maps/dir//{{ data.feature_json.geometry.geometries[0].coordinates[1] }},{{ data.feature_json.geometry.geometries[0].coordinates[0] }}/@{{ data.feature_json.geometry.geometries[0].coordinates[1] }},{{ data.feature_json.geometry.geometries[0].coordinates[0] }}" target="_blank">Visit this location</a>
+  &nbsp;&nbsp;&nbsp;
+  <a style="border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-bottom: 3px solid #00b321;color: white;background-color:#00cc26;font-weight:normal;text-decoration:none;text-transform:uppercase;font-size: 13px; padding: 16px 24px;text-align: center;" href="http://www.waterreporter.org/report/{{ data.feature.id }}" target="_blank">Review this report</a>
 </p>
-<br>
-<p>[[ activity_type ]][[ pollution_type ]]</p>
-
-{% if data.feature.comments: %}
-<p>{{ data.feature.comments }}</p>
-{% endif %}
-
-{% if data.feature.date: %}
-<p>{{ data.feature.date }}</p>
-{% endif %}
-
-<p>[[ report_image ]]</p>
-<br />
-<br />
-<!-- {{ data.storage }}
-{{ data.template }}
- -->
- <br>
-<br>
-Thanks,
-<br>
-<strong>The WaterReporter Team</strong>
-<br>
-<br>
-<br>
 
 {% endblock %}

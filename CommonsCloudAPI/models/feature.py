@@ -283,11 +283,10 @@ class Feature(CommonsModel):
               new_feature_attachments = self.feature_attachments(**details)
 
         feature_json = self.feature_get(storage, new_feature.id)
-        trigger_feature_created.send(current_app._get_current_object(),
-                             storage=storage, template=Template_, feature=new_feature, feature_json=feature_json)
         logger.info('A new feature was created in %s with an id of %d', 
             storage, new_feature.id)
-
+        trigger_feature_created.send(current_app._get_current_object(),
+                             storage=storage, template=Template_, feature=new_feature, feature_json=feature_json)
         return new_feature
 
     def feature_get(self, storage_, feature_id):
@@ -302,6 +301,11 @@ class Feature(CommonsModel):
 
         if not hasattr(feature, 'id'):
             return abort(404)
+
+        if this_template.is_geospatial and feature.geometry is not None:
+          the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
+
+          feature.geometry = json.loads(the_geometry)
 
         return feature
 
@@ -541,11 +545,23 @@ class Feature(CommonsModel):
 
         Storage_ = self.get_storage(this_template)
 
-        # features = Storage_.query(func.ST_Intersects(geometry, 4)).all()
+        if isinstance(geometry, WKBElement):
+            if db.session is not None:
+              string = str(db.session.scalar(func.ST_AsGeoJSON(geometry, 4)))
+              geojson = json.loads(string)
+              geometries = geojson.get('geometries', None)
+              coordinates = geometries[0].get('coordinates', None)
+              logger.debug('XXgeometries[0].get(coordinates, None), %s', coordinates)
+              coordinates_ = [str(coordinates[0]), str(coordinates[1])]
+              clean_geometry = ' '.join(coordinates_)
+        else:
+          clean_geometry = geometry
 
-        point = str('SRID=4326;POINT(%s)' % geometry)
+        point = str('SRID=4326;POINT(%s)' % clean_geometry)
 
-        features = db.session.execute(db.select([Storage_]).select_from(Storage_).where(func.ST_Intersects(point, Storage_.geometry))).fetchall()
+        select_statement = db.select([Storage_]).where(func.ST_Intersects(point, Storage_.geometry))
+
+        features = Storage_.query.select_entity_from(select_statement).all()
 
         return features
 
