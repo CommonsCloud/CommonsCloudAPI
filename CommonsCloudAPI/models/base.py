@@ -123,7 +123,7 @@ class CommonsModel(object):
       A dictionary of the contents of our objects
 
   """
-  def serialize_list(self, _content, document_type):
+  def serialize_list(self, _content, document_type=""):
 
       list_ = []
 
