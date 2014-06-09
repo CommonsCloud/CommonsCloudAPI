@@ -224,7 +224,7 @@ def execute_actions(actions, **data):
             copy_template = copy.get('template', None)
             copy_subject = copy.get('subject', None)
       else:
-        recipients_emailaddresses = [recipients.get('value', None)]
+        recipients_emailaddresses = [recipients.get('value', 'Error Reporter <joshua+error@viable.io>')]
         recipient_data = []
         copy_sender = None
         copy_template = None

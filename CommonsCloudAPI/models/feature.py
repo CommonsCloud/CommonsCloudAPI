@@ -311,6 +311,8 @@ class Feature(CommonsModel):
 
     def feature_get_relationship(self, storage_, feature_id, relationship):
 
+        logger.warning('%s', storage_)
+
         storage = self.validate_storage(storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()

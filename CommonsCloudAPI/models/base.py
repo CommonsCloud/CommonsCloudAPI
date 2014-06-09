@@ -123,7 +123,7 @@ class CommonsModel(object):
       A dictionary of the contents of our objects
 
   """
-  def serialize_list(self, _content):
+  def serialize_list(self, _content, document_type):
 
       list_ = []
 
@@ -141,10 +141,10 @@ class CommonsModel(object):
           logger.warning('public keys %s', self.__public__)
           for key in object_.keys():
             value = object_.get(key, None)
+            logger.warning('value type %s for key %s', type(value), key)
             logger.warning('value %s', value)
             if key in self.__public__:
-              logger.warning('value type %s for key %s', type(value), key)
-              if key == 'geometry':
+              if key == 'geometry' and document_type != 'json':
                 logger.warning('process that geometry')
                 if isinstance(value, WKBElement):
                   if db.session is not None:
@@ -156,8 +156,11 @@ class CommonsModel(object):
                 result[key] = int(value)
               elif isinstance(value, float):
                 result[key] = float(value)
+              elif isinstance(value, str):
+                result[key] = value
               else:
-                result[key] = str(value)
+                # If we can't identify the type, then we can't handle process it
+                pass
 
         list_.append(result)
 
@@ -609,7 +612,7 @@ class CommonsModel(object):
     """
     if type(the_content) is list and extension == 'json':
       the_content = {
-        list_name: self.serialize_list(the_content)
+        list_name: self.serialize_list(the_content, 'json')
       }
     elif type(the_content) is list:
       the_content = self.serialize_list(the_content)
