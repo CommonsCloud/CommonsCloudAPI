@@ -34,8 +34,6 @@ from flask import abort
 from flask import request
 from flask import current_app
 
-from geoalchemy2.functions import ST_AsGeoJSON
-
 from flask.ext.restless.views import API
 from flask.ext.restless.views import FunctionAPI
 from flask.ext.restless.search import search
@@ -61,7 +59,7 @@ from CommonsCloudAPI.utilities.geometry import ST_GeomFromGeoJSON
 from CommonsCloudAPI.signals import trigger_feature_created
 
 from geoalchemy2.elements import WKBElement
-import geoalchemy2.functions as func
+import geoalchemy2.functions as geofunc
 
 
 """
@@ -176,18 +174,16 @@ class Feature(CommonsModel):
         
         for field_ in content_.keys():
           if field_ == 'geometry':
-            logger.warning('Processing Field (geometry) %s', field_)
             geometry_ = content_.get('geometry', None)
             if geometry_ is not None:
               new_content['geometry'] = ST_GeomFromGeoJSON(geometry_)
           elif field_ == 'created':
-            logger.warning('Processing Field (created) %s', field_)
-            new_content['created'] = content_.get('created', datetime.now())
+            new_content['created'] = datetime.now()
+          elif field_ == 'created':
+            new_content['updated'] = datetime.now()
           elif field_ == 'status':
-            logger.warning('Processing Field (status) %s', field_)
             new_content['status'] = content_.get('status', 'public')
           elif field_ not in relationships and field_ not in attachments:
-            logger.warning('Processing Field (other) %s', field_)
             new_content[field_] = content_.get(field_, None)
         
         """
@@ -303,7 +299,7 @@ class Feature(CommonsModel):
             return abort(404)
 
         if this_template.is_geospatial and feature.geometry is not None:
-          the_geometry = db.session.scalar(ST_AsGeoJSON(feature.geometry))
+          the_geometry = db.session.scalar(geofunc.ST_AsGeoJSON(feature.geometry))
 
           feature.geometry = json.loads(the_geometry)
 
@@ -386,6 +382,8 @@ class Feature(CommonsModel):
           2. The second grouping (loop) are user defined fields that our Model_
              knows about, but ones we cannot hard code.
       """
+      feature_.updated = datetime.now()
+
       if hasattr(feature_, 'status'):
         feature_.status = sanitize.sanitize_string(content_.get('status', feature_.status))
 
@@ -549,7 +547,7 @@ class Feature(CommonsModel):
 
         if isinstance(geometry, WKBElement):
             if db.session is not None:
-              string = str(db.session.scalar(func.ST_AsGeoJSON(geometry, 4)))
+              string = str(db.session.scalar(geofunc.ST_AsGeoJSON(geometry, 4)))
               geojson = json.loads(string)
               geometries = geojson.get('geometries', None)
               coordinates = geometries[0].get('coordinates', None)
@@ -561,7 +559,7 @@ class Feature(CommonsModel):
 
         point = str('SRID=4326;POINT(%s)' % clean_geometry)
 
-        select_statement = db.select([Storage_]).where(func.ST_Intersects(point, Storage_.geometry))
+        select_statement = db.select([Storage_]).where(geofunc.ST_Intersects(point, Storage_.geometry))
 
         features = Storage_.query.select_entity_from(select_statement).all()
 
@@ -751,5 +749,16 @@ class Feature(CommonsModel):
         return "/".join([current_app.config["S3_BUCKET"],current_app.config["S3_UPLOAD_DIRECTORY"],destination_filename])
 
 
+    def features_last_modified(self, storage):
+
+      storage = self.validate_storage(storage_)
+      Template_ = Template.query.filter_by(storage=storage).first()
+      Storage_ = self.get_storage(Template_)
+
+      last_modified_date = db.session.query(db.func.max(Storage_.updated)).scalar()
+
+      logger.warning('Last Modified on %s', last_modified_date)
+
+      return last_modified_date
 
 

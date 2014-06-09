@@ -141,11 +141,8 @@ class CommonsModel(object):
           logger.warning('public keys %s', self.__public__)
           for key in object_.keys():
             value = object_.get(key, None)
-            logger.warning('value type %s for key %s', type(value), key)
-            logger.warning('value %s', value)
             if key in self.__public__:
               if key == 'geometry' and document_type != 'json':
-                logger.warning('process that geometry')
                 if isinstance(value, WKBElement):
                   if db.session is not None:
                     geojson = str(use_scalar(to_geojson(value, 4)))
@@ -333,6 +330,7 @@ class CommonsModel(object):
     new_table = db.Table(table_name, db.metadata,
       db.Column('id', db.Integer(), primary_key=True),
       db.Column('created', db.DateTime(), default=datetime.now()),
+      db.Column('updated', db.DateTime(), default=datetime.now()),
       db.Column('geometry', Geometry('GEOMETRY'), nullable=True),
       db.Column('status', db.String(24), nullable=False)
     )
@@ -605,7 +603,7 @@ class CommonsModel(object):
       message describing why the content couldn't be delivered
 
   """
-  def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200, **extras):
+  def endpoint_response(self, the_content, extension='json', list_name='', exclude_fields=[], code=200, last_modified="", **extras):
 
     """
     Make sure the content is ready to be served
@@ -625,12 +623,12 @@ class CommonsModel(object):
     """
     if (extension == 'json'):
 
-      this_data = JSON(the_content, list_name=list_name, exclude_fields=exclude_fields, **extras)
+      this_data = JSON(the_content, list_name=list_name, exclude_fields=exclude_fields, last_modified=last_modified, **extras)
       return this_data.create(), code
 
     elif (extension == 'geojson'):
 
-      this_data = GeoJSON(the_content, list_name=list_name, exclude_fields=exclude_fields, **extras)
+      this_data = GeoJSON(the_content, list_name=list_name, exclude_fields=exclude_fields, last_modified=last_modified, **extras)
       return this_data.create(), code
 
     elif (extension == 'csv'):

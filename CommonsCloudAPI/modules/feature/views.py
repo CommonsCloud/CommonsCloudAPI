@@ -62,6 +62,7 @@ def feature_list(oauth_request, storage, extension, is_public):
     Feature_.current_user = oauth_request.user
     feature_list = Feature_.feature_list(storage, results_per_page)
     feature_statistics = Feature_.feature_statistic(storage)
+    features_last_modified = Feature_.features_last_modified(storage)
 
     if type(feature_list) is tuple:
         return feature_list
