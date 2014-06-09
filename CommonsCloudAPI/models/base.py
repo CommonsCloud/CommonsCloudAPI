@@ -89,19 +89,20 @@ class CommonsModel(object):
 
       result = OrderedDict()
 
-      to_geojson = func.ST_AsGeoJSON
-      to_json = json.loads
-      use_scalar = db.session.scalar
-
       for key in _content.__mapper__.c.keys():
+        logger.warning("KEY >>>>> %s, %s", key, type(getattr(_content, key)))
         value = getattr(_content, key)
         if key in self.__public__ and value is not None:
           if isinstance(value, WKBElement):
             if db.session is not None:
-              geojson = str(use_scalar(to_geojson(value, 4)))
-              result[key] = to_json(geojson)
+              geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
+              result[key] = json.loads(geojson)
             else:
               result[key] = str(value)
+          elif 'geometry' in key and isinstance(value, dict):
+            result[key] = getattr(_content, key)
+          elif 'geometry' in key and isinstance(value, str):
+            result[key] = json.loads(getattr(_content, key))
           else:
             result[key] = str(getattr(_content, key))
 
