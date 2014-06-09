@@ -75,15 +75,12 @@ class JSON(FormatContent):
     Make sure we're caching the responses for 30 days to speed things up,
     then setting modification and expiration dates appropriately
     """
-    response.headers.add('Last-Modified', self.last_modified)
-    response.headers.add('Expires', expires)
-
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
     response.headers.add('Access-Control-Allow-Credentials', True)
     response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, OPTIONS, DELETE')
 
-    # response.headers.add('Pragma', 'no-cache')
-    # response.headers.add('Cache-Control', 'no-cache')
+    response.headers.add('Last-Modified', self.last_modified)
+    response.headers.add('Expires', expires)
 
     return response
