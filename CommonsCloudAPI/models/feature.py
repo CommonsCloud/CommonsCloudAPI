@@ -749,7 +749,7 @@ class Feature(CommonsModel):
         return "/".join([current_app.config["S3_BUCKET"],current_app.config["S3_UPLOAD_DIRECTORY"],destination_filename])
 
 
-    def features_last_modified(self, storage):
+    def features_last_modified(self, storage_):
 
       storage = self.validate_storage(storage_)
       Template_ = Template.query.filter_by(storage=storage).first()

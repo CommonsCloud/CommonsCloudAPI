@@ -77,7 +77,8 @@ def feature_list(oauth_request, storage, extension, is_public):
         'total_pages': feature_list.get('total_pages'),
         'total_features': feature_list.get('num_results'),
         'features_per_page': results_per_page,
-        'statistics': feature_statistics
+        'statistics': feature_statistics,
+        'last_modified': features_last_modified
     }
 
     return Feature_.endpoint_response(**arguments)
