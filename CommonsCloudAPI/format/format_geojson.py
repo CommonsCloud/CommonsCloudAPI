@@ -125,5 +125,6 @@ class GeoJSON(FormatContent):
 
     response.headers.add('Last-Modified', self.last_modified)
     response.headers.add('Expires', expires)
+    response.headers.add('Cache-Control', 'max-age=2592000')
 
     return response
