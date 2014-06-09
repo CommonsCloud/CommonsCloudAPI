@@ -103,8 +103,14 @@ class CommonsModel(object):
             result[key] = getattr(_content, key)
           elif 'geometry' in key and isinstance(value, str):
             result[key] = json.loads(getattr(_content, key))
+          elif isinstance(value, int):
+            result[key] = int(value)
+          elif isinstance(value, float):
+            result[key] = float(value)
+          elif isinstance(value, str):
+            result[key] = value
           else:
-            result[key] = str(getattr(_content, key))
+            pass
 
       return result
 
