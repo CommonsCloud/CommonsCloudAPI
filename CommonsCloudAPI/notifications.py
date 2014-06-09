@@ -213,18 +213,22 @@ def execute_actions(actions, **data):
             recipients.get('from_storage', None):
           feature = data.get('feature', None)
           recipients_list = fetch_dynamic_recipients(feature, **recipients)
+          
           recipient_data = recipients_list.get('recipients', None)
-          recipients_emailaddresses = recipients_list.get('email_addresses', None)
-          logger.debug('XXXXX Recipients in data %s', data.get('recipients', None))
+          logger.debug('XXXXX recipient_data %s', recipient_data)
+          
+          recipients_emailaddresses = recipients_list.get('email_addresses', ['error@commonscloud.org'])
+          logger.debug('XXXXX email_addresses %s', recipients_emailaddresses)
+
           copy = recipients.get('copy', False)
           if copy:
             this_field = copy.get('field', None)
-            user_email = getattr(feature, this_field, 'Error Reporter <joshua+error@viable.io>')
+            user_email = getattr(feature, this_field, 'error@commonscloud.org')
             copy_sender = [user_email]
             copy_template = copy.get('template', None)
             copy_subject = copy.get('subject', None)
       else:
-        recipients_emailaddresses = [recipients.get('value', 'Error Reporter <joshua+error@viable.io>')]
+        recipients_emailaddresses = [recipients.get('value', ['error@commonscloud.org'])]
         recipient_data = []
         copy_sender = None
         copy_template = None
@@ -281,6 +285,13 @@ def fetch_dynamic_recipients(feature, **options):
       email_addresses.append(getattr(feature, field))
 
 
+  if not len(email_addresses):
+    email_addresses.append('error@commonscloud.org')
+
+
+  logger.debug('email_addresses %s, %s', len(email_addresses), email_addresses)
+
+
   logger.debug('Dynamic recipient list %s', email_addresses)
   
   return {
@@ -293,7 +304,7 @@ def fetch_dynamic_recipients(feature, **options):
 Send an email notification
 
 subject (str)
-recipients (list)
+recipients_emailaddresses (list)
 sender (str) "FirstName LastName <email@address.com>"
 template (str) Defines the html/txt template's to be used
 context (kwargs) Dictionary of data or anything else you need passed along
