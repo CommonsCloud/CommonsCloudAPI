@@ -323,7 +323,8 @@ class CommonsModel(object):
   """
   def validate_storage(self, storage_name):
 
-    if not storage_name.startswith('type_'):
+    if not storage_name.startswith('type_') or \
+        not storage_name.startswith('attachment'):
       storage_name = str('type_' + storage_name)
 
     return storage_name
