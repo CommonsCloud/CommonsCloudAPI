@@ -104,8 +104,8 @@ class CommonsModel(object):
             result[key] = getattr(_content, key)
           elif 'geometry' in key and isinstance(value, str):
             result[key] = json.loads(getattr(_content, key))
-          elif isinstance(value, datetime):
-            result[key] = int(value)
+          elif isinstance(value, datetime.date):
+            result[key] = value.isoformat()
           elif isinstance(value, int):
             result[key] = int(value)
           elif isinstance(value, float):
@@ -166,9 +166,9 @@ class CommonsModel(object):
               elif 'geometry' in key and isinstance(value, str):
                 result[key] = json.loads(value)
               elif isinstance(value, datetime.date):
-                result[key] = str(value)
-              elif isinstance(value, datetime.time):
-                result[key] = str(value)
+                result[key] = value.isoformat()
+              # elif isinstance(value, datetime.time):
+              #   result[key] = str(value)
               elif isinstance(value, int):
                 result[key] = int(value)
               elif isinstance(value, float):
