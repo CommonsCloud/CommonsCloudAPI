@@ -90,7 +90,7 @@ class CommonsModel(object):
       result = OrderedDict()
 
       for key in _content.__mapper__.c.keys():
-        logger.warning("KEY >>>>> %s, %s", key, type(getattr(_content, key)))
+        logger.warning('key %s', key)
         value = getattr(_content, key)
         if key in self.__public__:
           if key == 'geometry' and document_type != 'json':
@@ -104,6 +104,8 @@ class CommonsModel(object):
             result[key] = getattr(_content, key)
           elif 'geometry' in key and isinstance(value, str):
             result[key] = json.loads(getattr(_content, key))
+          elif isinstance(value, datetime):
+            result[key] = int(value)
           elif isinstance(value, int):
             result[key] = int(value)
           elif isinstance(value, float):
@@ -114,6 +116,7 @@ class CommonsModel(object):
             result[key] = None
           else:
             # If we can't identify the type, then we can't handle process it
+            logger.warning('%s, cannot process value of type %s', value, type(value))
             pass
 
       return result
@@ -148,6 +151,7 @@ class CommonsModel(object):
               result[key] = getattr(object_, key)
         else:
           for key in object_.keys():
+            logger.warning('key %s', key)
             value = object_.get(key, None)
             if key in self.__public__:
               if key == 'geometry' and document_type != 'json':
@@ -171,6 +175,7 @@ class CommonsModel(object):
                 result[key] = None
               else:
                 # If we can't identify the type, then we can't handle process it
+                logger.warning('%s, cannot process value of type %s', value, type(value))
                 pass
 
         list_.append(result)
