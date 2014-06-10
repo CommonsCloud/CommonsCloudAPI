@@ -65,7 +65,7 @@ import geoalchemy2.functions as func
 
 class CommonsModel(object):
 
-  __public__ = ['id', 'name', 'created', 'status']
+  __public__ = ['id', 'name', 'created', 'status', 'filepath', 'caption', 'credit', 'credit_link']
   __public_relationships__ = None
 
   def __init__(self):
