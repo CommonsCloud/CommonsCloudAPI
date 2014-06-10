@@ -165,6 +165,10 @@ class CommonsModel(object):
                 result[key] = value
               elif 'geometry' in key and isinstance(value, str):
                 result[key] = json.loads(value)
+              elif isinstance(value, datetime.date):
+                result[key] = str(value)
+              elif isinstance(value, datetime.time):
+                result[key] = str(value)
               elif isinstance(value, int):
                 result[key] = int(value)
               elif isinstance(value, float):
