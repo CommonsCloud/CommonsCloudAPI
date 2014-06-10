@@ -85,20 +85,21 @@ class CommonsModel(object):
       A dictionary of the contents of our objects
 
   """
-  def serialize_object(self, _content):
+  def serialize_object(self, _content, document_type=""):
 
       result = OrderedDict()
 
       for key in _content.__mapper__.c.keys():
         logger.warning("KEY >>>>> %s, %s", key, type(getattr(_content, key)))
         value = getattr(_content, key)
-        if key in self.__public__ and value is not None:
-          if isinstance(value, WKBElement):
-            if db.session is not None:
-              geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
-              result[key] = json.loads(geojson)
+        if key in self.__public__:
+          if key == 'geometry' and document_type != 'json':
+            if isinstance(value, WKBElement):
+              if db.session is not None:
+                geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
+                result[key] = json.loads(geojson)
             else:
-              result[key] = str(value)
+              result[key] = value
           elif 'geometry' in key and isinstance(value, dict):
             result[key] = getattr(_content, key)
           elif 'geometry' in key and isinstance(value, str):
@@ -107,9 +108,12 @@ class CommonsModel(object):
             result[key] = int(value)
           elif isinstance(value, float):
             result[key] = float(value)
-          elif isinstance(value, str):
+          elif isinstance(value, str) or isinstance(value, unicode):
             result[key] = value
+          elif value is None:
+            result[key] = None
           else:
+            # If we can't identify the type, then we can't handle process it
             pass
 
       return result
@@ -143,25 +147,28 @@ class CommonsModel(object):
             if key in self.__public__:
               result[key] = getattr(object_, key)
         else:
-          logger.warning('object_.keys() %s', object_.keys())
-          logger.warning('object_ %s', object_)
-          logger.warning('public keys %s', self.__public__)
           for key in object_.keys():
             value = object_.get(key, None)
             if key in self.__public__:
               if key == 'geometry' and document_type != 'json':
                 if isinstance(value, WKBElement):
                   if db.session is not None:
-                    geojson = str(use_scalar(to_geojson(value, 4)))
-                    result[key] = to_json(geojson)
+                    geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
+                    result[key] = json.loads(geojson)
                 else:
                   result[key] = value
+              elif 'geometry' in key and isinstance(value, dict):
+                result[key] = value
+              elif 'geometry' in key and isinstance(value, str):
+                result[key] = json.loads(value)
               elif isinstance(value, int):
                 result[key] = int(value)
               elif isinstance(value, float):
                 result[key] = float(value)
-              elif isinstance(value, str):
+              elif isinstance(value, str) or isinstance(value, unicode):
                 result[key] = value
+              elif value is None:
+                result[key] = None
               else:
                 # If we can't identify the type, then we can't handle process it
                 pass
@@ -621,6 +628,8 @@ class CommonsModel(object):
       }
     elif type(the_content) is list:
       the_content = self.serialize_list(the_content)
+    elif extension == 'json':
+      the_content = self.serialize_object(the_content, 'json')
     else:
       the_content = self.serialize_object(the_content)
 
