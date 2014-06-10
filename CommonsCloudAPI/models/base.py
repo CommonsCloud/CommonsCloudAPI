@@ -65,7 +65,7 @@ import geoalchemy2.functions as func
 
 class CommonsModel(object):
 
-  __public__ = ['id', 'name', 'created', 'status', 'filepath', 'caption', 'credit', 'credit_link']
+  __public__ = ['id', 'created', 'status']
   __public_relationships__ = None
 
   def __init__(self):
@@ -146,9 +146,14 @@ class CommonsModel(object):
         result = {}
 
         if hasattr(object_, '__mapper__'):
+          logger.warning('has mapper %s', object_.__mapper__.c.keys())
           for key in object_.__mapper__.c.keys():
+            logger.warning('key %s', key)
+            value = getattr(object_, key)
+            logger.warning('value %s', value)
+            logger.warning('self.__public__ %s', self.__public__)
             if key in self.__public__:
-              result[key] = getattr(object_, key)
+              result[key] = value
         else:
           for key in object_.keys():
             logger.warning('key %s', key)
@@ -323,11 +328,14 @@ class CommonsModel(object):
   """
   def validate_storage(self, storage_name):
 
-    if not storage_name.startswith('type_') or \
-        not storage_name.startswith('attachment'):
-      storage_name = str('type_' + storage_name)
+    logger.warning('Validating storage object: %s', storage_name)
 
-    return storage_name
+    if storage_name.startswith('attachment_') or storage_name.startswith('type_'):
+      return storage_name
+
+    logger.warning('Invalid storage, must update to %s', storage_name)
+
+    return str('type_' + storage_name)
 
 
   """

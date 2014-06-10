@@ -140,7 +140,7 @@ Define our individual models
 """
 class Feature(CommonsModel):
 
-    __public__ = ['id', 'name', 'created', 'status', 'geometry']
+    __public__ = ['id', 'created', 'status', 'geometry']
 
     def __init__(self):
       pass
@@ -326,7 +326,22 @@ class Feature(CommonsModel):
         """
         relationships = []
 
+        rstorage = self.validate_storage(relationship)
+        rtemplate = Template.query.filter_by(storage=rstorage).first()
+
+        logger.warning(type(rtemplate))
+
+        if rtemplate is None:
+          if relationship.startswith('attachment_'):
+            self.__public__ += ['filepath', 'caption', 'credit', 'credit_link']
+          rStorage_ = self.get_storage(str(rstorage))
+          logger.warning('Template not in database', rstorage)
+        else:
+          rStorage_ = self.get_storage(rtemplate, rtemplate.fields)
+          logger.warning('Template in database %s', rstorage)
+
         for child_feature in getattr(feature, relationship):
+          logger.warning('relationship %s from %s', child_feature, relationship)
           relationships.append(child_feature)
 
         return relationships
