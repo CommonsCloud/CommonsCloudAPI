@@ -90,7 +90,6 @@ class CommonsModel(object):
       result = OrderedDict()
 
       for key in _content.__mapper__.c.keys():
-        logger.warning('key %s', key)
         value = getattr(_content, key)
         if key in self.__public__:
           if key == 'geometry' and document_type != 'json':
@@ -146,17 +145,12 @@ class CommonsModel(object):
         result = {}
 
         if hasattr(object_, '__mapper__'):
-          logger.warning('has mapper %s', object_.__mapper__.c.keys())
           for key in object_.__mapper__.c.keys():
-            logger.warning('key %s', key)
             value = getattr(object_, key)
-            logger.warning('value %s', value)
-            logger.warning('self.__public__ %s', self.__public__)
             if key in self.__public__:
               result[key] = value
         else:
           for key in object_.keys():
-            logger.warning('key %s', key)
             value = object_.get(key, None)
             if key in self.__public__:
               if key == 'geometry' and document_type != 'json':

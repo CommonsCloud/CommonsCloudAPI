@@ -67,8 +67,6 @@ def feature_list(oauth_request, storage, extension, is_public):
     if type(feature_list) is tuple:
         return feature_list
 
-    logger.warning('feature_list %s', feature_list)
-
     arguments = {
         'the_content': feature_list.get('objects'),
         'list_name': 'features',
