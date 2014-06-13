@@ -54,11 +54,15 @@ def feature_list(oauth_request, storage, extension, is_public):
     elif (extension == 'shp'):
         return status_.status_415('We do not support exporting a feature list as a SHP file yet, but we\'re working on it.'), 415
 
-    results_per_page = int(request.args.get('results_per_page'))
+    results_per_page = request.args.get('results_per_page')
     if not results_per_page:
         results_per_page = 25
     elif results_per_page > 100:
         results_per_page = 100
+    else:
+        results_per_page = int(request.args.get('results_per_page'))
+
+
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
