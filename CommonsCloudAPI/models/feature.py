@@ -176,7 +176,7 @@ class Feature(CommonsModel):
           if field_ == 'geometry':
             geometry_ = content_.get('geometry', None)
             if geometry_ is not None:
-              new_content['geometry'] = ST_GeomFromGeoJSON(str(geometry_))
+              new_content['geometry'] = ST_GeomFromGeoJSON(geometry_)
           elif field_ == 'created':
             new_content['created'] = datetime.now()
           elif field_ == 'created':
