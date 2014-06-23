@@ -87,6 +87,8 @@ class CommonsModel(object):
   """
   def serialize_object(self, _content, document_type=""):
 
+      logger.error('_content %s', _content)
+
       result = OrderedDict()
 
       for key in _content.__mapper__.c.keys():
@@ -105,11 +107,7 @@ class CommonsModel(object):
             result[key] = json.loads(getattr(_content, key))
           elif isinstance(value, datetime.date):
             result[key] = value.isoformat()
-          elif isinstance(value, int):
-            result[key] = int(value)
-          elif isinstance(value, float):
-            result[key] = float(value)
-          elif isinstance(value, str) or isinstance(value, unicode):
+          elif isinstance(value, int) or isinstance(value, float) or isinstance(value, str) or isinstance(value, unicode):
             result[key] = value
           elif value is None:
             result[key] = None
@@ -142,6 +140,7 @@ class CommonsModel(object):
 
       for object_ in _content:
 
+        logger.error('_content %s', object_)
         result = {}
 
         if hasattr(object_, '__mapper__'):
@@ -166,13 +165,7 @@ class CommonsModel(object):
                 result[key] = json.loads(value)
               elif isinstance(value, datetime.date):
                 result[key] = value.isoformat()
-              # elif isinstance(value, datetime.time):
-              #   result[key] = str(value)
-              elif isinstance(value, int):
-                result[key] = int(value)
-              elif isinstance(value, float):
-                result[key] = float(value)
-              elif isinstance(value, str) or isinstance(value, unicode):
+              elif isinstance(value, int) or isinstance(value, float) or isinstance(value, str) or isinstance(value, unicode):
                 result[key] = value
               elif value is None:
                 result[key] = None
