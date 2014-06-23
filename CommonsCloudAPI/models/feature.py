@@ -177,14 +177,13 @@ class Feature(CommonsModel):
             geometry_ = content_.get('geometry', None)
             if geometry_ is not None:
               new_content['geometry'] = ST_GeomFromGeoJSON(geometry_)
-          elif field_ == 'created':
-            new_content['created'] = datetime.now()
-          elif field_ == 'created':
-            new_content['updated'] = datetime.now()
           elif field_ == 'status':
             new_content['status'] = content_.get('status', 'public')
           elif field_ not in relationships and field_ not in attachments:
             new_content[field_] = content_.get(field_, None)
+
+        new_content['created'] = datetime.now()
+        new_content['updated'] = datetime.now()
         
         """
         Create the new feature and save it to the database
