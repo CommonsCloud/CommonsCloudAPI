@@ -87,8 +87,6 @@ class CommonsModel(object):
   """
   def serialize_object(self, _content, document_type=""):
 
-      logger.error('_content %s', _content)
-
       result = OrderedDict()
 
       for key in _content.__mapper__.c.keys():
@@ -140,7 +138,6 @@ class CommonsModel(object):
 
       for object_ in _content:
 
-        logger.error('_content %s', object_)
         result = {}
 
         if hasattr(object_, '__mapper__'):
