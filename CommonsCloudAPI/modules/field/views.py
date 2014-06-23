@@ -109,7 +109,6 @@ permission associated with them in the `user_templates` table
 """
 @module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['PUT', 'PATCH'])
 @oauth.require_oauth()
-# @permission_required('can_edit')
 def field_update(oauth_request, template_id, field_id, extension):
 
   Field_ = Field()
@@ -129,7 +128,6 @@ def field_update(oauth_request, template_id, field_id, extension):
 
 @module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['DELETE'])
 @oauth.require_oauth()
-# @permission_required('can_delete')
 def field_delete(oauth_request, template_id, field_id, extension):
 
   Field_ = Field()
