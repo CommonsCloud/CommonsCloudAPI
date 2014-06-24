@@ -140,7 +140,7 @@ Define our individual models
 """
 class Feature(CommonsModel):
 
-    __public__ = ['id', 'created', 'status', 'geometry']
+    __public__ = ['id', 'created', 'updated', 'status', 'geometry']
 
     def __init__(self):
       pass
