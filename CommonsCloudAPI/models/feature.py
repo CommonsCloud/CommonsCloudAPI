@@ -182,8 +182,10 @@ class Feature(CommonsModel):
           elif field_ not in relationships and field_ not in attachments:
             new_content[field_] = content_.get(field_, None)
 
-        new_content['created'] = datetime.now()
-        new_content['updated'] = datetime.now()
+        creation_datetime = datetime.now()
+
+        new_content['created'] = creation_datetime
+        new_content['updated'] = creation_datetime
         
         """
         Create the new feature and save it to the database
