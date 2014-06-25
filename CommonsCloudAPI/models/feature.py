@@ -279,7 +279,7 @@ class Feature(CommonsModel):
               #
               new_feature_attachments = self.feature_attachments(**details)
 
-        feature_json = self.feature_get(storage, new_feature.id)
+        feature_json = self.serialize_object(self.feature_get(storage, new_feature.id))
         logger.info('A new feature was created in %s with an id of %d', 
             storage, new_feature.id)
         trigger_feature_created.send(current_app._get_current_object(),
