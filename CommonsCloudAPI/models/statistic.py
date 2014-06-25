@@ -1,3 +1,4 @@
+
 """
 For CommonsCloud copyright information please see the LICENSE document
 (the "License") included with this software package. This file may not
@@ -43,7 +44,7 @@ Define our individual models
 """
 class Statistic(db.Model, CommonsModel):
 
-    __public__ = ['id', 'name', 'units', 'function', 'created', 'status', 'field_id']
+    __public__ = {'default': ['id', 'name', 'units', 'function', 'created', 'status', 'field_id']}
     __tablename__ = 'statistic'
     __table_args__ = {
         'extend_existing': True

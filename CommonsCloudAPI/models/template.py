@@ -90,7 +90,7 @@ the system.
 """
 class Template(db.Model, CommonsModel):
 
-  __public__ = ['id', 'name', 'help', 'storage', 'is_public', 'is_crowdsourced', 'is_moderated', 'is_listed', 'is_geospatial', 'created', 'status', 'fields']
+  __public__ = {'default': ['id', 'name', 'help', 'storage', 'is_public', 'is_crowdsourced', 'is_moderated', 'is_listed', 'is_geospatial', 'created', 'status', 'fields']}
 
   __tablename__ = 'template'
   __table_args__ = {

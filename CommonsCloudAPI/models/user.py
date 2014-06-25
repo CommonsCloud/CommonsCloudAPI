@@ -66,7 +66,7 @@ Flask-Security module. If you remove it Flask-Security gets fussy.
 """
 class User(db.Model, UserMixin, CommonsModel):
 
-  __public__ = ['id', 'name', 'email', 'active', 'confirmed_at']
+  __public__ = {'default': ['id', 'name', 'email', 'active', 'confirmed_at']}
 
   __tablename__ = 'user'
   __table_args__ = {

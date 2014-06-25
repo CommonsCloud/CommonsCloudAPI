@@ -52,7 +52,7 @@ Define our individual models
 """
 class Application(db.Model, CommonsModel):
 
-  __public__ = ['id', 'name', 'description', 'url', 'created', 'status']
+  __public__ = {'default': ['id', 'name', 'description', 'url', 'created', 'status']}
 
   __tablename__ = 'application'
   __table_args__ = {
