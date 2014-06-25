@@ -65,7 +65,7 @@ import geoalchemy2.functions as func
 
 class CommonsModel(object):
 
-  __public__ = ['id', 'created', 'status', 'updated']
+  __public__ = {}
   __public_relationships__ = None
 
   def __init__(self):
@@ -85,38 +85,50 @@ class CommonsModel(object):
       A dictionary of the contents of our objects
 
   """
-  def serialize_object(self, _content, document_type=""):
+  def serialize_object(self, object_, single=False):
 
-      result = OrderedDict()
+    result = OrderedDict()
 
-      for key in _content.__mapper__.c.keys():
-        value = getattr(_content, key)
-        if key in self.__public__:
-          if key == 'geometry' and document_type != 'json':
-            if isinstance(value, WKBElement):
-              if db.session is not None:
-                geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
-                result[key] = json.loads(geojson)
-            else:
-              result[key] = value
-          elif 'geometry' in key and isinstance(value, dict):
-            result[key] = getattr(_content, key)
-          elif 'geometry' in key and isinstance(value, str):
-            result[key] = json.loads(getattr(_content, key))
-          elif isinstance(value, datetime.date):
-            result[key] = value.isoformat()
-          elif isinstance(value, int) or isinstance(value, float) or isinstance(value, str) or isinstance(value, unicode):
-            result[key] = value
-          elif value is None:
-            result[key] = None
-          else:
-            # If we can't identify the type, then we can't handle process it
-            logger.warning('%s, cannot process value of type %s', value, type(value))
-            pass
+    logger.warning('Fields %s', self.__public__)
 
-      return result
+    if hasattr(object_, '__mapper__'):
+      for key in object_.__mapper__.c.keys():
+        value = getattr(object_, key)
+        if key in self.__public__['default']:
+          result[key] = self.serialize_field(key, value)
+        elif single is True:
+          result[key] = self.serialize_field(key, value)
+    else:
+      for key in object_.keys():
+        value = object_.get(key, None)
+        if key in self.__public__['default']:
+          result[key] = self.serialize_field(key, value)
+        elif single is True:
+          result[key] = self.serialize_field(key, value)
+
+    return result
 
 
+  def serialize_field(self, key, value):
+
+    if 'geometry' in key and isinstance(value, WKBElement):
+      if db.session is not None:
+        geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
+        return json.loads(geojson)
+    elif 'geometry' in key and isinstance(value, dict):
+      return value
+    elif 'geometry' in key and isinstance(value, str):
+      return json.loads(value)
+    elif isinstance(value, datetime.date):
+      return value.isoformat()
+    elif isinstance(value, int) or isinstance(value, float) or isinstance(value, str) or isinstance(value, unicode):
+      return value
+    elif value is None:
+      return None
+    elif isinstance(value, list):
+      return self.serialize_list(value)
+    else:
+      pass 
 
   """
   In order to be able to work with an object it needs to be serialized,
@@ -132,49 +144,17 @@ class CommonsModel(object):
       A dictionary of the contents of our objects
 
   """
-  def serialize_list(self, _content, document_type=""):
+  def serialize_list(self, _content):
 
       list_ = []
 
       for object_ in _content:
 
-        result = {}
-
-        if hasattr(object_, '__mapper__'):
-          for key in object_.__mapper__.c.keys():
-            value = getattr(object_, key)
-            if key in self.__public__:
-              result[key] = value
-        else:
-          for key in object_.keys():
-            value = object_.get(key, None)
-            if key in self.__public__:
-              if key == 'geometry' and document_type != 'json':
-                if isinstance(value, WKBElement):
-                  if db.session is not None:
-                    geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
-                    result[key] = json.loads(geojson)
-                else:
-                  result[key] = value
-              elif 'geometry' in key and isinstance(value, dict):
-                result[key] = value
-              elif 'geometry' in key and isinstance(value, str):
-                result[key] = json.loads(value)
-              elif isinstance(value, datetime.date):
-                result[key] = value.isoformat()
-              elif isinstance(value, int) or isinstance(value, float) or isinstance(value, str) or isinstance(value, unicode):
-                result[key] = value
-              elif value is None:
-                result[key] = None
-              else:
-                # If we can't identify the type, then we can't handle process it
-                logger.warning('%s, cannot process value of type %s', value, type(value))
-                pass
+        result = self.serialize_object(object_)
 
         list_.append(result)
 
       return list_
-
 
   """
   Remove all characters except for spaces and alpha-numeric characters,
@@ -473,14 +453,21 @@ class CommonsModel(object):
     """
     if fields or hasattr(template, 'fields'):
 
-      public_fields = self.__public__
+      public_fields = ['id', 'created', 'updated', 'geometry', 'status']
 
       for field in fields:
-        if field.is_listed:
+        logger.warning('Field found %s', field.name)
+        if field.is_listed and field.data_type == 'relationship':
+          public_fields.append(field.relationship)
+        elif field.is_listed:
+          logger.warning('Listed field found %s', field.name)
           public_fields.append(field.name)
 
-      self.__public__ = public_fields
+      # Remove all duplicate names before passing along to public fields
+      # self.__public__ = list(set(public_fields))
+      self.__public__['default'] = public_fields
 
+      logger.warning('Checking public fields %s', self.__public__)
 
     return Model
 
@@ -624,16 +611,12 @@ class CommonsModel(object):
     """
     Make sure the content is ready to be served
     """
-    if type(the_content) is list and extension == 'json':
+    if type(the_content) is list:
       the_content = {
-        list_name: self.serialize_list(the_content, 'json')
+        list_name: self.serialize_list(the_content)
       }
-    elif type(the_content) is list:
-      the_content = self.serialize_list(the_content)
-    elif extension == 'json':
-      the_content = self.serialize_object(the_content, 'json')
     else:
-      the_content = self.serialize_object(the_content)
+      the_content = self.serialize_object(the_content, single=True)
 
     """
     If the user is properly authenticated, then proceed to see if they

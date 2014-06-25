@@ -140,7 +140,7 @@ Define our individual models
 """
 class Feature(CommonsModel):
 
-    __public__ = ['id', 'created', 'updated', 'status', 'geometry']
+    __public__ = {}
 
     def __init__(self):
       pass
@@ -292,23 +292,29 @@ class Feature(CommonsModel):
 
         this_template = Template.query.filter_by(storage=storage).first()
 
-        Storage_ = self.get_storage(this_template, this_template.fields)
+        Model_ = self.get_storage(this_template, this_template.fields)
 
-        feature = Storage_.query.get(feature_id)
+        endpoint_ = API(db.session, Model_)
 
-        if not hasattr(feature, 'id'):
-            return abort(404)
+        result = endpoint_.get(feature_id, None, None)
 
-        if this_template.is_geospatial and feature.geometry is not None:
-          the_geometry = db.session.scalar(geofunc.ST_AsGeoJSON(feature.geometry))
+        # feature = Storage_.query.get(feature_id)
 
-          feature.geometry = json.loads(the_geometry)
+        # if not hasattr(feature, 'id'):
+        #     return abort(404)
 
-        return feature
+        # if this_template.is_geospatial and feature.geometry is not None:
+        #   the_geometry = db.session.scalar(geofunc.ST_AsGeoJSON(feature.geometry))
+
+        #   feature.geometry = json.loads(the_geometry)
+
+        # return feature
+
+        logger.warning('result %s', result)
+
+        return result
 
     def feature_get_relationship(self, storage_, feature_id, relationship):
-
-        logger.warning('%s', storage_)
 
         storage = self.validate_storage(storage_)
 
@@ -504,19 +510,13 @@ class Feature(CommonsModel):
 
       return self.feature_get(storage_, feature_id)
 
-    def feature_statistic(self, storage_):
+    def feature_statistic(self, Model_, Template_):
 
         search_params = json.loads(request.args.get('q', '{}'))
 
-        storage = self.validate_storage(storage_)
-
-        this_template = Template.query.filter_by(storage=storage).first()
-
-        Model_ = self.get_storage(this_template)
-
         query = search(db.session, Model_, search_params)
 
-        return self.get_statistics(query.all(), this_template)
+        return self.get_statistics(query.all(), Template_)
 
     def feature_list(self, storage_, results_per_page=25):
 
@@ -525,15 +525,20 @@ class Feature(CommonsModel):
         this_template = Template.query.filter_by(storage=storage).first()
 
         Model_ = self.get_storage(this_template, this_template.fields)
+        logger.warning('feature list called')
 
         endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
-
+        logger.warning('endpoint created')
         results = endpoint_._search()
-
+        logger.warning('search completed')
         # @todo loop over these and make sure we're dropping anything that isn't
         # set to 'public' unless the user has the appropriate permissions
 
-        return endpoint_._search()
+        return {
+          'results': endpoint_._search(),
+          'model': Model_,
+          'template': this_template
+        }
 
     def feature_delete(self, storage_, feature_id):
 
@@ -765,15 +770,9 @@ class Feature(CommonsModel):
         return "/".join([current_app.config["S3_BUCKET"],current_app.config["S3_UPLOAD_DIRECTORY"],destination_filename])
 
 
-    def features_last_modified(self, storage_):
-
-      storage = self.validate_storage(storage_)
-      Template_ = Template.query.filter_by(storage=storage).first()
-      Storage_ = self.get_storage(Template_)
+    def features_last_modified(self, Storage_):
 
       last_modified_date = db.session.query(db.func.max(Storage_.updated)).scalar()
-
-      logger.warning('Last Modified on %s', last_modified_date)
 
       return last_modified_date
 
