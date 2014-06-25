@@ -453,7 +453,7 @@ class CommonsModel(object):
     """
     if fields or hasattr(template, 'fields'):
 
-      public_fields = ['id', 'created', 'updated', 'geometry', 'status', 'filepath', 'caption', 'credit', 'credit_link']
+      public_fields = ['id', 'created', 'updated', 'geometry', 'status', 'filename', 'filepath', 'caption', 'credit', 'credit_link']
 
       for field in fields:
         logger.warning('Field found %s', field.name)
