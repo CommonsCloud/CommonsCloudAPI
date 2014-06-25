@@ -374,16 +374,13 @@ class Feature(CommonsModel):
       """
       Setup the request object so that we can work with it
       """
-      if request_object.data:
+      try:
         content_ = json.loads(request_object.data)
-        logger.warning('JSON Data %s', content_)
+        logger.warning("request_object.data %s", dir(request_object.data))
+      except ValueError, e:
+        content_ = request_object.form
+        logger.warning("request_object.form %s", request_object.form)
 
-      elif request_object.form:
-        content_ = json.loads(request_object.form['data'])
-        files_ = request_object.files
-
-        logger.warning('Form Content %s', content_)
-        logger.warning('Form Files %s', files_)
 
       """
       Check for a geometry and if it exists, we need to add a new geometry
@@ -443,17 +440,31 @@ class Feature(CommonsModel):
       """
       for field_ in content_:
         if field_ in relationships:
-      
           assoc_ = self._feature_relationship_associate(Template_, field_)
-      
+
+          logger.warning('%s %s', field_, type(content_.get(field_, None)))
+
+          if type(content_.get(field_, None)) is not list:
+            logger.warning('We need to do something else with this value %s', type(content_.get(field_, None)))
+            list_of_relationships = json.loads(content_.get(field_, None))
+            logger.warning('We updated it to %s', type(list_of_relationships))
+          else:
+            list_of_relationships = content_.get(field_, None)
+
+          # @todo
+          #
+          # Check to see if the values being passed are a list or a dictionary
+          #
+
           details = {
-            "parent_id": feature_id,
+            "parent_id": new_feature.id,
             "child_table": field_,
-            "content": content_.get(field_, None),
+            "content": list_of_relationships,
             "assoc_": assoc_
           }
       
           new_feature_relationships = self.feature_relationships(**details)
+
 
       """
       Saving attachments
