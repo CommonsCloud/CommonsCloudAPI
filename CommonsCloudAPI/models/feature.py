@@ -340,7 +340,7 @@ class Feature(CommonsModel):
 
         if rtemplate is None:
           if relationship.startswith('attachment_'):
-            self.__public__ += ['filepath', 'caption', 'credit', 'credit_link']
+            self.__public__['default'] += ['filepath', 'caption', 'credit', 'credit_link']
           rStorage_ = self.get_storage(str(rstorage))
           logger.warning('Template not in database', rstorage)
         else:
@@ -457,7 +457,7 @@ class Feature(CommonsModel):
           #
 
           details = {
-            "parent_id": new_feature.id,
+            "parent_id": feature_id,
             "child_table": field_,
             "content": list_of_relationships,
             "assoc_": assoc_
