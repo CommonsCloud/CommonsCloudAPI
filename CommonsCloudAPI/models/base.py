@@ -89,8 +89,6 @@ class CommonsModel(object):
 
     result = OrderedDict()
 
-    logger.warning('Fields %s', self.__public__)
-
     if hasattr(object_, '__mapper__'):
       for key in object_.__mapper__.c.keys():
         value = getattr(object_, key)
@@ -292,12 +290,8 @@ class CommonsModel(object):
   """
   def validate_storage(self, storage_name):
 
-    logger.warning('Validating storage object: %s', storage_name)
-
     if storage_name.startswith('attachment_') or storage_name.startswith('type_'):
       return storage_name
-
-    logger.warning('Invalid storage, must update to %s', storage_name)
 
     return str('type_' + storage_name)
 
@@ -456,18 +450,14 @@ class CommonsModel(object):
       public_fields = ['id', 'name', 'created', 'updated', 'geometry', 'status', 'filename', 'filepath', 'caption', 'credit', 'credit_link']
 
       for field in fields:
-        logger.warning('Field found %s', field.name)
         if field.is_listed and field.data_type == 'relationship':
           public_fields.append(field.relationship)
         elif field.is_listed:
-          logger.warning('Listed field found %s', field.name)
           public_fields.append(field.name)
 
       # Remove all duplicate names before passing along to public fields
       # self.__public__ = list(set(public_fields))
       self.__public__['default'] = public_fields
-
-      logger.warning('Checking public fields %s', self.__public__)
 
     return Model
 
