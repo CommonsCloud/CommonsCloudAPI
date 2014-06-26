@@ -64,11 +64,13 @@ class GeoJSON(FormatContent):
     today = datetime.utcnow()
     expires =  today + timedelta(+30)
 
-    if type(self.the_content) is list:
+    # logger.warning('self.the_content %s', self.the_content.keys())
+
+    if 'features' in self.the_content.keys():
 
         features = []
 
-        for feature in self.the_content:
+        for feature in self.the_content['features']:
 
           properties = {}
 
