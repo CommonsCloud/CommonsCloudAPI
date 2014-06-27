@@ -32,7 +32,6 @@ import datetime
 from collections import OrderedDict
 
 from migrate.changeset import *
-from sqlalchemy import MetaData
 
 """
 Import Flask Dependencies
@@ -575,11 +574,6 @@ class CommonsModel(object):
     """
     if not field.data_type is 'relationship' or not field.data_type is 'file':
       exisitng_table.c[field.name].drop()
-
-    """
-    Update the MetaData after the field is deleted
-    """
-    db.metadata = MetaData(db.engine)
 
     return True
 
