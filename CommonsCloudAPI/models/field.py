@@ -592,6 +592,7 @@ class Field(db.Model, CommonsModel):
 
         db.session.delete(field_)
         db.session.commit()
+        db.session.close()
 
         return True
 
