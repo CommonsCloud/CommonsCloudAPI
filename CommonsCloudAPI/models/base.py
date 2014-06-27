@@ -571,28 +571,29 @@ class CommonsModel(object):
   """
   def delete_storage_field(self, template, field):
 
-    # """
-    # Create a new custom table for a Feature Type
-    # """
-    # existing_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+    """
+    Create a new custom table for a Feature Type
+    """
+    existing_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
 
-    # """
-    # We must bind the engine to the metadata here in order for our fields to
-    # recognize the existing Table we have loaded in the following steps
-    # """
-    # db.metadata.bind = db.engine
+    """
+    We must bind the engine to the metadata here in order for our fields to
+    recognize the existing Table we have loaded in the following steps
+    """
+    db.metadata.bind = db.engine
 
-    # """
-    # Delete the column just like we would if we were hard coding the model
-    # """
-    # if not field.data_type is 'relationship' or not field.data_type is 'file':
-    #   existing_table.c[field.name].drop()
+    """
+    Delete the column just like we would if we were hard coding the model
+    """
+    if not field.data_type is 'relationship' or not field.data_type is 'file':
+      existing_table.c[field.name].drop()
 
     # existing_table = db.Table(template.storage, MetaData(db.engine), autoload=True, autoload_with=db.engine)
     # db.metadata.bind = db.engine
 
     db.engine.execute('ALTER TABLE %s DROP COLUMN %s' % (template.storage, field.name))
     db.session.close()
+    db.engine.connect()
 
     return True
 
