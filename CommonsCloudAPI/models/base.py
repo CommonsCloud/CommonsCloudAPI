@@ -387,9 +387,6 @@ class CommonsModel(object):
     """
     assert new_column is exisitng_table.c[field.name]
 
-    db.session.expire_all()
-    db.session.close()
-
     return new_column
 
 
@@ -579,8 +576,10 @@ class CommonsModel(object):
     if not field.data_type is 'relationship' or not field.data_type is 'file':
       exisitng_table.c[field.name].drop()
 
-    db.session.expire_all()
-    db.session.close()
+    """
+    Update the MetaData after the field is deleted
+    """
+    db.metadata = MetaData()
 
     return True
 
