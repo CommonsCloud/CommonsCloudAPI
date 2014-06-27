@@ -32,7 +32,7 @@ import datetime
 from collections import OrderedDict
 
 from migrate.changeset import *
-
+from sqlalchemy import MetaData
 
 """
 Import Flask Dependencies
@@ -579,7 +579,7 @@ class CommonsModel(object):
     """
     Update the MetaData after the field is deleted
     """
-    db.metadata = MetaData()
+    db.metadata = MetaData(db.engine)
 
     return True
 
