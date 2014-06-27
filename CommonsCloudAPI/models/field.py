@@ -269,9 +269,6 @@ class Field(db.Model, CommonsModel):
             field_.relationship = field_storage['relationship']
             db.session.commit()
 
-        db.session.expire_all()
-        db.session.close()
-
         return field_
 
     """
@@ -593,8 +590,6 @@ class Field(db.Model, CommonsModel):
 
         db.session.delete(field_)
         db.session.commit()
-        db.session.expire_all()
-        db.session.close()
 
         return True
 
