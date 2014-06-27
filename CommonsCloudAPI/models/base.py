@@ -32,7 +32,7 @@ import datetime
 from collections import OrderedDict
 
 from migrate.changeset import *
-# from sqlalchemy import MetaData
+from sqlalchemy import MetaData
 
 """
 Import Flask Dependencies
@@ -575,8 +575,8 @@ class CommonsModel(object):
     """
     if not field.data_type is 'relationship' or not field.data_type is 'file':
       existing_table.c[field.name].drop()
-    
-    existing_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+
+    existing_table = db.Table(template.storage, MetaData(db.engine), autoload=True, autoload_with=db.engine)
     db.metadata.bind = db.engine
 
     return True
