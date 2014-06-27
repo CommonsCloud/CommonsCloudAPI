@@ -212,7 +212,7 @@ class Field(db.Model, CommonsModel):
           If the type_ and the template type_ already have a relationship it will
           cause bad things to happen when searching via the API
           """
-          duplicate_check = check_relationship_field_duplicate(Template_.fields, relationship_storage)
+          duplicate_check = self.check_relationship_field_duplicate(Template_.fields, relationship_storage)
           if duplicate_check:
             logger.warning('User %d tried to add a duplicate relationship type', \
                 self.current_user.id, template_id)
