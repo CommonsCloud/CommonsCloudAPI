@@ -202,15 +202,17 @@ class Field(db.Model, CommonsModel):
           relationship_storage = content_.get('relationship', '')
           storage_check = Template().query.filter_by(storage=relationship_storage).first()
 
-          # if not storage_check.id in allowed_fields:
-          #   logger.error('User %d tried to add a Field to a Template %d which they do not own', self.current_user.id, template_id)
-          #   return status_.status_401('The Template `relationship` string you entered either doesn\'t exist or you don\'t have permission to use it'), 401
+          if not storage_check.id in allowed_fields:
+            logger.error('User %d tried to add a Field to a Template %d which they do not own', \
+                self.current_user.id, template_id)
+            return status_.status_401('The Template `relationship` string you entered either doesn\'t exist or you don\'t have permission to use it'), 401
 
           """
           Lastly, make sure that an identical relationship doesn't already exist.
           If the type_ and the template type_ already have a relationship it will
           cause bad things to happen when searching via the API
           """
+          logger.warning('Template_ Fields %s', Template_.fields)
           duplicate_check = Field().query.filter_by(relationship=relationship_storage).first()
 
           if hasattr(duplicate_check, 'id'):
