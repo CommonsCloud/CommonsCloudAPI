@@ -586,10 +586,10 @@ class Field(db.Model, CommonsModel):
         template_ = Template.query.get(template_id)
         field_ = Field.query.get(field_id)
 
-        self.delete_storage_field(template_, field_)
-
         db.session.delete(field_)
         db.session.commit()
+
+        self.delete_storage_field(template_, field_)
 
         return True
 

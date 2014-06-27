@@ -592,6 +592,7 @@ class CommonsModel(object):
     # db.metadata.bind = db.engine
 
     db.engine.execute('ALTER TABLE %s DROP COLUMN %s' % (template.storage, field.name))
+    db.session.close()
 
     return True
 
