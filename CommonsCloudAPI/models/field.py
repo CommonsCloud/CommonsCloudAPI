@@ -595,7 +595,7 @@ class Field(db.Model, CommonsModel):
         """
         Update the MetaData after the field is deleted
         """
-        db.metadata = MetaData(db.engine)
+        db.metadata = MetaData()
 
 
         return True
