@@ -270,7 +270,7 @@ class Field(db.Model, CommonsModel):
             db.session.commit()
 
         db.session.expire_all()
-
+        db.session.close()
 
         return field_
 
@@ -593,8 +593,8 @@ class Field(db.Model, CommonsModel):
 
         db.session.delete(field_)
         db.session.commit()
-        # db.session.close()
         db.session.expire_all()
+        db.session.close()
 
         return True
 
