@@ -212,10 +212,8 @@ class Field(db.Model, CommonsModel):
           If the type_ and the template type_ already have a relationship it will
           cause bad things to happen when searching via the API
           """
-          logger.warning('Template_ Fields %s', Template_.fields)
-          duplicate_check = Field().query.filter_by(relationship=relationship_storage).first()
-
-          if hasattr(duplicate_check, 'id'):
+          duplicate_check = check_relationship_field_duplicate(Template_.fields, relationship_storage)
+          if duplicate_check:
             logger.warning('User %d tried to add a duplicate relationship type', \
                 self.current_user.id, template_id)
             return status_.status_400('You already defined a relationship with this Template, you cannot create two relationship fields with the same relationship table.'), 400
@@ -617,6 +615,15 @@ class Field(db.Model, CommonsModel):
             logger.debug('All Fields user has permission to %s', id_list_)
 
         return id_list_
+
+
+    def check_relationship_field_duplicate(self, fields, relationship):
+
+      for field in fields:
+        if relationship in field.relationship:
+          return True
+
+      return False
 
 
 
