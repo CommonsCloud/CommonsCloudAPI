@@ -388,16 +388,16 @@ class CommonsModel(object):
     assert new_column is existing_table.c[field.name]
 
 
-    """
-    We must bind the engine to the metadata here in order for our fields to
-    recognize the existing Table we have loaded in the following steps
-    """
-    db.metadata.bind = db.engine
+    # """
+    # We must bind the engine to the metadata here in order for our fields to
+    # recognize the existing Table we have loaded in the following steps
+    # """
+    # db.metadata.bind = db.engine
 
-    """
-    Create a new custom table for a Feature Type
-    """
-    existing_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+    # """
+    # Create a new custom table for a Feature Type
+    # """
+    # existing_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
 
     return new_column
 
