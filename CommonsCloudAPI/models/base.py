@@ -210,7 +210,7 @@ class CommonsModel(object):
     Make sure that the table we need to use for creating the relationship is loaded
     into our db.metadata, otherwise the whole process will fail
     """
-    exisitng_table = db.Table(field.relationship, db.metadata, autoload=True, autoload_with=db.engine)
+    existing_table = db.Table(field.relationship, db.metadata, autoload=True, autoload_with=db.engine)
 
     """
     Create a name for our new field relationship table
@@ -353,7 +353,7 @@ class CommonsModel(object):
     """
     Create a new custom table for a Feature Type
     """
-    exisitng_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+    existing_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
 
     """
     We must bind the engine to the metadata here in order for our fields to
@@ -377,14 +377,14 @@ class CommonsModel(object):
     Create the new column just like we would if we were hard coding the model
     """
     new_column = db.Column(field.name, field_type)
-    new_column.create(exisitng_table)
+    new_column.create(existing_table)
 
     """
     Finally we need to make sure that the existing table knows that we've have
     just added a new column, otherwise we won't be able to use it until we
     restart the application, which would be very bad
     """
-    assert new_column is exisitng_table.c[field.name]
+    assert new_column is existing_table.c[field.name]
 
     return new_column
 
@@ -397,7 +397,7 @@ class CommonsModel(object):
     """
     Create a new custom table for a Feature Type
     """
-    exisitng_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+    existing_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
 
     """
     We must bind the engine to the metadata here in order for our fields to
@@ -409,14 +409,14 @@ class CommonsModel(object):
     Create the new column just like we would if we were hard coding the model
     """
     new_column = db.Column('owner', db.Integer, db.ForeignKey('user.id'))
-    new_column.create(exisitng_table)
+    new_column.create(existing_table)
 
     """
     Finally we need to make sure that the existing table knows that we've have
     just added a new column, otherwise we won't be able to use it until we
     restart the application, which would be very bad
     """
-    assert new_column is exisitng_table.c['owner']
+    assert new_column is existing_table.c['owner']
 
     return new_column
 
@@ -561,7 +561,7 @@ class CommonsModel(object):
     """
     Create a new custom table for a Feature Type
     """
-    exisitng_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
+    existing_table = db.Table(template.storage, db.metadata, autoload=True, autoload_with=db.engine)
 
     """
     We must bind the engine to the metadata here in order for our fields to
@@ -570,10 +570,13 @@ class CommonsModel(object):
     db.metadata.bind = db.engine
 
     """
-    Delete the new column just like we would if we were hard coding the model
+    Delete the column just like we would if we were hard coding the model
     """
     if not field.data_type is 'relationship' or not field.data_type is 'file':
-      exisitng_table.c[field.name].drop()
+      existing_table.c[field.name].drop()
+    
+    existing_table = db.Table(template.storage, MetaData(), autoload=True, autoload_with=db.engine)
+    db.metadata.bind = db.engine
 
     return True
 
