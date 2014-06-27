@@ -17,7 +17,6 @@ Import Python Dependencies
 import json
 import requests
 from datetime import datetime
-from sqlalchemy import MetaData
 
 
 """
@@ -591,12 +590,6 @@ class Field(db.Model, CommonsModel):
 
         db.session.delete(field_)
         db.session.commit()
-
-        """
-        Update the MetaData after the field is deleted
-        """
-        db.metadata = MetaData()
-
 
         return True
 
