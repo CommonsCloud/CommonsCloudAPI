@@ -269,6 +269,8 @@ class Field(db.Model, CommonsModel):
             field_.relationship = field_storage['relationship']
             db.session.commit()
 
+        db.session.close()
+
         return field_
 
     """
