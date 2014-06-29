@@ -259,9 +259,10 @@ class Field(db.Model, CommonsModel):
 
 
         """
-        Section 3: Create the Field in the Template Storage
+        Section 3: Create the Field in the Template Storage, if the field will
+                   hold data. Some fields, like fieldset, are only for visual
+                   and aesthetic purposes and do not need added to the Storage
         """
-        logger.warning('Is this a fieldset? %s >> %s', field_.data_type, ('fieldset' in field_.data_type))
         if not 'fieldset' in field_.data_type:
           field_storage = self.create_storage_field(Template_, field_)
 
@@ -590,7 +591,14 @@ class Field(db.Model, CommonsModel):
         db.session.delete(field_)
         db.session.commit()
 
-        self.delete_storage_field(template_, field_)
+        """
+        We only want to call the next method, if and when the field actually
+        exists in the Storage database table. In the case of some special
+        fields, such as the `fieldset` tag, the column doesn't exist in the 
+        database table for the Storage, only in the Field table.
+        """
+        if not 'fieldset' in field_.data_type:
+          self.delete_storage_field(template_, field_)
 
         return True
 
