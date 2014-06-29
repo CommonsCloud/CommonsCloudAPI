@@ -261,8 +261,8 @@ class Field(db.Model, CommonsModel):
         """
         Section 3: Create the Field in the Template Storage
         """
-        logger.warning('Is this a fieldset? %s >> %s', field_.data_type, ('fieldset' is field_.data_type))
-        if not 'fieldset' is field_.data_type:
+        logger.warning('Is this a fieldset? %s >> %s', field_.data_type, ('fieldset' in field_.data_type))
+        if not 'fieldset' in field_.data_type:
           field_storage = self.create_storage_field(Template_, field_)
 
           if 'relationship' in content_.get('data_type', 'text') or 'file' in content_.get('data_type', 'text'):
