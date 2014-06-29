@@ -261,7 +261,7 @@ class Field(db.Model, CommonsModel):
         """
         Section 3: Create the Field in the Template Storage
         """
-        if 'fieldset' is not new_field.data_type:
+        if 'fieldset' is not field_.data_type:
           field_storage = self.create_storage_field(Template_, field_)
 
           if 'relationship' in content_.get('data_type', 'text') or 'file' in content_.get('data_type', 'text'):
