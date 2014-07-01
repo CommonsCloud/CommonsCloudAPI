@@ -43,11 +43,11 @@ def features_single_preflight(storage, feature_id, extension):
 def features_relationship_preflight(storage, feature_id, relationship, extension):
     return status_.status_200(), 200
 
-@module.route('/v2/type_<string:storage>/intersects.<string:extension>', methods=['GET'])
+@module.route('/v2/type_<string:storage>/intersects.<string:extension>', methods=['OPTIONS'])
 def features_intersects_preflight(storage, extension):
     return status_.status_200(), 200
 
-@module.route('/v2/type_<string:storage>/region.<string:extension>', methods=['GET'])
+@module.route('/v2/type_<string:storage>/region.<string:extension>', methods=['OPTIONS'])
 def features_region_preflight(storage, extension):
     return status_.status_200(), 200
 
