@@ -597,6 +597,32 @@ class Feature(CommonsModel):
 
         return features
 
+
+    def feature_get_content_for_region(self, storage_, geometry):
+
+        storage = self.validate_storage(storage_)
+
+        this_template = Template.query.filter_by(storage=storage).first()
+
+        Storage_ = self.get_storage(this_template)
+
+        if not isinstance(geometry, unicode):
+          logger.warning('The region you submitted was not valid, please see http://postgis.net/docs/ST_IsValid.html to better understand why you\'re seeing this message.')
+          return status_.status_400('The region you submitted was not valid, please see http://postgis.net/docs/ST_IsValid.html to better understand why you\'re seeing this message.'), 400
+
+        region = db.session.scalar(geofunc.ST_IsValid(str(geometry)))
+
+        if not region:
+          logger.warning('The region you submitted was not valid, please see http://postgis.net/docs/ST_IsValid.html to better understand why you\'re seeing this message.')
+          return status_.status_400('The region you submitted was not valid, please see http://postgis.net/docs/ST_IsValid.html to better understand why you\'re seeing this message.'), 400
+
+        select_statement = db.select([Storage_]).where(geofunc.ST_Intersects(Storage_.geometry, geometry))
+        features = Storage_.query.select_entity_from(select_statement).all()
+
+
+        return features
+
+
     def feature_attachments(self, child_table, content, parent_id, assoc_):
       """
       We have to make sure that our dynamically typed Model for the association
