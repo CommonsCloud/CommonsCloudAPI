@@ -84,8 +84,6 @@ class GeoJSON(FormatContent):
             'properties': properties
           }
 
-          # this_feature = Feature(**arguments)
-
           try:
             this_feature = Feature(**arguments)
           except Exception, e:
@@ -94,9 +92,9 @@ class GeoJSON(FormatContent):
 
           features.append(this_feature)
 
-          arguments = {
-            'properties': self.extras
-          }
+        arguments = {
+          'properties': self.extras
+        }
 
         response = jsonify(FeatureCollection(features, **arguments))
     else:
