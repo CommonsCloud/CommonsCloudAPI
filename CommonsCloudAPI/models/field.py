@@ -594,7 +594,7 @@ class Field(db.Model, CommonsModel):
         """
         We only want to call the next method, if and when the field actually
         exists in the Storage database table. In the case of some special
-        fields, such as the `fieldset` tag, the column doesn't exist in the 
+        fields, such as the `fieldset` tag, the column doesn't exist in the
         database table for the Storage, only in the Field table.
         """
         if not 'fieldset' in field_.data_type:
@@ -664,6 +664,21 @@ class Field(db.Model, CommonsModel):
             public_.append(template.id)
 
         return public_
+
+
+    """
+    Get a list of templates that are marked as `is_public`
+    """
+    def community_templates(self):
+
+        templates_ = Template.query.filter_by(is_community=True).all()
+
+        community_ = []
+
+        for template in templates_:
+            community_.append(template.id)
+
+        return community_
 
 
     """

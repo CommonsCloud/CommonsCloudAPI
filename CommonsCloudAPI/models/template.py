@@ -106,12 +106,13 @@ class Template(db.Model, CommonsModel):
   is_moderated = db.Column(db.Boolean)
   is_listed = db.Column(db.Boolean)
   is_geospatial = db.Column(db.Boolean)
+  is_community = db.Column(db.Boolean)
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
   fields = db.relationship('Field', secondary='template_fields', backref=db.backref('template'), cascade="all,delete")
 
 
-  def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, is_geospatial=True, created=datetime.now(), status=True):
+  def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, is_geospatial=True, is_community=True, created=datetime.now(), status=True):
     self.name = name
     self.help = help
     self.storage = storage
@@ -120,6 +121,7 @@ class Template(db.Model, CommonsModel):
     self.is_moderated = is_moderated
     self.is_listed = is_listed
     self.is_geospatial = is_geospatial
+    self.is_community = is_community
     self.created = created
     self.status = status
 
@@ -180,9 +182,10 @@ class Template(db.Model, CommonsModel):
       'storage': storage_name,
       'is_public': sanitize.sanitize_boolean(content_.get('is_public', True)),
       'is_crowdsourced': sanitize.sanitize_boolean(content_.get('is_crowdsourced', False)),
-      'is_moderated': sanitize.sanitize_boolean(content_.get('is_moderated', True)),
+      'is_moderated': sanitize.sanitize_boolean(content_.get('is_moderated', False)),
       'is_listed': sanitize.sanitize_boolean(content_.get('is_listed', True)),
       'is_geospatial': sanitize.sanitize_boolean(content_.get('is_geospatial', True)),
+      'is_community': sanitize.sanitize_boolean(content_.get('is_community', False)),
       'created': datetime.now(),
       'status': sanitize.sanitize_boolean(content_.get('status', True))
     }
@@ -319,6 +322,9 @@ class Template(db.Model, CommonsModel):
 
     if hasattr(template_, 'is_geospatial'):
       template_.is_geospatial = sanitize.sanitize_boolean(template_content.get('is_geospatial', template_.is_geospatial))
+
+    if hasattr(template_, 'is_community'):
+      template_.is_community = sanitize.sanitize_boolean(template_content.get('is_community', template_.is_community))
 
     if hasattr(template_, 'status'):
       template_.status = sanitize.sanitize_boolean(template_content.get('status', template_.status))
@@ -512,7 +518,7 @@ class Template(db.Model, CommonsModel):
       All Templates belonging to the requested Application
       """
       application_templates_ = self.applications_templates(application_id)
-      logger.debug('All Templates for this Application %s', application_templates_)  
+      logger.debug('All Templates for this Application %s', application_templates_)
 
       """
       Using the `combined_template_access` filter the Application Templates (the
