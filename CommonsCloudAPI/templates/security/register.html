@@ -6,18 +6,6 @@
         {{ register_user_form.hidden_tag() }}
         <h1 class="text-center" style="margin-bottom: 32px; letter-spacing: 0.025em; font-size: 28px;">Create your account</h1>
 
-        {% include "security/_messages.html" %}
-
-{%- with messages = get_flashed_messages(with_categories=true) -%}
-  {% if messages %}
-    <ul class="flashes">
-    {% for category, message in messages %}
-      <li class="{{ category }}">{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{%- endwith %}
-
         <div class="form-group">
           <label for="email" class="control-label">Email Address</label>
           <input class="text form-control" id="email" name="email" type="email" data-trigger="change" data-required="true" />
