@@ -78,6 +78,11 @@ def user_list(oauth_request, extension):
   return User_.endpoint_response(**arguments)
 
 
+@module.route('/account/create/success/', methods=['GET'])
+def account_creation_success():
+  return render_template('security/register-success.html'), 200
+
+
 @module.route('/user/profile/', methods=['GET'])
 @login_required
 def user_profile_get():

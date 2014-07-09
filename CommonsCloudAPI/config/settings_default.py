@@ -16,7 +16,7 @@ These configuration variables are not tied to a specific enviornment, we can
 consider these the default variables. They can be overriden later on in this
 configuration file by any of the other enviornments, these just give us a jump
 start on the rest, and ensuring we're being as DRY as possible.
-"""  
+"""
 
 # Generic settings
 DEBUG = False
@@ -34,8 +34,13 @@ SECURITY_CHANGEABLE = True
 SECURITY_CHANGE_URL = '/user/password'
 
 SECURITY_LOGIN_USER_TEMPLATE = 'security/login.html'
+
 SECURITY_RESET_PASSWORD_TEMPLATE = 'security/reset_password.html'
+
 SECURITY_REGISTER_USER_TEMPLATE = 'security/register.html'
+SECURITY_REGISTER_URL = '/account/create'
+SECURITY_POST_REGISTER_VIEW = '/account/create/success'
+
 SECURITY_FORGOT_PASSWORD_TEMPLATE = 'security/password_forgot.html'
 
 SECURITY_EMAIL_SENDER = 'CommonsCloud Support <support@commonscloud.org>'
