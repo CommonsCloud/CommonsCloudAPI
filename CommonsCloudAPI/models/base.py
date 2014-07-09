@@ -126,7 +126,7 @@ class CommonsModel(object):
     elif isinstance(value, list):
       return self.serialize_list(value)
     else:
-      pass 
+      pass
 
   """
   In order to be able to work with an object it needs to be serialized,
@@ -633,12 +633,12 @@ class CommonsModel(object):
     """
     if (extension == 'json'):
 
-      this_data = JSON(the_content, list_name=list_name, exclude_fields=exclude_fields, last_modified=last_modified, **extras)
+      this_data = JSON(the_content, list_name=list_name, exclude_fields=exclude_fields, **extras)
       return this_data.create(), code
 
     elif (extension == 'geojson'):
 
-      this_data = GeoJSON(the_content, list_name=list_name, exclude_fields=exclude_fields, last_modified=last_modified, **extras)
+      this_data = GeoJSON(the_content, list_name=list_name, exclude_fields=exclude_fields, **extras)
       return this_data.create(), code
 
     elif (extension == 'csv'):

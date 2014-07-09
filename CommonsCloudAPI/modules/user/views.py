@@ -56,6 +56,9 @@ def user_me(oauth_request, extension):
   arguments = {
     'the_content': User_.current_user,
     'exclude_fields': ['password'],
+    'last_modified': 0,
+    'expires': 0,
+    'max_age': 0,
     'extension': extension
   }
 
@@ -72,6 +75,9 @@ def user_list(oauth_request, extension):
   arguments = {
     'the_content': user_list,
     'list_name': 'users',
+    'last_modified': 0,
+    'expires': 0,
+    'max_age': 0,
     'extension': extension
   }
 

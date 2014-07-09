@@ -62,7 +62,10 @@ class GeoJSON(FormatContent):
   def create(self):
 
     today = datetime.utcnow()
-    expires =  today + timedelta(+30)
+
+    expires_ = self.extras.get('expires', today + timedelta(+364))
+    max_age_ = self.extras.get('max_age', 'max-age=2592000')
+    last_modified_ = self.extras.get('last_modified', today)
 
     # logger.warning('self.the_content %s', self.the_content.keys())
 
@@ -123,9 +126,9 @@ class GeoJSON(FormatContent):
     response.headers.add('Access-Control-Allow-Credentials', True)
     response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, OPTIONS, DELETE')
 
-    response.headers.add('Last-Modified', self.last_modified)
-    response.headers.add('Expires', expires)
-    response.headers.add('Pragma', 'max-age=2592000')
-    response.headers.add('Cache-Control', 'max-age=2592000')
+    response.headers.add('Last-Modified', last_modified_)
+    response.headers.add('Expires', expires_)
+    response.headers.add('Pragma', max_age_)
+    response.headers.add('Cache-Control', max_age_)
 
     return response
