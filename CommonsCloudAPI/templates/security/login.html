@@ -6,8 +6,8 @@
         {{ login_user_form.hidden_tag() }}
         <fieldset>
           <div class="form-group">
-            <label for="email" class="control-label">Email address</label>
-            <input class="form-control input-lg" id="email" name="email" type="text" tabindex="1" />
+            <label for="email" class="control-label element-invisible">Email address</label>
+            <input class="form-control input-lg" id="email" name="email" type="text" tabindex="1" placeholder="Email address" />
             <p class="help-block"><a href="{{ url_for('security.register') }}">Don't have an account?</a></p>
           </div>
 
