@@ -64,8 +64,8 @@ def feature_list(oauth_request, storage, extension, is_public):
     results_per_page = request.args.get('results_per_page')
     if not results_per_page:
         results_per_page = 25
-    elif results_per_page > 100:
-        results_per_page = 100
+    elif results_per_page > 500:
+        results_per_page = 500
     else:
         results_per_page = int(request.args.get('results_per_page'))
 
