@@ -523,6 +523,8 @@ class Feature(CommonsModel):
 
     def feature_statistic(self, Model_, Template_):
 
+        logger.warning('get_statistics')    
+
         search_params = json.loads(request.args.get('q', '{}'))
 
         query = search(db.session, Model_, search_params)
