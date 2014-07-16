@@ -5525,9 +5525,11 @@ form {
 .card a:focus,
 .card a:hover,
 .card a:visited {
-  color: rgb(232,232,232);
+  color: rgb(30, 190, 195);
   font-weight: 200;
 }
+
+
 
 .form-actions {
   margin-top: 32px;
