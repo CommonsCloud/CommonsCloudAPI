@@ -547,7 +547,7 @@ class Feature(CommonsModel):
         # set to 'public' unless the user has the appropriate permissions
 
         return {
-          'results': results,
+          'results': results.get('query'),
           'model': Model_,
           'template': this_template
         }
