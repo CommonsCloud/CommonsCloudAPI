@@ -1306,9 +1306,9 @@ textarea.input-sm {
 
 .input-lg {
   height: 45px;
-  padding: 10px 16px;
+  padding: 0;
   font-size: 18px;
-  line-height: 1.33; }
+  line-height: 1.5; }
 
 .input-lg.text {
     padding: 10px 0 2px;
