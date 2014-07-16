@@ -5523,7 +5523,8 @@ form {
 .card a:focus,
 .card a:hover,
 .card a:visited {
-  color: rgb(27, 101, 118);
+  color: rgb(242,242,242);
+  font-weight: 200;
 }
 
 .form-actions {
