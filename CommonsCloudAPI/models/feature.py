@@ -735,7 +735,7 @@ class Feature(CommonsModel):
           
       logger.warning('get_statistic_value')    
       try:
-        if 'SUM' in statistic_object.function:
+        if 'sum' in statistic_object.function:
           return self.get_statistic_value_sum(query_results, field)
 
       except Exception as e:
