@@ -5235,9 +5235,7 @@ th.visible-print, td.visible-print {
 .element-hidden {
   visibility: hidden; }
 
-body,
 body.modal-open {
-  background-color: #5c646a;
   background-color: #fcfcfc;
   color: #333333;
   margin: 0 auto 60px; }
