@@ -742,7 +742,6 @@ class Feature(CommonsModel):
 
       for result in query_results:
         field_value = getattr(result, field.name, '')
-        logger.error('field_value %s', field_value)
         product = product+int(field_value or 0)
 
       return product
