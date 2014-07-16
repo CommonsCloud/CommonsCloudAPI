@@ -529,7 +529,7 @@ class Feature(CommonsModel):
 
         query = search(db.session, Model_, search_params)
 
-        return self.get_statistics(query.get('all', []), Template_)
+        return self.get_statistics(query.get('all'), Template_)
 
     def feature_list(self, storage_, results_per_page=25):
 
@@ -547,7 +547,7 @@ class Feature(CommonsModel):
         # set to 'public' unless the user has the appropriate permissions
 
         return {
-          'results': endpoint_._search(),
+          'results': results.get('query'),
           'model': Model_,
           'template': this_template
         }
