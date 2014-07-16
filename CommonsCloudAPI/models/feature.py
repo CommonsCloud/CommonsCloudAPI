@@ -543,7 +543,6 @@ class Feature(CommonsModel):
         endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
         logger.warning('endpoint created')
         results = endpoint_._search()
-        logger.warning('search completed', results)
         # @todo loop over these and make sure we're dropping anything that isn't
         # set to 'public' unless the user has the appropriate permissions
 
