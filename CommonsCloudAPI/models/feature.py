@@ -703,6 +703,7 @@ class Feature(CommonsModel):
     """
     def get_statistics(self, query_results, template):
 
+      logger.warning('get_statistics')    
       statistics_list = []
 
       statistic_field_id_list = self._statistic_field_id_list(template.fields)
@@ -729,6 +730,8 @@ class Feature(CommonsModel):
     """
     def get_statistic_value(self, statistic_object, query_results, field):
           
+          
+      logger.warning('get_statistic_value')    
       try:
         if 'SUM' in statistic_object.function:
           return self.get_statistic_value_sum(query_results, field)
@@ -738,6 +741,7 @@ class Feature(CommonsModel):
           
     def get_statistic_value_sum(self, query_results, field, product = 0):
 
+      logger.warning('get_statistic_value_sum')    
       for result in query_results:
         field_value = getattr(result, field.name, '')
         logger.error('field_value %s', field_value)
