@@ -1236,7 +1236,7 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
   line-height: 1.428571429;
   color: rgb(232,232,232);
   vertical-align: middle;
-  background-color: #ffffff;
+  background-color: transparent;
   border: 0;
   border-bottom: 1px solid rgb(232,232,232);
   box-shadow: none;
@@ -5603,7 +5603,7 @@ label.alt {
   text-decoration: none;
   text-align: center;
   text-shadow: none;
-  border-bottom: #30940c 2px solid; }
+  border-bottom: 0; }
 
 .button:active {
   position: relative;
