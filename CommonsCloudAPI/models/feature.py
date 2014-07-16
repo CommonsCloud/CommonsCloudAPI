@@ -529,7 +529,7 @@ class Feature(CommonsModel):
 
         query = search(db.session, Model_, search_params)
 
-        return self.get_statistics(query.all(), Template_)
+        return self.get_statistics(query.get('all', []), Template_)
 
     def feature_list(self, storage_, results_per_page=25):
 
@@ -548,7 +548,7 @@ class Feature(CommonsModel):
         # set to 'public' unless the user has the appropriate permissions
 
         return {
-          'results': endpoint_._search(),
+          'results': results.get('query' []),
           'model': Model_,
           'template': this_template
         }
@@ -732,8 +732,6 @@ class Feature(CommonsModel):
     """
     def get_statistic_value(self, statistic_object, query_results, field):
           
-          
-      logger.warning('get_statistic_value')    
       try:
         if 'sum' in statistic_object.function:
           return self.get_statistic_value_sum(query_results, field)
@@ -743,13 +741,11 @@ class Feature(CommonsModel):
           
     def get_statistic_value_sum(self, query_results, field, product = 0):
 
-      logger.warning('get_statistic_value_sum')    
       for result in query_results:
         field_value = getattr(result, field.name, '')
         logger.error('field_value %s', field_value)
         product = product+int(field_value or 0)
 
-      logger.error('product %s', product)
       return product
 
     def _statistic_field_id_list(self, fields):
