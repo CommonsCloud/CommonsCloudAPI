@@ -490,7 +490,7 @@ class Feature(CommonsModel):
             #         an ID for our attachment
             #         
 
-            logger.warning('file_ %s %s', file_, dir(file_.headers))     
+            logger.warning('file_ %s %s', file_, file_.headers.keys())     
             attachment_details = {
               'caption': sanitize.sanitize_string('cappy'),
               'credit': sanitize.sanitize_string('cred'),
