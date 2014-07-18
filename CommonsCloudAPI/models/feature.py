@@ -247,12 +247,10 @@ class Feature(CommonsModel):
               # Step 1: Create a record in the attachment_ so that we have
               #         an ID for our attachment
               #              
-
-              logger.warning('file_', file_)
               attachment_details = {
-                'caption': sanitize.sanitize_string(file_.caption),
-                'credit': sanitize.sanitize_string(file_.credit),
-                'credit_link': sanitize.sanitize_string(file_.credit_link),
+                'caption': sanitize.sanitize_string(''),
+                'credit': sanitize.sanitize_string(''),
+                'credit_link': sanitize.sanitize_string(''),
                 'filename': sanitize.sanitize_string(file_.filename),
                 'filepath': output,
                 'filetype': sanitize.sanitize_string(file_.mimetype),
@@ -489,11 +487,10 @@ class Feature(CommonsModel):
             # Step 1: Create a record in the attachment_ so that we have
             #         an ID for our attachment
             #              
-            logger.warning('file_ %s', file_)
             attachment_details = {
-              'caption': sanitize.sanitize_string(file_.caption),
-              'credit': sanitize.sanitize_string(file_.credit),
-              'credit_link': sanitize.sanitize_string(file_.credit_link),
+              'caption': sanitize.sanitize_string(''),
+              'credit': sanitize.sanitize_string(''),
+              'credit_link': sanitize.sanitize_string(''),
               'filename': sanitize.sanitize_string(file_.filename),
               'filepath': output,
               'filetype': sanitize.sanitize_string(file_.mimetype),
