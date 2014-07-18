@@ -476,6 +476,8 @@ class Feature(CommonsModel):
 
         field_attachments = request_object.files.getlist(attachment)
 
+        logger.warning('field_attachments %s', field_attachments)
+
         for file_ in field_attachments:
       
           if file_ and self.allowed_file(file_.filename):
