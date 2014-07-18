@@ -486,7 +486,9 @@ class Feature(CommonsModel):
             #
             # Step 1: Create a record in the attachment_ so that we have
             #         an ID for our attachment
-            #              
+            #         
+
+            logger.warning('file_ %s', file_)     
             attachment_details = {
               'caption': sanitize.sanitize_string(''),
               'credit': sanitize.sanitize_string(''),
