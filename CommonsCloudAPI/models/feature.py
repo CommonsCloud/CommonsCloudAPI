@@ -490,8 +490,8 @@ class Feature(CommonsModel):
             #         an ID for our attachment
             #         
             file_metadata = content_.get(attachment, None)
-            logger.warning('file_metadata, %s, %s, %s, %s', attachment, file_metadata, dir(content_), content_.keys())
-
+            # logger.warning('file_metadata, %s, %s, %s, %s', attachment, file_metadata, dir(content_), content_.keys())
+            logger.warning('content_ %s', content_)
             logger.warning('file_ %s', file_)     
             attachment_details = {
               'caption': sanitize.sanitize_string(''),
