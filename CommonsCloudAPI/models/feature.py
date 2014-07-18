@@ -489,12 +489,14 @@ class Feature(CommonsModel):
             # Step 1: Create a record in the attachment_ so that we have
             #         an ID for our attachment
             #         
+            file_metadata = content_.get(attachment, [])
+            logger.warning('file_metadata %s', file_metadata)
 
-            logger.warning('file_ %s %s', file_, file_.headers.keys())     
+            logger.warning('file_ %s', file_)     
             attachment_details = {
-              'caption': sanitize.sanitize_string('cappy'),
-              'credit': sanitize.sanitize_string('cred'),
-              'credit_link': sanitize.sanitize_string('linkage'),
+              'caption': sanitize.sanitize_string(''),
+              'credit': sanitize.sanitize_string(''),
+              'credit_link': sanitize.sanitize_string(''),
               'filename': sanitize.sanitize_string(file_.filename),
               'filepath': output,
               'filetype': sanitize.sanitize_string(file_.mimetype),
