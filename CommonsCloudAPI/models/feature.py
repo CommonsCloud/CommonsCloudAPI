@@ -490,7 +490,7 @@ class Feature(CommonsModel):
             #         an ID for our attachment
             #         
             file_metadata = content_.get(attachment, [])
-            logger.warning('file_metadata %s', file_metadata)
+            logger.warning('file_metadata, %s, %s', attachment, file_metadata)
 
             logger.warning('file_ %s', file_)     
             attachment_details = {
