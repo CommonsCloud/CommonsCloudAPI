@@ -492,9 +492,9 @@ class Feature(CommonsModel):
 
             logger.warning('file_ %s', file_)     
             attachment_details = {
-              'caption': sanitize.sanitize_string(''),
-              'credit': sanitize.sanitize_string(''),
-              'credit_link': sanitize.sanitize_string(''),
+              'caption': sanitize.sanitize_string('cappy'),
+              'credit': sanitize.sanitize_string('cred'),
+              'credit_link': sanitize.sanitize_string('linkage'),
               'filename': sanitize.sanitize_string(file_.filename),
               'filepath': output,
               'filetype': sanitize.sanitize_string(file_.mimetype),
