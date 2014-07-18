@@ -489,7 +489,7 @@ class Feature(CommonsModel):
             # Step 1: Create a record in the attachment_ so that we have
             #         an ID for our attachment
             #         
-            file_metadata = content_.get(attachment, [])
+            file_metadata = content_.get(attachment, None)
             logger.warning('file_metadata, %s, %s', attachment, file_metadata)
 
             logger.warning('file_ %s', file_)     
