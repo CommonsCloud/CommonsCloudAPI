@@ -376,7 +376,7 @@ class Feature(CommonsModel):
       """
       try:
         content_ = json.loads(request_object.data)
-        logger.warning("request_object.data %s", dir(request_object.data))
+        logger.warning("request_object.data %s", request_object.data)
       except ValueError, e:
         content_ = request_object.form
         logger.warning("request_object.form %s", request_object.form)
