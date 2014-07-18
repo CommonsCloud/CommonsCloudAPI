@@ -248,9 +248,9 @@ class Feature(CommonsModel):
               #         an ID for our attachment
               #              
               attachment_details = {
-                'caption': sanitize.sanitize_string(''),
-                'credit': sanitize.sanitize_string(''),
-                'credit_link': sanitize.sanitize_string(''),
+                'caption': sanitize.sanitize_string(file_.caption),
+                'credit': sanitize.sanitize_string(file_.credit),
+                'credit_link': sanitize.sanitize_string(file_.credit_link),
                 'filename': sanitize.sanitize_string(file_.filename),
                 'filepath': output,
                 'filetype': sanitize.sanitize_string(file_.mimetype),
@@ -488,9 +488,9 @@ class Feature(CommonsModel):
             #         an ID for our attachment
             #              
             attachment_details = {
-              'caption': sanitize.sanitize_string(''),
-              'credit': sanitize.sanitize_string(''),
-              'credit_link': sanitize.sanitize_string(''),
+              'caption': sanitize.sanitize_string(file_.caption),
+              'credit': sanitize.sanitize_string(file_.credit),
+              'credit_link': sanitize.sanitize_string(file_.credit_link),
               'filename': sanitize.sanitize_string(file_.filename),
               'filepath': output,
               'filetype': sanitize.sanitize_string(file_.mimetype),
