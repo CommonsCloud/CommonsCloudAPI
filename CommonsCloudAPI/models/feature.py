@@ -573,6 +573,50 @@ class Feature(CommonsModel):
 
         return True
 
+    def attachment_delete(self, storage_, feature_id, attachment_storage_, attachment_id):
+
+        storage = self.validate_storage(storage_)
+        attachment_storage = self.validate_storage(attachment_storage_)
+
+        Template_ = Template.query.filter_by(storage=storage).first()
+        Attachment_ = self.get_storage(str(attachment_storage))
+        
+        assoc_ = self._feature_relationship_associate(Template_, attachment_storage)
+        Relationship_ = self.get_storage(str(assoc_))
+
+        if not Template_.id in self.allowed_templates(self.current_user.templates):
+          return status_.status_401('That isn\'t your feature'), 401
+
+        try:
+          """
+          Step 1: Delete the feature <> attachment relationship
+          """
+          relationship_ = Relationship_.query.filter_by(parent_id=feature_id).filter_by(child_id=attachment_id).first()
+          # logger.warning('existing_relationship %s %s', existing_relationship.parent_id, existing_relationship.child_id)
+          db.session.delete(relationship_)
+          db.session.commit()
+
+          """
+          Step 2: Delete the attachment record
+          """
+          attachment = Attachment_.query.get(attachment_id)
+
+          if not hasattr(attachment, 'id'):
+              return abort(404)
+
+          db.session.delete(attachment)
+          db.session.commit()
+
+          """
+          Step 3: Delete the media from Amazon
+          """
+          # self.s3_delete()
+
+          return True
+  
+        except:
+          return status_.status_400('Something went wrong and we couldn\'t delete that attachment'), 400
+
     def feature_get_intersection(self, storage_, geometry):
 
         storage = self.validate_storage(storage_)
@@ -817,5 +861,14 @@ class Feature(CommonsModel):
       last_modified_date = db.session.query(db.func.max(Storage_.updated)).scalar()
 
       return last_modified_date
+
+    def allowed_templates(self, permissions):
+
+      templates_ = []
+
+      for permission in permissions:
+        templates_.append(permission.template_id)
+
+      return templates_
 
 

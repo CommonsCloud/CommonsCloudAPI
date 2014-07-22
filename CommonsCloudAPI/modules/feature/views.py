@@ -51,6 +51,11 @@ def features_intersects_preflight(storage, extension):
 def features_region_preflight(storage, extension):
     return status_.status_200(), 200
 
+@module.route('/v2/type_<string:storage>/<int:feature_id>/attachment_<string:attachment_storage>/<int:attachment_id>.<string:extension>', methods=['OPTIONS'])
+@oauth.require_oauth()
+def attachment_delete_preflight(oauth_request, storage, feature_id, attachment_storage, attachment_id, extension):
+    return status_.status_200(), 200
+
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()
@@ -195,6 +200,21 @@ def feature_delete(oauth_request, storage, feature_id, extension):
         return status_.status_204(), 204
     except Exception as e:
         return status_.status_500(e), 500
+
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/attachment_<string:attachment_storage>/<int:attachment_id>.<string:extension>', methods=['DELETE'])
+@oauth.require_oauth()
+def attachment_delete(oauth_request, storage, feature_id, attachment_storage, attachment_id, extension):
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    Feature_.attachment_delete(storage, feature_id, 'attachment_' + attachment_storage, attachment_id)
+
+    try:
+        return status_.status_204(), 204
+    except Exception as e:
+        return status_.status_500(e), 500
+
 
 @module.route('/v2/type_<string:storage>/intersects.<string:extension>', methods=['GET'])
 @is_public()
