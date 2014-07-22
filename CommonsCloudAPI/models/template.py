@@ -491,7 +491,7 @@ class Template(db.Model, CommonsModel):
   Get a list of Templates that belong to this Application
 
   """
-  def application_templates_get(self, application_id, is_public=False):
+  def application_templates_get(self, application_id, is_public):
 
     if not is_public:
       template_id_list_ = self.allowed_templates(application_id)
