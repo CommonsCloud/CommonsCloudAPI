@@ -25,19 +25,18 @@ from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.application import Application
+from CommonsCloudAPI.models.application import is_public
 
 from . import module
 
 
 @module.route('/v2/applications.<string:extension>', methods=['OPTIONS'])
 def application_preflight(extension):
-
   return status_.status_200(), 200
 
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['OPTIONS'])
 def application_single_preflight(application_id, extension):
-
   return status_.status_200(), 200
 
 
@@ -63,13 +62,14 @@ def application_list(oauth_request, extension):
 
 
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['GET'])
-@oauth.require_oauth('applications')
-def application_get(oauth_request, application_id, extension):
+@is_public()
+@oauth.oauth_or_public()
+def application_get(oauth_request, application_id, extension, is_public):
 
   Application_ = Application()
   Application_.current_user = oauth_request.user
 
-  this_application = Application_.application_get(application_id)
+  this_application = Application_.application_get(application_id, is_public)
 
   if type(this_application) is tuple:
     return this_application

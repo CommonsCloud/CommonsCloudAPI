@@ -489,9 +489,6 @@ class Feature(CommonsModel):
             # Step 1: Create a record in the attachment_ so that we have
             #         an ID for our attachment
             #         
-            file_metadata = content_.get(attachment, None)
-            # logger.warning('file_metadata, %s, %s, %s, %s', attachment, file_metadata, dir(content_), content_.keys())
-            logger.warning('content_ %s', content_)
             logger.warning('file_ %s', file_)     
             attachment_details = {
               'caption': sanitize.sanitize_string(''),
@@ -609,9 +606,9 @@ class Feature(CommonsModel):
 
         storage = self.validate_storage(storage_)
 
-        this_template = Template.query.filter_by(storage=storage).first()
+        Template_ = Template.query.filter_by(storage=storage).first()
 
-        Storage_ = self.get_storage(this_template)
+        Storage_ = self.get_storage(Template_)
 
         if not isinstance(geometry, unicode):
           logger.warning('The region you submitted was not valid, please see http://postgis.net/docs/ST_IsValid.html to better understand why you\'re seeing this message.')

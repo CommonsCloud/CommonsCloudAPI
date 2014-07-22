@@ -18,6 +18,8 @@ import json
 
 from datetime import datetime
 
+from functools import wraps
+
 
 """
 Import Commons Cloud Dependencies
@@ -48,6 +50,32 @@ class UserApplications(db.Model, CommonsModel):
 
 
 """
+is_public allows us to check if feature collections are supposed to public, if
+they are, then we don't need to check for OAuth crednetials to allow access
+"""
+class is_public(object):
+
+    def __init__(self):
+      pass
+
+    def __call__(self, f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+
+          application_ = Application.query.get(kwargs['application_id'])
+
+          keywords = kwargs
+
+          if not application_.is_public:
+            keywords['is_public'] = False
+          else:
+            keywords['is_public'] = True
+
+          return f(*args, **keywords)
+     
+        return decorated_function
+
+"""
 Define our individual models
 """
 class Application(db.Model, CommonsModel):
@@ -65,15 +93,17 @@ class Application(db.Model, CommonsModel):
   url = db.Column(db.String(255))
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
+  is_public = db.Column(db.Boolean)
   templates = db.relationship('ApplicationTemplates', backref=db.backref('application'), cascade="all,delete")
 
 
-  def __init__(self, name="", url="", description=None, created=datetime.utcnow(), status=True, templates=[], current_user_={}):
+  def __init__(self, name="", url="", description=None, created=datetime.utcnow(), status=True, is_public=True, templates=[], current_user_={}):
     self.name = name
     self.description = description
     self.url = url
     self.created = created
     self.status = status
+    self.is_public = is_public
     self.templates = templates
     self.current_user = current_user_
 
@@ -110,7 +140,8 @@ class Application(db.Model, CommonsModel):
     new_application = {
       'name': sanitize.sanitize_string(application_content.get('name', '')),
       'description': sanitize.sanitize_string(application_content.get('description', '')),
-      'url': application_content.get('url', '')
+      'url': application_content.get('url', ''),
+      'is_public': application_content.get('is_public', False)
     }
 
     application_ = Application(**new_application)
@@ -141,14 +172,14 @@ class Application(db.Model, CommonsModel):
   """
   Get a single, existing Application from the API
   """
-  def application_get(self, application_id):
+  def application_get(self, application_id, is_public):
 
-    allowed_applications = self.allowed_applications()
+    if not is_public:
 
-    if not application_id in allowed_applications:
-      logger.warning('User %d with Applications %s tried to access Application %d', \
-          self.current_user.id, allowed_applications, application_id)
-      return status_.status_401('You need to be logged in to access applications'), 401
+      allowed_applications = self.allowed_applications()
+
+      if not application_id in allowed_applications:
+        return status_.status_401('You need to be logged in to access applications'), 401
 
     return Application.query.get(application_id)
 

@@ -16,7 +16,7 @@ Import Python Dependencies
 """
 import json
 from datetime import datetime
-
+from functools import wraps
 
 """
 Import Commons Cloud Dependencies
@@ -29,6 +29,36 @@ from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.application import Application
+
+
+"""
+is_public allows us to check if feature collections are supposed to public, if
+they are, then we don't need to check for OAuth crednetials to allow access
+"""
+class is_public(object):
+
+    def __init__(self):
+      pass
+
+    def __call__(self, f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+
+          if 'application_id' in kwargs:
+            element_ = Application.query.get(kwargs['application_id'])
+          elif 'template_id' in kwargs:
+            element_ = Template.query.get(kwargs['template_id'])
+
+          keywords = kwargs
+
+          if not element_.is_public:
+            keywords['is_public'] = False
+          else:
+            keywords['is_public'] = True
+
+          return f(*args, **keywords)
+     
+        return decorated_function
 
 
 """
@@ -239,7 +269,7 @@ class Template(db.Model, CommonsModel):
       A fully qualified Template object
 
   """
-  def template_get(self, template_id):
+  def template_get(self, template_id, is_public):
 
     """
     If there's no template_id we can't do any, so display a 404
@@ -253,10 +283,11 @@ class Template(db.Model, CommonsModel):
     they have explicit permission to access it (i.e., collaborator, owner) or
     the template is marked as `is_public`
     """
-    template_id_list_ = self.allowed_templates()
+    if not is_public:
+      template_id_list_ = self.allowed_templates()
 
-    if not template_id in template_id_list_:
-      return status_.status_401('That isn\'t your template'), 401
+      if not template_id in template_id_list_:
+        return status_.status_401('That isn\'t your template'), 401
 
     """
     If we've made it this far, then the user can access the template, just show
@@ -460,11 +491,14 @@ class Template(db.Model, CommonsModel):
   Get a list of Templates that belong to this Application
 
   """
-  def application_templates_get(self, application_id):
+  def application_templates_get(self, application_id, is_public):
 
-    template_id_list_ = self.allowed_templates(application_id)
-
-    templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
+    if not is_public:
+      template_id_list_ = self.allowed_templates(application_id)
+      templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
+    else:
+      template_id_list_ = self.applications_templates(application_id)
+      templates_ = Template.query.filter(Template.id.in_(template_id_list_)).filter(Template.is_public).all()
 
     return templates_
 

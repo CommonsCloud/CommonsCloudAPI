@@ -24,6 +24,7 @@ from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.template import Template
+from CommonsCloudAPI.models.template import is_public
 
 from . import module
 
@@ -50,13 +51,14 @@ def template_list(extension):
 
 
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['GET'])
-@oauth.require_oauth('user')
-def application_templates_get(oauth_request, application_id, extension):
+@is_public()
+@oauth.oauth_or_public()
+def application_templates_get(oauth_request, application_id, extension, is_public):
 
   Template_ = Template()
   Template_.current_user = oauth_request.user
 
-  these_templates = Template_.application_templates_get(application_id)
+  these_templates = Template_.application_templates_get(application_id, is_public)
 
   if type(these_templates) is tuple:
     return these_templates
@@ -91,12 +93,13 @@ def template_post(oauth_request, application_id, extension):
 
 
 @module.route('/v2/templates/<int:template_id>.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
-def template_get(oauth_request, template_id, extension):
+@is_public()
+@oauth.oauth_or_public()
+def template_get(oauth_request, template_id, extension, is_public):
 
   Template_ = Template()
   Template_.current_user = oauth_request.user
-  this_template = Template_.template_get(template_id)
+  this_template = Template_.template_get(template_id, is_public)
 
   if type(this_template) is tuple:
     return this_template
