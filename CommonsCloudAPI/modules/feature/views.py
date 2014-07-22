@@ -52,7 +52,6 @@ def features_region_preflight(storage, extension):
     return status_.status_200(), 200
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>/attachment_<string:attachment_storage>/<int:attachment_id>.<string:extension>', methods=['OPTIONS'])
-@oauth.require_oauth()
 def attachment_delete_preflight(oauth_request, storage, feature_id, attachment_storage, attachment_id, extension):
     return status_.status_200(), 200
 
