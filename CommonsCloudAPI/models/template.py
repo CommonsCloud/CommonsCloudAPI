@@ -495,12 +495,12 @@ class Template(db.Model, CommonsModel):
 
     logger.warning('is_public %s', is_public)
 
-    if not is_public:
-      template_id_list_ = self.allowed_templates(application_id)
-      templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
-    else:
+    if not hasattr(self.current_user, 'id'):
       template_id_list_ = self.applications_templates(application_id)
       templates_ = Template.query.filter(Template.id.in_(template_id_list_)).filter(Template.is_public).all()
+    else:
+      template_id_list_ = self.allowed_templates(application_id)
+      templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
 
     return templates_
 
