@@ -493,6 +493,8 @@ class Template(db.Model, CommonsModel):
   """
   def application_templates_get(self, application_id, is_public):
 
+    logger.warning('is_public %s', is_public)
+
     if not is_public:
       template_id_list_ = self.allowed_templates(application_id)
       templates_ = Template.query.filter(Template.id.in_(template_id_list_)).all()
