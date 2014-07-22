@@ -25,6 +25,7 @@ from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.template import Template
 from CommonsCloudAPI.models.field import Field
+from CommonsCloudAPI.models.field import is_public
 
 from . import module
 
@@ -39,12 +40,13 @@ def fields_single_preflight(template_id, field_id, extension):
 
 
 @module.route('/v2/templates/<int:template_id>/fields/<int:field_id>.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
-def field_get(oauth_request, template_id, field_id, extension):
+@is_public()
+@oauth.oauth_or_public()
+def field_get(oauth_request, template_id, field_id, extension, is_public):
 
   Field_ = Field()
   Field_.current_user = oauth_request.user
-  this_field = Field_.field_get(field_id)
+  this_field = Field_.field_get(field_id, is_public)
 
   if type(this_field) is tuple:
     return this_field
@@ -61,12 +63,13 @@ def field_get(oauth_request, template_id, field_id, extension):
 A list of templates that belongs to a specific application
 """
 @module.route('/v2/templates/<int:template_id>/fields.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
-def template_fields_get(oauth_request, template_id, extension):
+@is_public()
+@oauth.oauth_or_public()
+def template_fields_get(oauth_request, template_id, extension, is_public):
 
   Field_ = Field()
   Field_.current_user = oauth_request.user
-  these_fields = Field_.template_fields_get(template_id)
+  these_fields = Field_.template_fields_get(template_id, is_public)
 
   if type(these_fields) is tuple:
     return these_fields

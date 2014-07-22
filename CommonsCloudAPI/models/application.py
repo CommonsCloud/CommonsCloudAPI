@@ -172,7 +172,7 @@ class Application(db.Model, CommonsModel):
   """
   Get a single, existing Application from the API
   """
-  def application_get(self, application_id, is_public):
+  def application_get(self, application_id, is_public=False):
 
     if not is_public:
 

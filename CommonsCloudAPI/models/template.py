@@ -269,7 +269,7 @@ class Template(db.Model, CommonsModel):
       A fully qualified Template object
 
   """
-  def template_get(self, template_id, is_public):
+  def template_get(self, template_id, is_public=False):
 
     """
     If there's no template_id we can't do any, so display a 404
@@ -491,7 +491,7 @@ class Template(db.Model, CommonsModel):
   Get a list of Templates that belong to this Application
 
   """
-  def application_templates_get(self, application_id, is_public):
+  def application_templates_get(self, application_id, is_public=False):
 
     if not is_public:
       template_id_list_ = self.allowed_templates(application_id)

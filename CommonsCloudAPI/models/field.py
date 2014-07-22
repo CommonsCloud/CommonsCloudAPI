@@ -17,6 +17,7 @@ Import Python Dependencies
 import json
 import requests
 from datetime import datetime
+from functools import wraps
 
 
 """
@@ -37,6 +38,35 @@ from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.template import Template
 
+
+"""
+is_public allows us to check if feature collections are supposed to public, if
+they are, then we don't need to check for OAuth crednetials to allow access
+"""
+class is_public(object):
+
+    def __init__(self):
+      pass
+
+    def __call__(self, f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+
+          if 'template_id' in kwargs:
+            element_ = Template.query.get(kwargs['template_id'])
+          elif 'field_id' in kwargs:
+            element_ = Field.query.get(kwargs['field_id'])
+
+          keywords = kwargs
+
+          if not element_.is_public:
+            keywords['is_public'] = False
+          else:
+            keywords['is_public'] = True
+
+          return f(*args, **keywords)
+     
+        return decorated_function
 
 """
 Field to Template Association
@@ -374,8 +404,9 @@ class Field(db.Model, CommonsModel):
       A fully qualified Field object
 
     """
-    def field_get(self, field_id):
+    def field_get(self, field_id, is_public=False):
 
+      if not is_public:
         """
         Make sure that we have everything we need to created the
         template successfully, including things like a Name, an associated
@@ -400,9 +431,12 @@ class Field(db.Model, CommonsModel):
               self.current_user.id, allowed_fields, field_id)
           return status_.status_401('You can\'t edit this Field because it\'s not yours'), 401
 
+      field_ = {}
+
+      if field_id:
         field_ = Field.query.get(field_id)
 
-        return field_
+      return field_
 
 
 
@@ -512,7 +546,7 @@ class Field(db.Model, CommonsModel):
     Get a list of Fields that belong to this Template
 
     """
-    def template_fields_get(self, template_id):
+    def template_fields_get(self, template_id, is_public=False):
 
         """
         Make sure that we have everything we need to created the
@@ -524,32 +558,38 @@ class Field(db.Model, CommonsModel):
               self.current_user.id)
           return status_.status_400('You didn\'t include a Template ID to get a list of fields with'), 400
 
-        """
-        Fields are directly tied to Templates and really have no life of their
-        own outside of Templates. Because of that we need to instantiate a
-        Template object that we can work with
-        """
-        allowed_templates = self.allowed_fields(template_id=template_id)
-
-        if not template_id in allowed_templates:
-          logger.warning('User %d with Templates %s tried to access Template Fields %d', \
-              self.current_user.id, allowed_templates, template_id)
-          return status_.status_401('You can\'t edit this Template because it\'s not yours'), 401
-
         template_ = Template.query.get(template_id)
-
-        allowed_fields = self.allowed_fields()
-        public_fields_ = self.public_templates()
-
-        allowed_fields_list = allowed_fields + public_fields_
-
         fields_ = []
 
-        for field in template_.fields:
-            if field.id in allowed_fields_list:
-                fields_.append(field)
+        if not is_public:
 
-        return list(fields_)
+          """
+          Fields are directly tied to Templates and really have no life of their
+          own outside of Templates. Because of that we need to instantiate a
+          Template object that we can work with
+          """
+          allowed_templates = self.allowed_fields(template_id=template_id)
+
+          if not template_id in allowed_templates:
+            logger.warning('User %d with Templates %s tried to access Template Fields %d', \
+                self.current_user.id, allowed_templates, template_id)
+            return status_.status_401('You can\'t edit this Template because it\'s not yours'), 401
+
+          allowed_fields = self.allowed_fields()
+          public_fields_ = self.public_templates()
+
+          allowed_fields_list = allowed_fields + public_fields_
+
+          for field in template_.fields:
+              if field.id in allowed_fields_list:
+                  fields_.append(field)
+  
+        else:
+          for field in template_.fields:
+            # if field.is_public:
+            fields_.append(field)
+
+        return fields_
 
 
     """
