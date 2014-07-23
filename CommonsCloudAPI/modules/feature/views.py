@@ -15,6 +15,7 @@ limitations under the License.
 Import Flask Dependencies
 """
 from flask import request
+from flask import send_from_directory
 
 
 """
@@ -260,3 +261,19 @@ def feature_region(oauth_request, storage, extension, is_public):
     }
 
     return Feature_.endpoint_response(**arguments)
+
+
+@module.route('/v2/type_<string:storage>/excel-template', methods=['GET'])
+@is_public()
+@oauth.oauth_or_public()
+def feature_get_excel_template(oauth_request, storage, is_public):
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    excel_template = Feature_.feature_get_excel_template(storage)
+
+    logger.warning('excel_template %s', excel_template)
+
+    # return status_.status_200(), 200
+
+    return send_from_directory(excel_template.get('directory'), excel_template.get('filename'), as_attachment=True)

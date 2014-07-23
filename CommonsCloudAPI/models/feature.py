@@ -19,6 +19,7 @@ import boto
 import json
 import os.path
 import uuid
+import xlsxwriter
 
 from datetime import datetime
 from uuid import uuid4
@@ -870,5 +871,38 @@ class Feature(CommonsModel):
         templates_.append(permission.template_id)
 
       return templates_
+
+    def feature_get_excel_template(self, storage_):
+
+      storage = self.validate_storage(storage_)
+      Template_ = Template.query.filter_by(storage=storage).first()
+      Storage_ = self.get_storage(Template_)
+
+      """
+      Setup our basic file and name it appropriately.
+      """
+      directory = current_app.config['FILE_ATTACHMENTS_DIRECTORY']
+      filename = ('%s.xlsx') % (storage)
+      filepath  = ('%s/%s') % (directory, filename)
+      workbook = xlsxwriter.Workbook(filepath)
+
+      """
+      Add our base Worksheet that will serve as our template
+      """
+      storage_worksheet = workbook.add_worksheet('Sheet to Import')
+      # storage_worksheet.write('A1', 'grr')
+
+      for index, field in enumerate(Template_.fields):
+        logger.warning('0, %d, %s', index, field.name)
+        storage_worksheet.write(0, index, field.name)
+
+      workbook.close()
+
+      return {
+        'workbook': workbook,
+        'filename': filename,
+        'directory': directory,
+        'filepath': filepath
+      }
 
 

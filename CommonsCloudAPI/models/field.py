@@ -586,7 +586,6 @@ class Field(db.Model, CommonsModel):
   
         else:
           for field in template_.fields:
-            # if field.is_public:
             fields_.append(field)
 
         return fields_
