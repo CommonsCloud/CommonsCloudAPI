@@ -653,7 +653,7 @@ class Feature(CommonsModel):
 
         Template_ = Template.query.filter_by(storage=storage).first()
 
-        Storage_ = self.get_storage(Template_)
+        Storage_ = self.get_storage(Template_, Template_.fields)
 
         if not isinstance(geometry, unicode):
           logger.warning('The region you submitted was not valid, please see http://postgis.net/docs/ST_IsValid.html to better understand why you\'re seeing this message.')
@@ -667,6 +667,12 @@ class Feature(CommonsModel):
 
         select_statement = db.select([Storage_]).where(geofunc.ST_Intersects(Storage_.geometry, geometry))
         features = Storage_.query.select_entity_from(select_statement).all()
+
+        logger.warning('features %s', features)
+        logger.warning('__public__ %s', self.__public__)
+
+        for feature in features:
+          logger.warning('feature.keys() %s', dir(feature))
 
 
         return features
