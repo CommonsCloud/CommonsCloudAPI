@@ -668,13 +668,6 @@ class Feature(CommonsModel):
         select_statement = db.select([Storage_]).where(geofunc.ST_Intersects(Storage_.geometry, geometry))
         features = Storage_.query.select_entity_from(select_statement).all()
 
-        logger.warning('features %s', features)
-        logger.warning('__public__ %s', self.__public__)
-
-        for feature in features:
-          logger.warning('feature.keys() %s', dir(feature))
-
-
         return features
 
 
