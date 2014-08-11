@@ -889,10 +889,8 @@ class Feature(CommonsModel):
       Add our base Worksheet that will serve as our template
       """
       storage_worksheet = workbook.add_worksheet('Sheet to Import')
-      # storage_worksheet.write('A1', 'grr')
 
       for index, field in enumerate(Template_.fields):
-        logger.warning('0, %d, %s', index, field.name)
         storage_worksheet.write(0, index, field.name)
 
       workbook.close()

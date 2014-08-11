@@ -56,6 +56,10 @@ def features_region_preflight(storage, extension):
 def attachment_delete_preflight(storage, feature_id, attachment_storage, attachment_id, extension):
     return status_.status_200(), 200
 
+@module.route('/v2/type_<string:storage>/import.<string:extension>', methods=['OPTIONS'])
+def features_import_preflight(storage, extension):
+    return status_.status_200(), 200
+
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()
@@ -277,3 +281,19 @@ def feature_get_excel_template(oauth_request, storage, is_public):
     # return status_.status_200(), 200
 
     return send_from_directory(excel_template.get('directory'), excel_template.get('filename'), as_attachment=True)
+
+
+@module.route('/v2/type_<string:storage>/import.<string:extension>', methods=['POST'])
+@oauth.require_oauth()
+def feature_import(oauth_request, storage, extension):
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+
+    arguments = {
+        'the_content': [],
+        'list_name': 'features',
+        'extension': extension
+    }
+
+    return Feature_.endpoint_response(**arguments)

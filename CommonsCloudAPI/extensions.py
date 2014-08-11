@@ -24,6 +24,7 @@ from flask.ext.security import Security
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail
 from flask.ext.principal import Principal
+from flask.ext.rq import RQ
 
 from CommonsCloudAPI.utilities.sanitize import CommonsSanitize
 from CommonsCloudAPI.utilities.statuses import CommonsStatus
@@ -41,7 +42,7 @@ oauth = CommonsOAuth2Provider()
 principal = Principal()
 status = CommonsStatus()
 sanitize = CommonsSanitize()
-
+queue = RQ()
 
 """
 Signals
