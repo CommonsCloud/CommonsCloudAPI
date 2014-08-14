@@ -934,9 +934,8 @@ class Feature(CommonsModel):
         if field.data_type == 'relationship':
           relationship_field_name = str(field.name + '__id')
           storage_worksheet.write(0, index, relationship_field_name)
-          continue
-
-        storage_worksheet.write(0, index, field.name)
+        else:
+          storage_worksheet.write(0, index, field.name)
 
       workbook.close()
 
