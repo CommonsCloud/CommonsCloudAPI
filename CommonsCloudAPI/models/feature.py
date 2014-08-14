@@ -913,6 +913,8 @@ class Feature(CommonsModel):
 
     def feature_get_excel_template(self, storage_):
 
+      logger.warning('Creating an Excel template for the %s feature collection', storage_)
+
       storage = self.validate_storage(storage_)
       Template_ = Template.query.filter_by(storage=storage).first()
       Storage_ = self.get_storage(Template_)
@@ -933,6 +935,7 @@ class Feature(CommonsModel):
       for index, field in enumerate(Template_.fields):
         if field.data_type == 'relationship':
           relationship_field_name = str(field.name + '__id')
+          logger.warning('relationship field %s', relationship_field_name)
           storage_worksheet.write(0, index, relationship_field_name)
         else:
           storage_worksheet.write(0, index, field.name)
