@@ -931,7 +931,7 @@ class Feature(CommonsModel):
       storage_worksheet = workbook.add_worksheet('Sheet to Import')
 
       for index, field in enumerate(Template_.fields):
-        if field.data_type is 'relationship':
+        if field.data_type == 'relationship':
           relationship_field_name = str(field.name + '__id')
           storage_worksheet.write(0, index, relationship_field_name)
           continue
