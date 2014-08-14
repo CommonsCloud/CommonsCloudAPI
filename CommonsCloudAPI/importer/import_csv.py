@@ -34,7 +34,7 @@ def import_csv(self, filename, storage, template_fields):
   """
   Ensure we have a valid URL, the nominal case is 
   """
-  filename = self.validate_url(filename)
+  filename_ = self.validate_url(filename)
   
   """
   List of new features that has been created
@@ -45,7 +45,7 @@ def import_csv(self, filename, storage, template_fields):
   """
   Open the CSV from a remote server (AmazonS3)
   """
-  response = urllib2.urlopen(filename)
+  response = urllib2.urlopen(filename_)
   reader = csv.reader(response)
 
   """
@@ -58,29 +58,28 @@ def import_csv(self, filename, storage, template_fields):
       logger.warning('Header: %s', headers)
       continue
 
-    feature_object = {}
-    feature_object['data'] = self.build_feature_object(row, headers)
+    feature_object = self.build_feature_object(row, headers)
 
-    logger.warning('Request Object: %s', feature_object.data)
+    logger.warning('Index: %s; Feature: %s', index, new_feature)
 
-    # Feature_ = Feature()
-    # new_feature = Feature_.feature_create(feature_object, storage)
+    features.append(feature_object)
 
-    # logger.warning('Index: %s; Feature: %s', index, new_feature)
+  """
+  Send list of Features to our batch import function
+  """
+  batch_url = ('//127.0.0.1:5000/v2/%s/batch.json') % (storage)
+  data = {
+    'features': features
+  }
+  timeout = 300
+  response = urllib2.urlopen(batch_url, data, timeout)
 
-
-    # """
-    # Create the new Feature within the correct storage table
-    # """
-    # new_feature = self.feature_create(feature, storage)
-
-    # features.append(feature_object)
 
   """
   Return a list of newly created Features
   """
-  # logger.warning("Imported Features: %s", features)
-  # return features
+  logger.warning("Batch Response: %s", response)
+  return response
 
 def build_feature_object(self, data, columns):
 
