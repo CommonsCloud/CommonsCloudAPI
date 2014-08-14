@@ -140,6 +140,7 @@ class Template(db.Model, CommonsModel):
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
   fields = db.relationship('Field', secondary='template_fields', backref=db.backref('template'), cascade="all,delete")
+  activity = db.relationship('Activity', backref=db.backref('template'), cascade="all,delete")
 
 
   def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, is_geospatial=True, is_community=True, created=datetime.now(), status=True):

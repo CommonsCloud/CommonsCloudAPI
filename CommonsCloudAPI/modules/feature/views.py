@@ -305,11 +305,11 @@ def feature_import(oauth_request, storage, extension):
 
 
 @module.route('/v2/type_<string:storage>/batch.<string:extension>', methods=['POST'])
-@oauth.require_oauth()
-def feature_batch(oauth_request, storage, extension):
+# @oauth.require_oauth()
+def feature_batch(storage, extension):
 
     Feature_ = Feature()
-    Feature_.current_user = oauth_request.user
+    # Feature_.current_user = oauth_request.user
     import_features = Feature_.feature_batch(request, storage)
 
     if type(import_features) is tuple:

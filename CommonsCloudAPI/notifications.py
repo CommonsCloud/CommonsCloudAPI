@@ -139,25 +139,25 @@ class Action(db.Model):
 def execute_notification(signal_type, app, **data):
 
   # 1. Get a list of Notifications that match the `signal_type`
-  logger.debug('data %s', dir(data))
+  # logger.debug('data %s', dir(data))
   notifications = Notification.query.all()
 
   # 2. Loop over Notifications 
   for notification in notifications:
-    logger.debug('Notification %s %s', notification.id, notification.label)
+    # logger.debug('Notification %s %s', notification.id, notification.label)
 
     # 3. Get all conditions that match this Notification
-    logger.debug('Conditions %s', notification.conditions)
+    # logger.debug('Conditions %s', notification.conditions)
 
     # 4. Loop over conditions and execute each
     should_execute_actions = execute_conditions(notification.conditions, **data)
-    logger.debug('Should we execute the actions? %s', 
-        str(should_execute_actions))
+    # logger.debug('Should we execute the actions? %s', 
+    #     str(should_execute_actions))
 
     # 5. If ALL return true, then get all Actions matching this Notification
     if should_execute_actions:
 
-      logger.debug('Actions %s', notification.actions)
+      # logger.debug('Actions %s', notification.actions)
 
       # 6. Loop over Actions and execute each
       execute_actions(notification.actions, **data)
@@ -171,13 +171,13 @@ def execute_conditions(conditions, **data):
   result_list = []
 
   for condition in conditions:
-    logger.debug('Condition %s', condition.label)
+    # logger.debug('Condition %s', condition.label)
 
     if 'storage' in condition.name:
-      logger.debug('Condition for Storage Type is executing now')
+      # logger.debug('Condition for Storage Type is executing now')
       result_list.append(condition_storage_type(condition.value, **data))
   
-  logger.debug('Condition Results %s', result_list)
+  # logger.debug('Condition Results %s', result_list)
 
   for result in result_list:
     if not result:
@@ -188,8 +188,8 @@ def execute_conditions(conditions, **data):
 
 def condition_storage_type(required_value, **data):
 
-  logger.debug('condition_storage_type > %s should match %s', 
-      required_value, data.get('storage', None))
+  # logger.debug('condition_storage_type > %s should match %s', 
+  #     required_value, data.get('storage', None))
 
   if required_value in data.get('storage', None):
     return True
@@ -200,11 +200,11 @@ def condition_storage_type(required_value, **data):
 def execute_actions(actions, **data):
 
   for action in actions:
-    logger.debug('Action <%s> %s', action.action, action.label)
+    # logger.debug('Action <%s> %s', action.action, action.label)
 
     if 'send_email' in action.action:
 
-      logger.debug('Executing Action > send_email')
+      # logger.debug('Executing Action > send_email')
       defaults = json.loads(action.options)
       send_email = defaults.get('send_email', None)
       recipients = send_email.get('recipients', None)
@@ -215,10 +215,10 @@ def execute_actions(actions, **data):
           recipients_list = fetch_dynamic_recipients(feature, **recipients)
           
           recipient_data = recipients_list.get('recipients', None)
-          logger.debug('XXXXX recipient_data %s', recipient_data)
+          # logger.debug('XXXXX recipient_data %s', recipient_data)
           
           recipients_emailaddresses = recipients_list.get('email_addresses', ['error@commonscloud.org'])
-          logger.debug('XXXXX email_addresses %s', recipients_emailaddresses)
+          # logger.debug('XXXXX email_addresses %s', recipients_emailaddresses)
 
           copy = recipients.get('copy', False)
           if copy:
@@ -258,7 +258,7 @@ def fetch_dynamic_recipients(feature, **options):
 
   if 'geometry_intersects' in options.get('conditions', None):
 
-    logger.debug('Geometry %s', feature.geometry)
+    # logger.debug('Geometry %s', feature.geometry)
 
     if feature.geometry is None:
       return abort(400)
@@ -270,7 +270,7 @@ def fetch_dynamic_recipients(feature, **options):
     }
     features = Feature_.feature_get_intersection(**intersection_options)
 
-    logger.debug('features from get intersects %s', features)
+    # logger.debug('features from get intersects %s', features)
 
   """
   Create the recipients list
@@ -279,9 +279,9 @@ def fetch_dynamic_recipients(feature, **options):
 
   if features:
     field = options.get('field', None)
-    logger.debug('features %s', dir(features))
+    # logger.debug('features %s', dir(features))
     for feature in features:
-      logger.debug('Adding recipient %s', getattr(feature, field))
+      # logger.debug('Adding recipient %s', getattr(feature, field))
       email_addresses.append(getattr(feature, field))
 
 
@@ -289,10 +289,10 @@ def fetch_dynamic_recipients(feature, **options):
     email_addresses.append('error@commonscloud.org')
 
 
-  logger.debug('email_addresses %s, %s', len(email_addresses), email_addresses)
+  # logger.debug('email_addresses %s, %s', len(email_addresses), email_addresses)
 
 
-  logger.debug('Dynamic recipient list %s', email_addresses)
+  # logger.debug('Dynamic recipient list %s', email_addresses)
   
   return {
     "recipients": features,

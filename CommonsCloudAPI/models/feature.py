@@ -20,6 +20,7 @@ import csv
 import json
 import os.path
 import re
+import sys
 import urllib2
 import uuid
 import xlsxwriter
@@ -45,11 +46,14 @@ from flask.ext.restless.search import search
 from flask.ext.rq import get_queue
 from flask.ext.rq import job
 
+from sqlalchemy.exc import DataError
+
 """
 Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.models.base import CommonsModel
 
+from CommonsCloudAPI.models.activity import Activity
 from CommonsCloudAPI.models.template import Template
 from CommonsCloudAPI.models.field import Field
 from CommonsCloudAPI.models.statistic import Statistic
@@ -161,20 +165,33 @@ class Feature(CommonsModel):
         Template_ = Template.query.filter_by(storage=storage).first()
         Storage_ = self.get_storage(Template_)
 
-        features = json.loads(request_object.data)
+        # logger.warning('request_object: %s; %s;', request_object.data, request_object.form)
+
+        """
+        Setup the request object so that we can work with it
+        """
+        try:
+          features = json.loads(request_object.data)
+        except ValueError, e:
+          features = request_object.form
 
         for feature in features.get('features', []):
-          new_feature = self.feature_create_from_object(feature, Storage_, Template_, storage, [])
+          try:
+            new_feature = self.feature_create_from_object(feature, Storage_, Template_, storage, [])
+            logger.warning('new_feature %s', new_feature.id)
+          except DataError, e:
+            logger.error('An unknown error occured while importing data')
+            db.session.rollback()
+            sys.exc_clear()
 
-        return status_.status_200(), 200
+          continue
+
+        return status_.status_201(), 201
 
     def feature_create(self, request_object, storage_):
 
-        logger.warning('3.1')
         storage = self.validate_storage(storage_)
-        logger.warning('3.2')
         Template_ = Template.query.filter_by(storage=storage).first()
-        logger.warning('3.3')
         Storage_ = self.get_storage(Template_)
 
         """
@@ -182,13 +199,11 @@ class Feature(CommonsModel):
         """
         try:
           logger.warning("request_object.data %s", dir(request_object.data))
-          logger.warning('3.4a')
           content_ = json.loads(request_object.data)
           new_feature = self.feature_create_from_object(content_, Storage_, Template_, storage, request_object.files)
           return new_feature
         except ValueError, e:
           logger.warning("request_object.form %s", request_object.form)
-          logger.warning('3.4b')
           content_ = request_object.form
           new_feature = self.feature_create_from_object(content_, Storage_, Template_, storage, request_object.files)
           return new_feature
@@ -199,15 +214,12 @@ class Feature(CommonsModel):
         """
         Relationships and Attachments
         """
-        logger.warning('3.5')
         attachments = self._get_fields_of_type(Template_, 'file')
 
-        logger.warning('3.6')
         relationships = self._get_fields_of_type(Template_, 'relationship')
 
         new_content = {}
         
-        logger.warning('3.7')
         for field_ in content_.keys():
           if field_ == 'geometry':
             geometry_ = content_.get('geometry', None)
@@ -220,27 +232,28 @@ class Feature(CommonsModel):
 
         creation_datetime = datetime.now()
 
+        if 'status' not in new_content:
+          new_content['status'] = 'public'
+
         new_content['created'] = creation_datetime
         new_content['updated'] = creation_datetime
         
         """
         Create the new feature and save it to the database
         """
-        logger.warning('3.8')
         new_feature = Storage_(**new_content)
         db.session.add(new_feature)
         db.session.commit()
-        
+
         
         """
         Save relationships and attachments
         """
-        logger.warning('3.9')
         for field_ in content_:
           if field_ in relationships:
             assoc_ = self._feature_relationship_associate(Template_, field_)
 
-            logger.warning('%s %s', field_, type(content_.get(field_, None)))
+            # logger.warning('%s %s', field_, type(content_.get(field_, None)))
 
             if type(content_.get(field_, None)) is not list:
               logger.warning('We need to do something else with this value %s', type(content_.get(field_, None)))
@@ -267,7 +280,6 @@ class Feature(CommonsModel):
         """
         Saving attachments
         """
-        logger.warning('3.10')
         for attachment in attachments:
 
           assoc_ = self._feature_relationship_associate(Template_, attachment)
@@ -318,13 +330,11 @@ class Feature(CommonsModel):
               #
               new_feature_attachments = self.feature_attachments(**details)
 
-        logger.warning('3.11')
         feature_json = self.serialize_object(self.feature_get(storage, new_feature.id))
         logger.info('A new feature was created in %s with an id of %d', 
             storage, new_feature.id)
         trigger_feature_created.send(current_app._get_current_object(),
                              storage=storage, template=Template_, feature=new_feature, feature_json=feature_json)
-        logger.warning('3.12')
         return new_feature
 
     def feature_get(self, storage_, feature_id):
@@ -338,20 +348,6 @@ class Feature(CommonsModel):
         endpoint_ = API(db.session, Model_)
 
         result = endpoint_.get(feature_id, None, None)
-
-        # feature = Storage_.query.get(feature_id)
-
-        # if not hasattr(feature, 'id'):
-        #     return abort(404)
-
-        # if this_template.is_geospatial and feature.geometry is not None:
-        #   the_geometry = db.session.scalar(geofunc.ST_AsGeoJSON(feature.geometry))
-
-        #   feature.geometry = json.loads(the_geometry)
-
-        # return feature
-
-        logger.warning('result %s', result)
 
         return result
 
@@ -750,7 +746,7 @@ class Feature(CommonsModel):
       [el] Else we are assuming that the child doesn't exist and we need to
            create it before we save it to the assocation table
       """
-      logger.warning('content %s', type(content))
+      # logger.warning('content %s', type(content))
 
       for child_feature in content:
         if 'id' in child_feature:
@@ -951,16 +947,43 @@ class Feature(CommonsModel):
 
     def feature_import(self, request_object, storage_):
 
-      logger.warning('IMPORT CONTENT: %s, %s, %s', storage_, request_object, request_object.files.get('import'));
-
       file_ = request_object.files.get('import')
       output = self.s3_upload(file_)
   
       storage = self.validate_storage(storage_)
       Template_ = Template.query.filter_by(storage=storage).first()
 
-      job = get_queue().enqueue(import_csv, output, storage_, Template_.fields)
+      fields = self.safe_field_list(Template_.fields)
 
-      # self.import_csv(output, storage_, Template_.fields)
+      job = get_queue().enqueue(import_csv, output, storage_, fields, timeout=500)
+
+      """
+      Create a new Activity record for this job within our database
+      """
+      new_activity = {
+        'name': 'Import content from CSV',
+        'description': '',
+        'result': '',
+        'status': 'pending',
+        'template_id': Template_.id
+      }
+      activity = Activity(**new_activity)
+      db.session.add(activity)
+      db.session.commit()
 
       return True
+
+    def safe_field_list(self, fields):
+
+      safe_fields = []
+
+      for field in fields:
+        this_field = {
+          'name': field.name,
+          'data_type': field.data_type,
+          'relationship': field.relationship
+        }
+        safe_fields.append(this_field)
+
+      return safe_fields
+

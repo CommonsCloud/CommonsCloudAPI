@@ -15,6 +15,7 @@ limitations under the License.
 Import Python/System Dependencies
 """
 import csv
+import json
 import urllib2
 
 
@@ -29,12 +30,12 @@ Imports features from a CSV file based on user defined content
     The object we are acting on behalf of
 
 """
-def import_csv(self, filename, storage, template_fields):
+def import_csv(filename, storage, template_fields):
 
   """
   Ensure we have a valid URL, the nominal case is 
   """
-  filename_ = self.validate_url(filename)
+  filename_ = validate_url(filename)
   
   """
   List of new features that has been created
@@ -54,34 +55,36 @@ def import_csv(self, filename, storage, template_fields):
   for index, row in enumerate(reader):
 
     if not index:
-      headers = self.process_import_headers(row, template_fields)
-      logger.warning('Header: %s', headers)
+      headers = process_import_headers(row, template_fields)
       continue
 
-    feature_object = self.build_feature_object(row, headers)
-
-    logger.warning('Index: %s; Feature: %s', index, new_feature)
+    feature_object = build_feature_object(row, headers)
 
     features.append(feature_object)
 
   """
   Send list of Features to our batch import function
   """
-  batch_url = ('//127.0.0.1:5000/v2/%s/batch.json') % (storage)
+  batch_url = ('http://127.0.0.1:5000/v2/type_%s/batch.json') % (storage)
   data = {
     'features': features
   }
+  content_length = len(data)
   timeout = 300
-  response = urllib2.urlopen(batch_url, data, timeout)
+
+  req = urllib2.Request(batch_url)
+  req.add_header('Content-Type', 'application/json')
+  # req.add_header('Content-Length', content_length)
+
+  response = urllib2.urlopen(req, json.dumps(data), timeout)
 
 
   """
   Return a list of newly created Features
   """
-  logger.warning("Batch Response: %s", response)
   return response
 
-def build_feature_object(self, data, columns):
+def build_feature_object(data, columns):
 
   feature = {}
 
@@ -92,21 +95,22 @@ def build_feature_object(self, data, columns):
           'id': data[index]
         }
       ]
-      continue          
-    feature[column] = data[index]
+    elif data[index] is None or data[index] == '':
+      feature[column] = None
+    else:
+      feature[column] = data[index]
 
   return feature
   
 
-def process_import_headers(self, headers, template_fields):
+def process_import_headers(headers, template_fields):
 
   fields = []
 
   for index, field in enumerate(headers):
     if field.endswith('__id'):
       field_name = field.replace('__id', '')
-      relationship_field = self.get_relationship_field(field_name, template_fields)
-      logger.warning('Relationship Field Name: %s', relationship_field)
+      relationship_field = get_relationship_field(field_name, template_fields)
       fields.append(relationship_field)
       continue
 
@@ -115,11 +119,11 @@ def process_import_headers(self, headers, template_fields):
   return fields
 
 
-def get_relationship_field(self, field_name, fields):
+def get_relationship_field(field_name, fields):
 
   for field in fields:
-    if field.name == field_name:
-      return field.relationship
+    if field.get('name') == field_name:
+      return field.get('relationship')
 
 """
 Ensures that the URL we're opening is prepended with an appropriate
@@ -132,7 +136,7 @@ http:// or https://
     The URL to check for proper structure
 
 """
-def validate_url(self, url):
+def validate_url(url):
 
     if url.startswith('http://') or url.startswith('https://'):
       return url
