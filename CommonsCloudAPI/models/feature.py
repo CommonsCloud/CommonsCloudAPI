@@ -961,6 +961,6 @@ class Feature(CommonsModel):
 
       job = get_queue().enqueue(import_csv, output, storage_, Template_.fields)
 
-      self.import_csv(output, storage_, Template_.fields)
+      # self.import_csv(output, storage_, Template_.fields)
 
       return True
