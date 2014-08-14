@@ -16,8 +16,11 @@ Import Python Dependencies
 """
 import ast
 import boto
+import csv
 import json
 import os.path
+import re
+import urllib2
 import uuid
 import xlsxwriter
 
@@ -39,6 +42,8 @@ from flask.ext.restless.views import API
 from flask.ext.restless.views import FunctionAPI
 from flask.ext.restless.search import search
 
+from flask.ext.rq import get_queue
+from flask.ext.rq import job
 
 """
 Import Commons Cloud Dependencies
@@ -55,9 +60,13 @@ from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
+from CommonsCloudAPI.importer.import_csv import import_csv
+
 from CommonsCloudAPI.utilities.geometry import ST_GeomFromGeoJSON
 
 from CommonsCloudAPI.signals import trigger_feature_created
+
+# from CommonsCloudAPI.importer.import_csv import import_csv
 
 from geoalchemy2.elements import WKBElement
 import geoalchemy2.functions as geofunc
@@ -146,33 +155,59 @@ class Feature(CommonsModel):
     def __init__(self):
       pass
 
-    def feature_create(self, request_object, storage_):
+    def feature_batch(self, request_object, storage_):
 
         storage = self.validate_storage(storage_)
         Template_ = Template.query.filter_by(storage=storage).first()
         Storage_ = self.get_storage(Template_)
 
-        """
-        Relationships and Attachments
-        """
-        attachments = self._get_fields_of_type(Template_, 'file')
-        logger.warning("attachments %s", attachments)
+        features = json.loads(request_object.data)
 
-        relationships = self._get_fields_of_type(Template_, 'relationship')
-        logger.warning("relationships %s", relationships)
+        for feature in features.get('features', []):
+          new_feature = self.feature_create_from_object(feature, Storage_, Template_, storage, [])
+
+        return status_.status_200(), 200
+
+    def feature_create(self, request_object, storage_):
+
+        logger.warning('3.1')
+        storage = self.validate_storage(storage_)
+        logger.warning('3.2')
+        Template_ = Template.query.filter_by(storage=storage).first()
+        logger.warning('3.3')
+        Storage_ = self.get_storage(Template_)
 
         """
         Setup the request object so that we can work with it
         """
         try:
-          content_ = json.loads(request_object.data)
           logger.warning("request_object.data %s", dir(request_object.data))
+          logger.warning('3.4a')
+          content_ = json.loads(request_object.data)
+          new_feature = self.feature_create_from_object(content_, Storage_, Template_, storage, request_object.files)
+          return new_feature
         except ValueError, e:
-          content_ = request_object.form
           logger.warning("request_object.form %s", request_object.form)
+          logger.warning('3.4b')
+          content_ = request_object.form
+          new_feature = self.feature_create_from_object(content_, Storage_, Template_, storage, request_object.files)
+          return new_feature
+
+
+    def feature_create_from_object(self, content_, Storage_, Template_, storage, files_):
+
+        """
+        Relationships and Attachments
+        """
+        logger.warning('3.5')
+        attachments = self._get_fields_of_type(Template_, 'file')
+
+        logger.warning('3.6')
+        relationships = self._get_fields_of_type(Template_, 'relationship')
 
         new_content = {}
         
+        logger.warning('3.7')
         for field_ in content_.keys():
           if field_ == 'geometry':
             geometry_ = content_.get('geometry', None)
@@ -191,6 +226,7 @@ class Feature(CommonsModel):
         """
         Create the new feature and save it to the database
         """
+        logger.warning('3.8')
         new_feature = Storage_(**new_content)
         db.session.add(new_feature)
         db.session.commit()
@@ -199,6 +235,7 @@ class Feature(CommonsModel):
         """
         Save relationships and attachments
         """
+        logger.warning('3.9')
         for field_ in content_:
           if field_ in relationships:
             assoc_ = self._feature_relationship_associate(Template_, field_)
@@ -230,12 +267,13 @@ class Feature(CommonsModel):
         """
         Saving attachments
         """
+        logger.warning('3.10')
         for attachment in attachments:
 
           assoc_ = self._feature_relationship_associate(Template_, attachment)
           Attachment_ = self.get_storage(str(attachment))
 
-          field_attachments = request_object.files.getlist(attachment)
+          field_attachments = files_.getlist(attachment)
 
           for file_ in field_attachments:
         
@@ -280,11 +318,13 @@ class Feature(CommonsModel):
               #
               new_feature_attachments = self.feature_attachments(**details)
 
+        logger.warning('3.11')
         feature_json = self.serialize_object(self.feature_get(storage, new_feature.id))
         logger.info('A new feature was created in %s with an id of %d', 
             storage, new_feature.id)
         trigger_feature_created.send(current_app._get_current_object(),
                              storage=storage, template=Template_, feature=new_feature, feature_json=feature_json)
+        logger.warning('3.12')
         return new_feature
 
     def feature_get(self, storage_, feature_id):
@@ -891,6 +931,11 @@ class Feature(CommonsModel):
       storage_worksheet = workbook.add_worksheet('Sheet to Import')
 
       for index, field in enumerate(Template_.fields):
+        if field.data_type is 'relationship':
+          relationship_field_name = str(field.name + '__id')
+          storage_worksheet.write(0, index, relationship_field_name)
+          continue
+
         storage_worksheet.write(0, index, field.name)
 
       workbook.close()
@@ -902,4 +947,18 @@ class Feature(CommonsModel):
         'filepath': filepath
       }
 
+    def feature_import(self, request_object, storage_):
 
+      logger.warning('IMPORT CONTENT: %s, %s, %s', storage_, request_object, request_object.files.get('import'));
+
+      file_ = request_object.files.get('import')
+      output = self.s3_upload(file_)
+  
+      storage = self.validate_storage(storage_)
+      Template_ = Template.query.filter_by(storage=storage).first()
+
+      job = get_queue().enqueue(import_csv, output, storage_, Template_.fields)
+
+      self.import_csv(output, storage_, Template_.fields)
+
+      return True

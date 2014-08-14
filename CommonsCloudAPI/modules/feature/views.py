@@ -157,16 +157,23 @@ def feature_get_relationship(oauth_request, storage, feature_id, relationship, e
 @oauth.oauth_or_crowdsourced()
 def feature_create(oauth_request, storage, extension, is_crowdsourced):
 
+    logger.warning('1')
     Feature_ = Feature()
+    logger.warning('2')
     Feature_.current_user = oauth_request.user
+    logger.warning('3')
     new_feature = Feature_.feature_create(request, storage)
 
+    logger.warning('4')
     if type(new_feature) is tuple:
+        logger.warning('5')
         return new_feature
 
     try:
+        logger.warning('6')
         return status_.status_201(new_feature.id), 201
     except Exception as e:
+        logger.warning('7')
         return status_.status_500(e), 500
 
 
@@ -289,11 +296,23 @@ def feature_import(oauth_request, storage, extension):
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
+    import_features = Feature_.feature_import(request, storage)
 
-    arguments = {
-        'the_content': [],
-        'list_name': 'features',
-        'extension': extension
-    }
+    if type(import_features) is tuple:
+        return import_features
 
-    return Feature_.endpoint_response(**arguments)
+    return status_.status_200(), 200
+
+
+@module.route('/v2/type_<string:storage>/batch.<string:extension>', methods=['POST'])
+@oauth.require_oauth()
+def feature_batch(oauth_request, storage, extension):
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    import_features = Feature_.feature_batch(request, storage)
+
+    if type(import_features) is tuple:
+        return import_features
+
+    return status_.status_200(), 200

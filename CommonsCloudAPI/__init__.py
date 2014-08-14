@@ -53,7 +53,6 @@ def create_application(name = __name__, env = 'testing'):
     # Load our application's blueprints
     load_blueprints(app)
 
-    # Load our Redis Queue
     queue.init_app(app)
 
     """
