@@ -442,6 +442,7 @@ class CommonsModel(object):
       class_name = str(template.storage)
       relationships = self.get_relationship_fields(template.fields)
 
+    logger.debug('Dynamic Model executed for %s', class_name)
 
     arguments = {
       "class_name": class_name,
@@ -513,29 +514,37 @@ class CommonsModel(object):
     4. We need the name of the class or 'storage' of the Class being acted on
 
     """
-    for relationship in relationships:
+    relationship_message = 'No relationships'
+    
+    if relationships:
+      relationship_message = 'Relationships found'
+      for relationship in relationships:
 
-      table_name = str(relationship.relationship)
+        logger.debug('Adding relationship (%s) to model', relationship)
 
-      RelationshipModel = self.get_storage(table_name)
+        table_name = str(relationship.relationship)
+
+        RelationshipModel = self.get_storage(table_name)
 
 
-      """
-      Setup our association table for each relationship that we have
-      in our fields list
-      """
-      parent_id_key = str(class_name) + '.id'
-      child_id_key = table_name + '.id'
+        """
+        Setup our association table for each relationship that we have
+        in our fields list
+        """
+        parent_id_key = str(class_name) + '.id'
+        child_id_key = table_name + '.id'
 
-      association_table = db.Table(str(relationship.association), db.metadata,
-          db.Column('parent_id', db.Integer, db.ForeignKey(parent_id_key), primary_key=True),
-          db.Column('child_id', db.Integer, db.ForeignKey(child_id_key), primary_key=True),
-          extend_existing = True,
-          autoload = True,
-          autoload_with = db.engine
-      )
+        association_table = db.Table(str(relationship.association), db.metadata,
+            db.Column('parent_id', db.Integer, db.ForeignKey(parent_id_key), primary_key=True),
+            db.Column('child_id', db.Integer, db.ForeignKey(child_id_key), primary_key=True),
+            extend_existing = True,
+            autoload = True,
+            autoload_with = db.engine
+        )
 
-      class_arguments[table_name] = db.relationship(RelationshipModel, secondary=association_table, backref=class_name)
+        class_arguments[table_name] = db.relationship(RelationshipModel, secondary=association_table, backref=class_name)
+    
+    logger.debug('Relationships > %s', relationship_message)
 
     return class_arguments
 
