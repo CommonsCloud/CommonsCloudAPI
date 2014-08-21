@@ -514,38 +514,30 @@ class CommonsModel(object):
     4. We need the name of the class or 'storage' of the Class being acted on
 
     """
-    relationship_message = 'No relationships'
-    
-    if relationships:
-      relationship_message = 'Relationships found'
-      for relationship in relationships:
+    for relationship in relationships:
 
-        logger.debug('Adding relationship (%s) to model', relationship)
+      table_name = str(relationship.relationship)
 
-        table_name = str(relationship.relationship)
-
-        RelationshipModel = self.get_storage(table_name)
+      RelationshipModel = self.get_storage(table_name)
 
 
-        """
-        Setup our association table for each relationship that we have
-        in our fields list
-        """
-        parent_id_key = str(class_name) + '.id'
-        child_id_key = table_name + '.id'
+      """
+      Setup our association table for each relationship that we have
+      in our fields list
+      """
+      parent_id_key = str(class_name) + '.id'
+      child_id_key = table_name + '.id'
 
-        association_table = db.Table(str(relationship.association), db.metadata,
-            db.Column('parent_id', db.Integer, db.ForeignKey(parent_id_key), primary_key=True),
-            db.Column('child_id', db.Integer, db.ForeignKey(child_id_key), primary_key=True),
-            extend_existing = True,
-            autoload = True,
-            autoload_with = db.engine
-        )
+      association_table = db.Table(str(relationship.association), db.metadata,
+          db.Column('parent_id', db.Integer, db.ForeignKey(parent_id_key), primary_key=True),
+          db.Column('child_id', db.Integer, db.ForeignKey(child_id_key), primary_key=True),
+          extend_existing = True,
+          autoload = True,
+          autoload_with = db.engine
+      )
 
-        class_arguments[table_name] = db.relationship(RelationshipModel, secondary=association_table, backref=class_name)
-    
-    logger.debug('Relationships > %s', relationship_message)
-
+      class_arguments[table_name] = db.relationship(RelationshipModel, secondary=association_table, backref=class_name)
+  
     return class_arguments
 
 
