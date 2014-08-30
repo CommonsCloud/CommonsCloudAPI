@@ -1239,10 +1239,10 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
   background-color: transparent;
   border: 0;
   border-bottom: 1px solid rgb(128, 128, 128);
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-box-shadow: none;
   -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
   transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; 
-    box-shadow: none;
+  box-shadow: none;
 }
 
 .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
@@ -1332,13 +1332,13 @@ textarea.input-lg {
 
 .has-warning .form-control {
   border-color: #c09853;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); }
+  -webkit-box-shadow: none;
+  box-shadow: none; }
 
 .has-warning .form-control:focus {
   border-color: #a47e3c;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #dbc59e;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #dbc59e; }
+  -webkit-box-shadow: none;
+  box-shadow: none; }
 
 .has-warning .input-group-addon {
   color: #c09853;
@@ -1346,35 +1346,41 @@ textarea.input-lg {
   background-color: #fcf8e3; }
 
 .has-error .help-block, .has-error .control-label {
-  color: #b94a48; }
+  color: #F44336; }
 
 .has-error .form-control {
-  border-color: #b94a48;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); }
+  border-color: #F44336;
+  -webkit-box-shadow: none;
+  box-shadow: none; }
 
 .has-error .form-control:focus {
   border-color: #953b39;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392; }
+  -webkit-box-shadow: none;
+  box-shadow: none; }
 
 .has-error .input-group-addon {
-  color: #b94a48;
-  border-color: #b94a48;
+  color: #F44336;
+  border-color: #F44336;
   background-color: #f2dede; }
+
+.card .has-error .help-block,
+.card .has-error .help-block a,
+.card .has-error .help-block a:hover {
+  color: #F44336;
+}
 
 .has-success .help-block, .has-success .control-label {
   color: #468847; }
 
 .has-success .form-control {
   border-color: #468847;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); }
+  -webkit-box-shadow: none;
+  box-shadow: none; }
 
 .has-success .form-control:focus {
   border-color: #356635;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7aba7b;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7aba7b; }
+  -webkit-box-shadow: none;
+  box-shadow: none; }
 
 .has-success .input-group-addon {
   color: #468847;
@@ -5294,7 +5300,7 @@ body.modal-open {
  * Messages
  */
 .alert {
-  font-size: 1.3em; }
+  font-size: 14px; }
 
 .alert-error {
   background-color: #f2dede;
@@ -5607,7 +5613,7 @@ label.alt {
   border-radius: 0;
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
-  border: 1px solid #40ac18;
+  border: none;
   color: white;
   display: inline-block;
   font-size: 14px;

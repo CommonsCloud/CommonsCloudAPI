@@ -33,8 +33,6 @@ SECURITY_CHANGEABLE = True
 
 SECURITY_CHANGE_URL = '/user/password'
 
-SECURITY_LOGIN_USER_TEMPLATE = 'security/login.html'
-
 SECURITY_RESET_PASSWORD_TEMPLATE = 'security/reset_password.html'
 
 SECURITY_REGISTER_USER_TEMPLATE = 'security/register.html'
@@ -46,6 +44,9 @@ SECURITY_FORGOT_PASSWORD_TEMPLATE = 'security/password_forgot.html'
 SECURITY_EMAIL_SENDER = 'CommonsCloud Support <support@commonscloud.org>'
 SECURITY_EMAIL_SUBJECT_REGISTER = 'Welcome! CommonsCloud needs you to confirm your email address'
 SECURITY_EMAIL_SUBJECT_CONFIRM = 'CommonsCloud needs you to confirm your email address'
+
+SECURITY_FLASH_MESSAGES = True
+
 
 # OAUTH 1
 OAUTH1_PROVIDER_ENFORCE_SSL = True

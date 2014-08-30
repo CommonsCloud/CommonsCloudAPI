@@ -2,9 +2,18 @@
 
 {% block content %}
 
-      <form method="POST" action="{{ url_for_security('login') }}" class="card" id="login_user_form" name="login_user_form">
-        {{ login_user_form.hidden_tag() }}
-        <fieldset>
+{% from "security/_macros.html" import render_field_with_errors, render_button %}
+<form action="{{ url_for_security('login') }}" method="POST"  class="card" id="login_user_form" name="login_user_form">
+  {% include "security/_messages.html" %}
+  <fieldset>
+    {{ login_user_form.hidden_tag() }}
+    {{ render_field_with_errors(login_user_form.email, help='<a href="/account/create">Don\'t have an account?</a>') }}
+    {{ render_field_with_errors(login_user_form.password, help='<a href="/reset">Forgot password?</a>') }}
+    {{ render_button(login_user_form.submit, value='Sign in') }}
+  </fieldset>
+</form>
+
+<!--         <fieldset>
           <div class="form-group">
             <label for="email" class="control-label element-invisible">Email address</label>
             <input class="form-control input-lg" id="email" name="email" type="text" tabindex="1" placeholder="Email address" />
@@ -23,6 +32,6 @@
             <input type="submit" id="submit" name="submit" class="button large" value="Sign in" tabindex="3" />
           </div>
         </fieldset>
-      </form>
+      </form> -->
 
 {% endblock %}
