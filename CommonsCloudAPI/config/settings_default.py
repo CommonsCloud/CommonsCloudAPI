@@ -45,6 +45,8 @@ SECURITY_EMAIL_SUBJECT_CONFIRM = 'CommonsCloud needs you to confirm your email a
 
 SECURITY_FLASH_MESSAGES = True
 
+SECURITY_MSG_LOGIN = ("Please login to continue", "error")
+
 
 # OAUTH 1
 OAUTH1_PROVIDER_ENFORCE_SSL = True
