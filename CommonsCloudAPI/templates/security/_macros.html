@@ -1,8 +1,10 @@
-{% macro render_field_with_errors(field, help='') %}
+{% macro render_field_with_errors(field, help='', placeholder='') %}
 
           <div class="form-group {% if field.errors %}has-error{% endif %}">
             <label class="control-label element-invisible">field.label</label>
-            {% if 'email' in field.name: %}
+            {% if placeholder: %}
+              {% set placeholder = placeholder %}
+            {% elif 'email' in field.name: %}
               {% set placeholder = 'Email address' %}
             {% elif 'password' in field.name: %}
               {% set placeholder = 'Password' %}

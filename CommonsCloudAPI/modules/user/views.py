@@ -14,6 +14,7 @@ limitations under the License.
 """
 Import Flask Dependencies
 """
+from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -114,5 +115,7 @@ def user_profile_post():
 
   user_ = User()
   user_.user_update(request.form)
+
+  flash('You\'re profile was updated successfully', 'success')
 
   return redirect(url_for('user.user_profile_get')), 301

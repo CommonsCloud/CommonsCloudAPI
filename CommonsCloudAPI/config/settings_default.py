@@ -33,8 +33,6 @@ SECURITY_CHANGEABLE = True
 
 SECURITY_CHANGE_URL = '/user/password'
 
-SECURITY_RESET_PASSWORD_TEMPLATE = 'security/reset_password.html'
-
 SECURITY_REGISTER_USER_TEMPLATE = 'security/register.html'
 SECURITY_REGISTER_URL = '/account/create'
 SECURITY_POST_REGISTER_VIEW = '/account/create/success'
