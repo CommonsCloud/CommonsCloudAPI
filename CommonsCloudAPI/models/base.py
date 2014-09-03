@@ -463,7 +463,7 @@ class CommonsModel(object):
       if relationship:
         public_fields = ['id', 'name', 'created', 'updated', 'status', 'filename', 'filepath', 'caption', 'credit', 'credit_link']
       else:
-        public_fields = ['id', 'name', 'created', 'updated', 'geometry', 'status', 'filename', 'filepath', 'caption', 'credit', 'credit_link']
+        public_fields = ['id', 'name', 'created', 'updated', 'status', 'filename', 'filepath', 'caption', 'credit', 'credit_link']
 
       for field in fields:
         if field.is_listed and field.data_type == 'relationship':
