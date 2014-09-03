@@ -433,7 +433,7 @@ class CommonsModel(object):
 
     return new_column
 
-  def get_storage(self, template, fields=[]):
+  def get_storage(self, template, fields=[], relationship=False):
 
     if type(template) is str:
       class_name = str(template)
@@ -460,7 +460,10 @@ class CommonsModel(object):
     """
     if fields or hasattr(template, 'fields'):
 
-      public_fields = ['id', 'name', 'created', 'updated', 'geometry', 'status', 'filename', 'filepath', 'caption', 'credit', 'credit_link']
+      if relationship:
+        public_fields = ['id', 'name', 'created', 'updated', 'status', 'filename', 'filepath', 'caption', 'credit', 'credit_link']
+      else:
+        public_fields = ['id', 'name', 'created', 'updated', 'geometry', 'status', 'filename', 'filepath', 'caption', 'credit', 'credit_link']
 
       for field in fields:
         if field.is_listed and field.data_type == 'relationship':
@@ -524,7 +527,7 @@ class CommonsModel(object):
 
         table_name = str(relationship.relationship)
 
-        RelationshipModel = self.get_storage(table_name)
+        RelationshipModel = self.get_storage(table_name, relationship=True)
 
 
         """
