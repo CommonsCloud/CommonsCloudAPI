@@ -468,6 +468,7 @@ class Feature(CommonsModel):
             setattr(feature_, field_, new_value)
 
       logger.warning('Feature to be saved: %s', feature_)
+      logger.warning('Geometry to be saved: %s', feature_.geometry)
 
       db.session.commit()
 
