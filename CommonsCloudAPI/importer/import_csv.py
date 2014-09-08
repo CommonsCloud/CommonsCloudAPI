@@ -43,6 +43,8 @@ def import_csv(filename, storage, template_fields):
   features = []
   headers = []
 
+  print filename_
+
   """
   Open the CSV from a remote server (AmazonS3)
   """
