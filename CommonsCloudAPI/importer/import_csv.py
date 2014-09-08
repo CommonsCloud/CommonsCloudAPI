@@ -51,9 +51,10 @@ def import_csv(filename, storage, template_fields):
   try:
     response = urllib2.urlopen(filename_)
     reader = csv.reader(response)
-  except urllib2.HTTPError, error:
+  except urllib2.HTTPError as error:
       reader = error.read()
-      print error.read()
+      print 'grr'
+      print reader
 
   """
   Process each row of the CSV and save each row as a separate Feature
