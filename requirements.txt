@@ -3,6 +3,7 @@ Flask-Login==0.2.9
 Flask-Mail==0.9.0
 Flask-OAuthlib==0.4.3
 Flask-Principal==0.4.0
+Flask-RQ==0.2
 Flask-Restless==0.12.1
 Flask-SQLAlchemy==1.0
 Flask-Security==1.7.1
@@ -32,9 +33,11 @@ pbr==0.6
 psycopg2==2.5.2
 python-dateutil==2.2
 python-mimeparse==0.1.4
+redis==2.10.3
 requests==2.2.1
 responses==0.2.0
+rq==0.4.6
 six==1.5.2
 sqlalchemy-migrate==0.8.2
-twill==0.9
+twill==1.8.0
 wsgiref==0.1.2
