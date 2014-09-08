@@ -47,7 +47,7 @@ def import_csv(filename, storage, template_fields):
   Open the CSV from a remote server (AmazonS3)
   """
   response = urllib2.urlopen(filename_)
-  reader = csv.reader(response, dialect=csv.excel_tab)
+  reader = csv.reader(response)
 
   """
   Process each row of the CSV and save each row as a separate Feature
