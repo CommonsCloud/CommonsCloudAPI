@@ -48,8 +48,12 @@ def import_csv(filename, storage, template_fields):
   """
   Open the CSV from a remote server (AmazonS3)
   """
-  response = urllib2.urlopen(filename_)
-  reader = csv.reader(response)
+  try:
+    response = urllib2.urlopen(filename_)
+    reader = csv.reader(response)
+  except urllib2.HTTPError, error:
+      reader = error.read()
+      print error.read()
 
   """
   Process each row of the CSV and save each row as a separate Feature
