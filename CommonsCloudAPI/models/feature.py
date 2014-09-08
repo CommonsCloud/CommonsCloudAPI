@@ -855,7 +855,7 @@ class Feature(CommonsModel):
     """
     def allowed_file(self, filename):
       return '.' in filename and \
-        filename.rsplit('.', 1)[1] in ['png', 'jpg']
+        filename.rsplit('.', 1)[1] in ['png', 'PNG', 'gif', 'GIF', 'jpg', 'JPG', 'JPEG', 'jpeg']
 
 
     """

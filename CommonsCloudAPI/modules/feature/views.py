@@ -65,9 +65,9 @@ def features_import_preflight(storage, extension):
 @oauth.oauth_or_public()
 def feature_list(oauth_request, storage, extension, is_public):
 
-    # if (extension == 'csv'):
-    #     return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
-    if (extension == 'shp'):
+    if (extension == 'csv'):
+        return status_.status_415('We do not support exporting a feature list as a CSV file yet, but we\'re working on it.'), 415
+    elif (extension == 'shp'):
         return status_.status_415('We do not support exporting a feature list as a SHP file yet, but we\'re working on it.'), 415
 
     results_per_page = request.args.get('results_per_page')
