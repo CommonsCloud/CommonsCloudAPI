@@ -854,9 +854,13 @@ class Feature(CommonsModel):
     """
     Check the file name's extension to ensure it is in our safe list
     """
-    def allowed_file(self, filename):
+    def allowed_file(self, filename, file_list=None):
       return '.' in filename and \
         filename.rsplit('.', 1)[1] in ['png', 'PNG', 'gif', 'GIF', 'jpg', 'JPG', 'JPEG', 'jpeg']
+        #
+        # @todo Enable the user to add "Allowed file types" to their list of fields via the UI
+        #
+        # filename.rsplit('.', 1)[1] in file_list
 
 
     """
