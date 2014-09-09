@@ -880,10 +880,8 @@ class Feature(CommonsModel):
             the uuid4 function combined with the file extension from
             the source file.
         '''
-        logger.warning('source_file %s', source_file)
 
         source_filename = secure_filename(source_file.filename)
-
         source_extension = os.path.splitext(source_filename)[1]
 
         destination_filename = uuid4().hex + source_extension
@@ -961,7 +959,6 @@ class Feature(CommonsModel):
     def feature_import(self, request_object, storage_):
 
       file_ = request_object.files.get('import')
-      logger.warning('file_ %s', file_)
       output = self.s3_upload(file_)
   
       storage = self.validate_storage(storage_)
