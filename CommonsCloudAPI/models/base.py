@@ -545,7 +545,7 @@ class CommonsModel(object):
             autoload_with = db.engine
         )
 
-        class_arguments[table_name] = db.relationship(RelationshipModel, secondary=association_table, cascade="all,delete", backref=class_name)
+        class_arguments[table_name] = db.relationship(RelationshipModel, secondary=association_table, cascade="", backref=class_name)
     
     logger.debug('Relationships > %s', relationship_message)
 
