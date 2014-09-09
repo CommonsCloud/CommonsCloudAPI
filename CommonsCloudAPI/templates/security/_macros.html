@@ -6,11 +6,13 @@
               {% set placeholder = placeholder %}
             {% elif 'email' in field.name: %}
               {% set placeholder = 'Email address' %}
+              {% set tabindex = 1 %}
             {% elif 'password' in field.name: %}
               {% set placeholder = 'Password' %}
+              {% set tabindex = 2 %}
             {% endif %}
 
-            {{ field(class="form-control input-lg",placeholder=placeholder)|safe }}
+            {{ field(class="form-control input-lg",placeholder=placeholder,tabindex=tabindex)|safe }}
             
             {% if help and field.errors: %}
               <p class="help-block">{{ field.errors[0] }}, {{ help|safe }}</p>
