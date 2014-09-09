@@ -962,28 +962,28 @@ class Feature(CommonsModel):
 
       file_ = request_object.files.get('import')
       logger.warning('file_ %s', file_)
-      # output = self.s3_upload(file_)
+      output = self.s3_upload(file_)
   
-      # storage = self.validate_storage(storage_)
-      # Template_ = Template.query.filter_by(storage=storage).first()
+      storage = self.validate_storage(storage_)
+      Template_ = Template.query.filter_by(storage=storage).first()
 
-      # fields = self.safe_field_list(Template_.fields)
+      fields = self.safe_field_list(Template_.fields)
 
-      # job = get_queue().enqueue(import_csv, output, storage_, fields, timeout=500)
+      job = get_queue().enqueue(import_csv, output, storage_, fields, timeout=500)
 
-      # """
-      # Create a new Activity record for this job within our database
-      # """
-      # new_activity = {
-      #   'name': 'Import content from CSV',
-      #   'description': '',
-      #   'result': '',
-      #   'status': 'pending',
-      #   'template_id': Template_.id
-      # }
-      # activity = Activity(**new_activity)
-      # db.session.add(activity)
-      # db.session.commit()
+      """
+      Create a new Activity record for this job within our database
+      """
+      new_activity = {
+        'name': 'Import content from CSV',
+        'description': '',
+        'result': '',
+        'status': 'pending',
+        'template_id': Template_.id
+      }
+      activity = Activity(**new_activity)
+      db.session.add(activity)
+      db.session.commit()
 
       return True
 
