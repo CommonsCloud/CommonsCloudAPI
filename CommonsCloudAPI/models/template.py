@@ -29,6 +29,7 @@ from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.application import Application
+from CommonsCloudAPI.models.activity import Activity
 
 
 """
@@ -403,6 +404,25 @@ class Template(db.Model, CommonsModel):
     db.session.commit()
 
     return True
+
+
+  """
+  Delete an existing Template from the CommonsCloudAPI
+
+  @param (object) self
+
+  @param (int) template_id
+      The unique ID of the Template to be retrieved from the system
+
+  @return (bool)
+      A boolean to indicate if the deletion was succesful
+
+  """
+  def template_activity(self, template_id):
+
+    activity_ = Activity.query.filter_by(template_id=template_id).all()
+
+    return activity_
 
 
   """

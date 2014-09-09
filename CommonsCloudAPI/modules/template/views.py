@@ -38,6 +38,9 @@ def templates_preflight(extension):
 def templates_single_preflight(template_id, extension):
     return status_.status_200(), 200
 
+@module.route('/v2/templates/<int:template_id>/activity.<string:extension>', methods=['OPTIONS'])
+def templates_activity_preflight(template_id, extension):
+    return status_.status_200(), 200
 
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['OPTIONS'])
 def application_templates_preflight(application_id, extension):
@@ -106,6 +109,26 @@ def template_get(oauth_request, template_id, extension, is_public):
 
   arguments = {
     'the_content': this_template,
+    'extension': extension
+  }
+
+  return Template_.endpoint_response(**arguments)
+
+
+@module.route('/v2/templates/<int:template_id>/activity.<string:extension>', methods=['GET'])
+@is_public()
+@oauth.oauth_or_public()
+def template_activity(oauth_request, template_id, extension, is_public):
+
+  Template_ = Template()
+  Template_.current_user = oauth_request.user
+  this_activity = Template_.template_activity(template_id)
+
+  if type(this_activity) is tuple:
+    return this_activity
+
+  arguments = {
+    'the_content': this_activity,
     'extension': extension
   }
 
