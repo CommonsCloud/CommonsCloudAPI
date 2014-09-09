@@ -960,7 +960,7 @@ class Feature(CommonsModel):
 
     def feature_import(self, request_object, storage_):
 
-      file_ = request_object.files.get('import')
+      file_ = request_object.files.getlist('import')
       logger.warning('file_ %s', file_)
       logger.warning('request_object.files %s', request_object.files)
       output = self.s3_upload(file_)
