@@ -972,7 +972,7 @@ class Feature(CommonsModel):
       Create a new Activity record for this job within our database
       """
       new_activity = {
-        'name': 'Import content from CSV' + file_.filename,
+        'name': 'Import content from CSV',
         'description': output,
         'result': '',
         'status': 'pending',
