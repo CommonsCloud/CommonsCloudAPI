@@ -933,8 +933,12 @@ class Feature(CommonsModel):
       for index, field in enumerate(Template_.fields):
         if field.data_type == 'relationship':
           relationship_field_name = str(field.name + '__id')
-          logger.warning('relationship field %s', relationship_field_name)
+          logger.debug('relationship field %s', relationship_field_name)
           storage_worksheet.write(0, index, relationship_field_name)
+        elif field.data_type == 'file':
+          file_field_name = str(field.name + '__id')
+          logger.debug('attachment field %s', file_field_name)
+          storage_worksheet.write(0, index, file_field_name)
         else:
           storage_worksheet.write(0, index, field.name)
 
