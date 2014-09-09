@@ -962,7 +962,7 @@ class Feature(CommonsModel):
 
       file_ = request_object.files.getlist('import')
       logger.warning('file_ %s', file_)
-      logger.warning('request_object.files %s', request_object.files)
+      logger.warning('request_object.files.getlist() %s', request_object.files.getlist())
       output = self.s3_upload(file_)
   
       storage = self.validate_storage(storage_)
