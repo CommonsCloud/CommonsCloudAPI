@@ -982,7 +982,7 @@ class Feature(CommonsModel):
       db.session.add(activity)
       db.session.commit()
 
-      return True
+      return activity
 
     def safe_field_list(self, fields):
 
