@@ -936,9 +936,9 @@ class Feature(CommonsModel):
           logger.debug('relationship field %s', relationship_field_name)
           storage_worksheet.write(0, index, relationship_field_name)
         elif field.data_type == 'file':
-          file_field_name = str(field.name + '__id')
-          logger.debug('attachment field %s', file_field_name)
-          storage_worksheet.write(0, index, file_field_name)
+          # file_field_name = str(field.name + '__file')
+          # logger.debug('attachment field %s', file_field_name)
+          # storage_worksheet.write(0, index, file_field_name)
         else:
           storage_worksheet.write(0, index, field.name)
 
