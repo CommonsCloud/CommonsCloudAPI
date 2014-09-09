@@ -175,6 +175,10 @@ class Feature(CommonsModel):
         except ValueError, e:
           features = request_object.form
 
+        activity_id = features.get('activity_id', [])
+        activity_ = Activity.query.get(activity_id)
+        activity_.status = 'Processing'
+
         for feature in features.get('features', []):
           try:
             new_feature = self.feature_create_from_object(feature, Storage_, Template_, storage, [])
@@ -185,6 +189,10 @@ class Feature(CommonsModel):
             sys.exc_clear()
 
           continue
+
+        activity_id = features.get('activity_id', [])
+        activity_ = Activity.query.get(activity_id)
+        activity_.status = 'Complete'
 
         return status_.status_201(), 201
 
@@ -966,8 +974,6 @@ class Feature(CommonsModel):
 
       fields = self.safe_field_list(Template_.fields)
 
-      job = get_queue().enqueue(import_csv, output, storage_, fields, timeout=500)
-
       """
       Create a new Activity record for this job within our database
       """
@@ -981,6 +987,8 @@ class Feature(CommonsModel):
       activity = Activity(**new_activity)
       db.session.add(activity)
       db.session.commit()
+
+      job = get_queue().enqueue(import_csv, output, storage_, fields, activity_id, timeout=500)
 
       return activity
 

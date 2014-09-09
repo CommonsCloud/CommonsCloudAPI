@@ -30,7 +30,7 @@ Imports features from a CSV file based on user defined content
     The object we are acting on behalf of
 
 """
-def import_csv(filename, storage, template_fields):
+def import_csv(filename, storage, template_fields, activity_id):
 
   """
   Ensure we have a valid URL, the nominal case is 
@@ -53,8 +53,6 @@ def import_csv(filename, storage, template_fields):
     reader = csv.reader(response)
   except urllib2.HTTPError as error:
       reader = error.read()
-      print 'grr'
-      print reader
 
   """
   Process each row of the CSV and save each row as a separate Feature
@@ -74,7 +72,8 @@ def import_csv(filename, storage, template_fields):
   """
   batch_url = ('http://api.commonscloud.org/v2/type_%s/batch.json') % (storage)
   data = {
-    'features': features
+    'features': features,
+    'activity_id': activity
   }
   content_length = len(data)
   timeout = 300
