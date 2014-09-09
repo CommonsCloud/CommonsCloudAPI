@@ -881,7 +881,12 @@ class Feature(CommonsModel):
             the source file.
         '''
         logger.warning('source_file %s', source_file)
-        source_filename = secure_filename(source_file.filename)
+
+        if hasattr(source_file, 'filename'):
+          source_filename = secure_filename(source_file.filename)
+        elif hasattr(source_file, 'name'):
+          source_filename = secure_filename(source_file.name)
+
         source_extension = os.path.splitext(source_filename)[1]
 
         destination_filename = uuid4().hex + source_extension
@@ -959,6 +964,7 @@ class Feature(CommonsModel):
     def feature_import(self, request_object, storage_):
 
       file_ = request_object.files.get('import')
+      logger.warning('file_ sourcefile %s', file_)
       output = self.s3_upload(file_)
   
       storage = self.validate_storage(storage_)
