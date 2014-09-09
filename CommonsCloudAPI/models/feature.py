@@ -880,7 +880,7 @@ class Feature(CommonsModel):
             the uuid4 function combined with the file extension from
             the source file.
         '''
-
+        logger.warning('source_file %s', source_file)
         source_filename = secure_filename(source_file.filename)
         source_extension = os.path.splitext(source_filename)[1]
 
