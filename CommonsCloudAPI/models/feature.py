@@ -960,33 +960,32 @@ class Feature(CommonsModel):
 
     def feature_import(self, request_object, storage_):
 
-      file_ = request_object.files.getlist('import')
-      logger.warning('file_ %s', file_)
-      logger.warning('request_object.files.getlist() %s', request_object.files.getlist())
-      output = self.s3_upload(file_)
+      file_ = request_object.files.get('import')
+      logger.warning('request_object %s', request_object)
+      # output = self.s3_upload(file_)
   
-      storage = self.validate_storage(storage_)
-      Template_ = Template.query.filter_by(storage=storage).first()
+      # storage = self.validate_storage(storage_)
+      # Template_ = Template.query.filter_by(storage=storage).first()
 
-      fields = self.safe_field_list(Template_.fields)
+      # fields = self.safe_field_list(Template_.fields)
 
-      job = get_queue().enqueue(import_csv, output, storage_, fields, timeout=500)
+      # job = get_queue().enqueue(import_csv, output, storage_, fields, timeout=500)
 
-      """
-      Create a new Activity record for this job within our database
-      """
-      new_activity = {
-        'name': 'Import content from CSV',
-        'description': '',
-        'result': '',
-        'status': 'pending',
-        'template_id': Template_.id
-      }
-      activity = Activity(**new_activity)
-      db.session.add(activity)
-      db.session.commit()
+      # """
+      # Create a new Activity record for this job within our database
+      # """
+      # new_activity = {
+      #   'name': 'Import content from CSV',
+      #   'description': '',
+      #   'result': '',
+      #   'status': 'pending',
+      #   'template_id': Template_.id
+      # }
+      # activity = Activity(**new_activity)
+      # db.session.add(activity)
+      # db.session.commit()
 
-      return True
+      # return True
 
     def safe_field_list(self, fields):
 
