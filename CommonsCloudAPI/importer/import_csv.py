@@ -54,6 +54,8 @@ def import_csv(filename, storage, template_fields, activity_id):
   except urllib2.HTTPError as error:
       reader = error.read()
 
+  post_url = ('http://api.commonscloud.org/v2/type_%s.json') % (storage)
+
   """
   Process each row of the CSV and save each row as a separate Feature
   """
@@ -65,30 +67,71 @@ def import_csv(filename, storage, template_fields, activity_id):
 
     feature_object = build_feature_object(row, headers)
 
-    features.append(feature_object)
+    req = urllib2.Request(post_url)
+    req.add_header('Content-Type', 'application/json')
 
-  """
-  Send list of Features to our batch import function
-  """
-  batch_url = ('http://api.commonscloud.org/v2/type_%s/batch.json') % (storage)
-  data = {
-    'features': features,
-    'activity_id': activity_id
-  }
-  content_length = len(data)
-  timeout = 300
-
-  req = urllib2.Request(batch_url)
-  req.add_header('Content-Type', 'application/json')
-  # req.add_header('Content-Length', content_length)
-
-  response = urllib2.urlopen(req, json.dumps(data), timeout)
+    response = urllib2.urlopen(req, json.dumps(dfeature_objectata), 300)
 
 
-  """
-  Return a list of newly created Features
-  """
-  return response
+# def import_csv(filename, storage, template_fields, activity_id):
+
+#   """
+#   Ensure we have a valid URL, the nominal case is 
+#   """
+#   filename_ = validate_url(filename)
+  
+#   """
+#   List of new features that has been created
+#   """
+#   features = []
+#   headers = []
+
+#   print filename_
+
+#   """
+#   Open the CSV from a remote server (AmazonS3)
+#   """
+#   try:
+#     response = urllib2.urlopen(filename_)
+#     reader = csv.reader(response)
+#   except urllib2.HTTPError as error:
+#       reader = error.read()
+
+#   """
+#   Process each row of the CSV and save each row as a separate Feature
+#   """
+#   for index, row in enumerate(reader):
+
+#     if not index:
+#       headers = process_import_headers(row, template_fields)
+#       continue
+
+#     feature_object = build_feature_object(row, headers)
+
+#     features.append(feature_object)
+
+#   """
+#   Send list of Features to our batch import function
+#   """
+#   batch_url = ('http://api.commonscloud.org/v2/type_%s/batch.json') % (storage)
+#   data = {
+#     'features': features,
+#     'activity_id': activity_id
+#   }
+#   content_length = len(data)
+#   timeout = 3600
+
+#   req = urllib2.Request(batch_url)
+#   req.add_header('Content-Type', 'application/json')
+#   # req.add_header('Content-Length', content_length)
+
+#   response = urllib2.urlopen(req, json.dumps(data), timeout)
+
+
+#   """
+#   Return a list of newly created Features
+#   """
+#   return response
 
 def build_feature_object(data, columns):
 
