@@ -988,7 +988,7 @@ class Feature(CommonsModel):
       db.session.add(activity)
       db.session.commit()
 
-      job = get_queue().enqueue(import_csv, output, storage_, fields, activity.id, timeout=500)
+      job = get_queue().enqueue_call(import_csv, output, storage_, fields, activity.id, timeout=3600)
 
       return activity
 
