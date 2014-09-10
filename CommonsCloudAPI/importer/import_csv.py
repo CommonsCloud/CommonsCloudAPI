@@ -70,7 +70,7 @@ def import_csv(filename, storage, template_fields, activity_id):
     req = urllib2.Request(post_url)
     req.add_header('Content-Type', 'application/json')
 
-    response = urllib2.urlopen(req, json.dumps(dfeature_objectata), 300)
+    response = urllib2.urlopen(req, json.dumps(feature_object), 300)
 
 
 # def import_csv(filename, storage, template_fields, activity_id):
