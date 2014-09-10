@@ -18,8 +18,6 @@ import csv
 import json
 import urllib2
 
-from CommonsCloudAPI.importer.import_feature import import_feature
-
 """
 Imports features from a CSV file based on user defined content
 
