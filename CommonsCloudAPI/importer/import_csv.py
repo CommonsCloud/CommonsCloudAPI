@@ -18,7 +18,8 @@ import csv
 import json
 import urllib2
 
-from CommonsCloudAPI.models.feature import Feature
+from CommonsCloudAPI.models.activity import Activity
+from CommonsCloudAPI.models.template import Template
 
 
 """
