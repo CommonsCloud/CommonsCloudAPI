@@ -43,6 +43,8 @@ from flask.ext.restless.views import API
 from flask.ext.restless.views import FunctionAPI
 from flask.ext.restless.search import search
 
+from flask.ext.mail import Message
+
 from flask.ext.rq import get_queue
 
 from sqlalchemy.exc import DataError
@@ -198,6 +200,11 @@ class Feature(CommonsModel):
         activity_.status = 'Complete'
         activity_.updated = datetime.now()
         db.session.commit()
+
+        """
+        Send an email notifying the user of the completed import
+        """
+        self.send_import_complete_email()
 
         return status_.status_200(), 200
 
@@ -1018,3 +1025,50 @@ class Feature(CommonsModel):
 
       return safe_fields
 
+
+    def send_import_complete_email():
+
+        options = {
+          "subject": "Your feature import is complete",
+          "recipients_emailaddresses": "Joshua Powell <joshua@viableindustries.com>",
+          "sender": "The CommonsCloud Team <support@commonscloud.org>",
+          "template": "commonscloud_importsuccess"
+        }
+
+        send_notification_email(**options)    
+
+    """
+    Send an email notification
+
+    subject (str)
+    recipients_emailaddresses (list)
+    sender (str) "FirstName LastName <email@address.com>"
+    template (str) Defines the html/txt template's to be used
+    context (kwargs) Dictionary of data or anything else you need passed along
+
+    """
+    def send_notification_email(subject, recipients_emailaddresses, sender, template, copy, **context):
+        """Send an email via the Flask-Mail extension.
+
+        :param subject: Email subject
+        :param recipient: Email recipient
+        :param template: The name of the email template
+        :param context: The context to render the template with
+        """
+        msg = Message(subject, sender=sender, recipients=recipients_emailaddresses)
+
+        ctx = ('notifications', template)
+        msg.body = render_template('%s/%s.txt' % ctx, **context)
+        msg.html = render_template('%s/%s.html' % ctx, **context)
+
+        mail = current_app.extensions.get('mail')
+        mail.send(msg)
+
+        if copy.get('email_address', None):
+          copy_msg = Message(copy.get('subject', None), sender=sender, recipients=copy.get('email_address', None))
+          copy_ctx = ('notifications', copy.get('template', None))
+          copy_msg.body = render_template('%s/%s.txt' % copy_ctx, **context)
+          copy_msg.html = render_template('%s/%s.html' % copy_ctx, **context)
+
+          copy_mail = current_app.extensions.get('mail')
+          copy_mail.send(copy_msg)
