@@ -36,7 +36,7 @@ Define our individual models
 """
 class Activity(db.Model, CommonsModel):
 
-    __public__ = {'default': ['id', 'name', 'description', 'result', 'created', 'updated', 'status', 'template_id']}
+    __public__ = ['id', 'name', 'description', 'result', 'created', 'updated', 'status', 'template_id']
     __tablename__ = 'activity'
     __table_args__ = {
         'extend_existing': True

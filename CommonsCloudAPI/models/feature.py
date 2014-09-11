@@ -179,6 +179,7 @@ class Feature(CommonsModel):
         activity_id = features.get('activity_id', [])
         activity_ = Activity.query.get(activity_id)
         activity_.status = 'Processing'
+        activity_.updated = datetime.now()
         db.session.commit()
 
         for feature in features.get('features', []):
@@ -195,6 +196,7 @@ class Feature(CommonsModel):
         activity_id = features.get('activity_id', [])
         activity_ = Activity.query.get(activity_id)
         activity_.status = 'Complete'
+        activity_.updated = datetime.now()
         db.session.commit()
 
         return status_.status_200(), 200
