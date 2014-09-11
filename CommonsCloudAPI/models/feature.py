@@ -205,7 +205,7 @@ class Feature(CommonsModel):
         """
         Send an email notifying the user of the completed import
         """
-        self.send_import_complete_email(activity_.notify)
+        self.send_import_complete_email([activity_.notify])
 
         return status_.status_200(), 200
 
