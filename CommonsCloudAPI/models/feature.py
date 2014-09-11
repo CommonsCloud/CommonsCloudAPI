@@ -1031,7 +1031,7 @@ class Feature(CommonsModel):
 
         options = {
           "subject": "Your feature import is complete",
-          "recipients_emailaddresses": "Joshua Powell <joshua@viableindustries.com>",
+          "recipients_emailaddresses": ["Joshua Powell <joshua@viableindustries.com>"],
           "sender": "The CommonsCloud Team <support@commonscloud.org>",
           "template": "commonscloud_importsuccess"
         }
