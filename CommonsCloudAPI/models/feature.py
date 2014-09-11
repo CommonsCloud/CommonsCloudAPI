@@ -1026,7 +1026,7 @@ class Feature(CommonsModel):
       return safe_fields
 
 
-    def send_import_complete_email():
+    def send_import_complete_email(self):
 
         options = {
           "subject": "Your feature import is complete",
