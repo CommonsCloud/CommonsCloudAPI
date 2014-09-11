@@ -38,6 +38,7 @@ from werkzeug import secure_filename
 from flask import abort
 from flask import request
 from flask import current_app
+from flask import render_template
 
 from flask.ext.restless.views import API
 from flask.ext.restless.views import FunctionAPI
