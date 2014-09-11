@@ -1035,7 +1035,7 @@ class Feature(CommonsModel):
           "template": "commonscloud_importsuccess"
         }
 
-        send_notification_email(**options)    
+        self.send_notification_email(**options)    
 
     """
     Send an email notification
@@ -1047,7 +1047,7 @@ class Feature(CommonsModel):
     context (kwargs) Dictionary of data or anything else you need passed along
 
     """
-    def send_notification_email(subject, recipients_emailaddresses, sender, template, copy, **context):
+    def send_notification_email(self, subject, recipients_emailaddresses, sender, template, copy, **context):
         """Send an email via the Flask-Mail extension.
 
         :param subject: Email subject
