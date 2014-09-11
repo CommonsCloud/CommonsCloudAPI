@@ -1047,7 +1047,7 @@ class Feature(CommonsModel):
     context (kwargs) Dictionary of data or anything else you need passed along
 
     """
-    def send_notification_email(self, subject, recipients_emailaddresses, sender, template, copy, **context):
+    def send_notification_email(self, subject, recipients_emailaddresses, sender, template, **context):
         """Send an email via the Flask-Mail extension.
 
         :param subject: Email subject
@@ -1063,12 +1063,3 @@ class Feature(CommonsModel):
 
         mail = current_app.extensions.get('mail')
         mail.send(msg)
-
-        if copy.get('email_address', None):
-          copy_msg = Message(copy.get('subject', None), sender=sender, recipients=copy.get('email_address', None))
-          copy_ctx = ('notifications', copy.get('template', None))
-          copy_msg.body = render_template('%s/%s.txt' % copy_ctx, **context)
-          copy_msg.html = render_template('%s/%s.html' % copy_ctx, **context)
-
-          copy_mail = current_app.extensions.get('mail')
-          copy_mail.send(copy_msg)
