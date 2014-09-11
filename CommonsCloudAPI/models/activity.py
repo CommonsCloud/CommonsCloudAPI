@@ -49,15 +49,17 @@ class Activity(db.Model, CommonsModel):
     created = db.Column(db.DateTime)
     updated = db.Column(db.DateTime)
     status = db.Column(db.String(24))
+    notify = db.Column(db.Text)
     template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
 
-    def __init__(self, name="", description="", result="", created=datetime.now(), updated=datetime.now(), status=True, template_id=""):
+    def __init__(self, name="", description="", result="", created=datetime.now(), updated=datetime.now(), status=True, notify=[], template_id=""):
         self.name = name
         self.description = description
         self.result = result
         self.created = created
         self.updated = updated
         self.status = status
+        self.notify = notify
         self.template_id = template_id
 
     def activity_get(self, activity_id):

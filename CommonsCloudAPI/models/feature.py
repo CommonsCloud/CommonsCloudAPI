@@ -205,7 +205,7 @@ class Feature(CommonsModel):
         """
         Send an email notifying the user of the completed import
         """
-        self.send_import_complete_email()
+        self.send_import_complete_email(activity_.notify)
 
         return status_.status_200(), 200
 
@@ -1002,7 +1002,8 @@ class Feature(CommonsModel):
         'description': output,
         'result': '',
         'status': 'pending',
-        'template_id': Template_.id
+        'template_id': Template_.id,
+        'notify': [self.current_user.email]
       }
       activity = Activity(**new_activity)
       db.session.add(activity)
@@ -1027,11 +1028,11 @@ class Feature(CommonsModel):
       return safe_fields
 
 
-    def send_import_complete_email(self):
+    def send_import_complete_email(self, recipients=[]):
 
         options = {
           "subject": "Your feature import is complete",
-          "recipients_emailaddresses": ["Joshua Powell <joshua@viableindustries.com>"],
+          "recipients_emailaddresses": recipients,
           "sender": "The CommonsCloud Team <support@commonscloud.org>",
           "template": "commonscloud_importsuccess"
         }
