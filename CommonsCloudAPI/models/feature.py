@@ -1003,7 +1003,7 @@ class Feature(CommonsModel):
         'result': '',
         'status': 'pending',
         'template_id': Template_.id,
-        'notify': [self.current_user.email]
+        'notify': self.current_user.email
       }
       activity = Activity(**new_activity)
       db.session.add(activity)
