@@ -230,7 +230,7 @@ class Feature(CommonsModel):
           return new_feature
 
 
-    def feature_create_from_object(self, content_, Storage_, Template_, storage, files_, bulk):
+    def feature_create_from_object(self, content_, Storage_, Template_, storage, files_, bulk=False):
 
         """
         Relationships and Attachments
