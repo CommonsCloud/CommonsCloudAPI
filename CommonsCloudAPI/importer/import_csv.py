@@ -18,6 +18,19 @@ import csv
 import json
 import urllib2
 
+
+"""
+Import Flask Dependencies
+"""
+from flask.ext.rq import job
+
+
+"""
+Import Commons Cloud Dependencies
+"""
+from CommonsCloudAPI.extensions import rq
+
+
 """
 Imports features from a CSV file based on user defined content
 
@@ -29,6 +42,7 @@ Imports features from a CSV file based on user defined content
     The object we are acting on behalf of
 
 """
+@job
 def import_csv(filename, storage, template_fields, activity_id):
 
   """
@@ -69,13 +83,14 @@ def import_csv(filename, storage, template_fields, activity_id):
   """
   Send list of Features to our batch import function
   """
-  batch_url = ('http://api.commonscloud.org/v2/type_%s/batch.json') % (storage)
+  # batch_url = ('http://api.commonscloud.org/v2/type_%s/batch.json') % (storage)
+  batch_url = ('http://127.0.0.1:5000/v2/type_%s/batch.json') % (storage)
   data = {
     'features': features,
     'activity_id': activity_id
   }
   content_length = len(data)
-  timeout = 300
+  timeout = 3600
 
   req = urllib2.Request(batch_url)
   req.add_header('Content-Type', 'application/json')

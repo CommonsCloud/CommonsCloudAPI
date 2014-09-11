@@ -298,9 +298,6 @@ def feature_import(oauth_request, storage, extension):
     Feature_.current_user = oauth_request.user
     import_features = Feature_.feature_import(request, storage)
 
-    if type(import_features) is tuple:
-        return import_features
-
     return status_.status_200(), 200
 
 

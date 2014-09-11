@@ -44,7 +44,6 @@ from flask.ext.restless.views import FunctionAPI
 from flask.ext.restless.search import search
 
 from flask.ext.rq import get_queue
-from flask.ext.rq import job
 
 from sqlalchemy.exc import DataError
 
@@ -59,21 +58,20 @@ from CommonsCloudAPI.models.field import Field
 from CommonsCloudAPI.models.statistic import Statistic
 
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import rq
 from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
-from CommonsCloudAPI.importer.import_csv import import_csv
-
 from CommonsCloudAPI.utilities.geometry import ST_GeomFromGeoJSON
 
 from CommonsCloudAPI.signals import trigger_feature_created
 
-# from CommonsCloudAPI.importer.import_csv import import_csv
-
 from geoalchemy2.elements import WKBElement
 import geoalchemy2.functions as geofunc
+
+from CommonsCloudAPI.importer.import_csv import import_csv
 
 
 """
@@ -161,6 +159,9 @@ class Feature(CommonsModel):
 
     def feature_batch(self, request_object, storage_):
 
+        with current_app.app_context():
+          logger.warning('Inside Current APP Context');
+
         storage = self.validate_storage(storage_)
         Template_ = Template.query.filter_by(storage=storage).first()
         Storage_ = self.get_storage(Template_)
@@ -178,10 +179,11 @@ class Feature(CommonsModel):
         activity_id = features.get('activity_id', [])
         activity_ = Activity.query.get(activity_id)
         activity_.status = 'Processing'
+        db.session.commit()
 
         for feature in features.get('features', []):
           try:
-            new_feature = self.feature_create_from_object(feature, Storage_, Template_, storage, [])
+            new_feature = self.feature_create_from_object(feature, Storage_, Template_, storage, [], bulk=True)
             logger.warning('new_feature %s', new_feature.id)
           except DataError, e:
             logger.error('An unknown error occured while importing data')
@@ -193,8 +195,9 @@ class Feature(CommonsModel):
         activity_id = features.get('activity_id', [])
         activity_ = Activity.query.get(activity_id)
         activity_.status = 'Complete'
+        db.session.commit()
 
-        return status_.status_201(), 201
+        return status_.status_200(), 200
 
     def feature_create(self, request_object, storage_):
 
@@ -217,7 +220,7 @@ class Feature(CommonsModel):
           return new_feature
 
 
-    def feature_create_from_object(self, content_, Storage_, Template_, storage, files_):
+    def feature_create_from_object(self, content_, Storage_, Template_, storage, files_, bulk):
 
         """
         Relationships and Attachments
@@ -339,11 +342,18 @@ class Feature(CommonsModel):
                 #
                 new_feature_attachments = self.feature_attachments(**details)
 
-        feature_json = self.serialize_object(self.feature_get(storage, new_feature.id))
-        logger.info('A new feature was created in %s with an id of %d', 
-            storage, new_feature.id)
-        trigger_feature_created.send(current_app._get_current_object(),
-                             storage=storage, template=Template_, feature=new_feature, feature_json=feature_json)
+        """
+        Trigger: trigger_feature_created
+
+        !!! This needs to be skipped on bulk uploads of content. A trigger should only fire when a
+            single record has been enetered into the system
+        """
+        if not bulk:
+          feature_json = self.serialize_object(self.feature_get(storage, new_feature.id))
+          logger.info('A new feature was created in %s with an id of %d', 
+              storage, new_feature.id)
+          trigger_feature_created.send(current_app._get_current_object(),
+                               storage=storage, template=Template_, feature=new_feature, feature_json=feature_json)
         return new_feature
 
     def feature_get(self, storage_, feature_id):
@@ -988,8 +998,7 @@ class Feature(CommonsModel):
       db.session.add(activity)
       db.session.commit()
 
-      # job = get_queue().enqueue(import_csv, output, storage_, fields, activity.id, timeout=3600)
-      job = get_queue().enqueue_call(func=import_csv, args=(output, storage_, fields, activity.id,), timeout=3600)
+      job = get_queue().enqueue_call(func=import_csv, args=(str(output), str(storage_), fields, activity.id), timeout=3600)
 
       return activity
 

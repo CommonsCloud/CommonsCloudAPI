@@ -42,7 +42,7 @@ oauth = CommonsOAuth2Provider()
 principal = Principal()
 status = CommonsStatus()
 sanitize = CommonsSanitize()
-queue = RQ()
+rq = RQ()
 
 """
 Signals

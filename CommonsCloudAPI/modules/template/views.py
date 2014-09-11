@@ -129,6 +129,7 @@ def template_activity(oauth_request, template_id, extension, is_public):
 
   arguments = {
     'the_content': this_activity,
+    'list_name': 'activities',
     'extension': extension
   }
 

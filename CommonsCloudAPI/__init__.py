@@ -24,7 +24,7 @@ from .extensions import db
 from .extensions import mail
 from .extensions import security
 from .extensions import oauth
-from .extensions import queue
+from .extensions import rq
 
 from .errors import load_errorhandlers
 
@@ -53,7 +53,7 @@ def create_application(name = __name__, env = 'testing'):
     # Load our application's blueprints
     load_blueprints(app)
 
-    queue.init_app(app)
+    rq.init_app(app)
 
     """
     Setup Flask Security 
