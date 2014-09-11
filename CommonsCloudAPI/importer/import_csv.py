@@ -83,8 +83,8 @@ def import_csv(filename, storage, template_fields, activity_id):
   """
   Send list of Features to our batch import function
   """
-  # batch_url = ('http://api.commonscloud.org/v2/type_%s/batch.json') % (storage)
-  batch_url = ('http://127.0.0.1:5000/v2/type_%s/batch.json') % (storage)
+  batch_url = ('http://api.commonscloud.org/v2/type_%s/batch.json') % (storage)
+  # batch_url = ('http://127.0.0.1:5000/v2/type_%s/batch.json') % (storage)
   data = {
     'features': features,
     'activity_id': activity_id
