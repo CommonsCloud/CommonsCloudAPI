@@ -114,7 +114,7 @@ A field that helps make up a Template within CommonsCloudAPI
 """
 class Field(db.Model, CommonsModel):
 
-    __public__ = {'default': ['id', 'label', 'name', 'help', 'data_type', 'relationship', 'is_public', 'is_visible', 'is_listed', 'is_searchable', 'is_required', 'weight', 'status']}
+    __public__ = {'default': ['id', 'label', 'name', 'help', 'data_type', 'relationship', 'is_public', 'is_visible', 'is_listed', 'is_searchable', 'is_required', 'weight', 'status', 'options']}
 
     __tablename__ = 'field'
     __table_args__ = {
