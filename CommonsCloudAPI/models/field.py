@@ -381,6 +381,9 @@ class Field(db.Model, CommonsModel):
         if hasattr(field_, 'status'):
           field_.status = sanitize.sanitize_boolean(field_content.get('status', field_.status))
 
+        if hasattr(field_, 'options'):
+          field_.options = sanitize.sanitize_string(field_content.get('options', field_.options))
+
         #
         # @todo
         #    We probably need to make the API capable of changing
