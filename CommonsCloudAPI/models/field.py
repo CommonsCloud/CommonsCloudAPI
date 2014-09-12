@@ -263,7 +263,7 @@ class Field(db.Model, CommonsModel):
           'is_required': sanitize.sanitize_boolean(content_.get('is_required', False)),
           'weight': sanitize.sanitize_integer(content_.get('created', 1)),
           'status': sanitize.sanitize_boolean(content_.get('status', True)),
-          'options': sanitize.sanitize_string(content_.get('options', True)),
+          'options': sanitize.sanitize_string(content_.get('options', '')),
           'templates': [Template_]
         }
 
