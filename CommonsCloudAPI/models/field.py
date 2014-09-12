@@ -135,9 +135,10 @@ class Field(db.Model, CommonsModel):
     is_required = db.Column(db.Boolean)
     weight = db.Column(db.Integer)
     status = db.Column(db.Boolean)
+    options = db.Column(db.Text)
     statistics = db.relationship('Statistic', backref=db.backref('field'), cascade="all,delete")
 
-    def __init__(self, label="", name="", help="", data_type="", relationship="", association="", is_public=True, is_visible=True, is_listed=True, is_searchable=False, is_required=False, weight="", status=True, templates=[]):
+    def __init__(self, label="", name="", help="", data_type="", relationship="", association="", is_public=True, is_visible=True, is_listed=True, is_searchable=False, is_required=False, weight="", status=True, options="", templates=[]):
         self.label = label
         self.name = name
         self.help = help
@@ -151,6 +152,7 @@ class Field(db.Model, CommonsModel):
         self.is_required = is_required
         self.weight = weight
         self.status = status
+        self.options = options
         self.templates = templates
 
 
