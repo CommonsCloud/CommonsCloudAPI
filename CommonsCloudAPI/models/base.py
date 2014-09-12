@@ -97,7 +97,6 @@ class CommonsModel(object):
         elif single is True:
           result[key] = self.serialize_field(key, value)
     else:
-      logger.debug('!!! object_ %s', dir(object_))
       for key in object_.keys():
         value = object_.get(key, None)
         if key in self.__public__['default']:
