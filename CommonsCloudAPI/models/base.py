@@ -196,7 +196,8 @@ class CommonsModel(object):
       "textarea": db.Text(),
       "boolean": db.Boolean(),
       "date": db.Date(),
-      "time": db.Time()
+      "time": db.Time(),
+      "list": db.String(255)
     }
 
     if field.data_type == 'relationship':
