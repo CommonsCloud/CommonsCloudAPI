@@ -694,7 +694,7 @@ class Feature(CommonsModel):
 
         if isinstance(geometry, WKBElement):
             if db.session is not None:
-              string = str(db.session.scalar(geofunc.ST_AsGeoJSON(geometry, 4)))
+              string = str(db.session.scalar(geofunc.ST_AsGeoJSON(geometry)))
               geojson = json.loads(string)
               geometries = geojson.get('geometries', None)
               coordinates = geometries[0].get('coordinates', None)

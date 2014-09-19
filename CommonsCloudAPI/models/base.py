@@ -107,11 +107,15 @@ class CommonsModel(object):
     return result
 
 
+  """
+  Serializing fields properly is extremely important if the content will be passed
+  off to another service within the API such as the GeoJSON, JSON, or CSV formatter.
+  """
   def serialize_field(self, key, value):
 
     if 'geometry' in key and isinstance(value, WKBElement):
       if db.session is not None:
-        geojson = str(db.session.scalar(func.ST_AsGeoJSON(value, 4)))
+        geojson = str(db.session.scalar(func.ST_AsGeoJSON(value))) # To change precision of the geometry add a numeric value after the `value` variable
         return json.loads(geojson)
     elif 'geometry' in key and isinstance(value, dict):
       return value

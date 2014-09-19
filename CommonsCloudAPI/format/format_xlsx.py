@@ -14,7 +14,7 @@ limitations under the License.
 """
 Import Python/System Dependencies
 """
-import csv
+import xlsxwriter
 
 
 """
@@ -28,8 +28,6 @@ Import CommonsCloudAPI Dependencies
 """
 from . import FormatContent
 
-from CommonsCloudAPI.extensions import logger
-
 
 """
 A class for formatting objects as comma separated value documents or CSV
@@ -39,7 +37,7 @@ A class for formatting objects as comma separated value documents or CSV
 @method create
 
 """
-class CSV(FormatContent):
+class XLSX(FormatContent):
 
   """
   Creates a CSV file based on user requested content
@@ -61,53 +59,35 @@ class CSV(FormatContent):
 
   """
   def create(self):
+    pass
 
-    """
-    The following variables help us define what, where, and how things will be saved
-    as we walk through the CSV creation process
-    """
-    this_directory = self.get_directory_name()
-    this_filename  = self.get_file_name()
-    this_filepath  = ('%s%s%s') % (this_directory, '/', this_filename)
+    # """
+    # The following variables help us define what, where, and how things will be saved
+    # as we walk through the CSV creation process
+    # """
+    # this_directory = self.get_directory_name()
+    # this_filename  = self.get_file_name()
+    # this_filepath  = ('%s%s%s') % (this_directory, '/', this_filename)
+    # workbook = xlsxwriter.Workbook(this_filepath)
 
-    """
-    With the current file open, begin writing our content
-    """
-    with open(this_filepath, 'wb') as open_file:
+    # """
+    # Add our base Worksheet that will serve as our template
+    # """
+    # storage_worksheet = workbook.add_worksheet('Sheet 1')
 
-      """
-      Create the header row for our CSV
-      """
-      headers = self.createHeaders(self.the_content['features'][0])
+    # """
+    # With the current file open, begin writing our content
+    # """
+    # with open(this_filepath, 'wb') as open_file:
 
-      """
-      Create the Writer for our CSV document
-      """
-      writer_ = csv.DictWriter(open_file, headers, lineterminator="\r\n", delimiter=",", doublequote=False)
+      
+      # storage_worksheet.write(0, index, field.name)
 
-      """
-      Write the headers to the document
-      """
-      writer_.writeheader()
-
-      """
-      Write the content to the document
-      """
-      if 'features' in self.the_content.keys():
-        writer_.writerows(self.the_content['features'])
-      else:
-        writer_.writerows(self.the_content)        
-
-      """
-      Close the file since we are done adding content to it for now
-      """
-      open_file.close()
-
-    """
-    Send the completed file to the user and force the download of the file
-    """
-    return send_from_directory(this_directory, this_filename, as_attachment=True)
-
+      # # """
+      # # Create the header row for our CSV
+      # # """
+      # # for index, column in enumerate(self.the_content['features'][0]):
+      # #   storage_worksheet.write(0, index, field.name)
 
   def createHeaders(self, object_):
 
@@ -117,5 +97,3 @@ class CSV(FormatContent):
       headers.append(item)
 
     return headers
-
-
