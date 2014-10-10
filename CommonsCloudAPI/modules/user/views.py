@@ -67,7 +67,7 @@ def user_me(oauth_request, extension):
 
 
 @module.route('/v2/users/list.<string:extension>', methods=['GET'])
-@oauth.require_oauth('admin')
+@oauth.require_oauth('user')
 def user_list(oauth_request, extension):
 
   User_ = User()
