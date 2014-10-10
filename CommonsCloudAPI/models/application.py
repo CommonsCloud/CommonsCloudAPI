@@ -66,7 +66,9 @@ class is_public(object):
 
           keywords = kwargs
 
-          if not application_.is_public:
+          if not is_public in keywords:
+            keywords['is_public'] = False
+          elif not application_.is_public:
             keywords['is_public'] = False
           else:
             keywords['is_public'] = True
@@ -174,14 +176,48 @@ class Application(db.Model, CommonsModel):
   """
   def application_get(self, application_id, is_public=False):
 
+    """
+    So we'll send a request to the database for the requested applciation_id and display a Response
+    to the user based on the return from the database
+    """
+    application = Application.query.get(application_id)
+
+    """
+    We need to check if the return from the database has return an Application
+    object or a None value. If it's a None value, then we need to tell the user the application_id doesn't
+    exist within the current system.
+    """
+    if application is None:
+      return status_.status_404('The Application Requested does not exist'), 404
+
+    """
+    Check to see if the Application is_public or can be view at it's endpoint[1]
+    without a bearer token.
+
+    [1] //api.commonscloud.org/v2/applications/[ApplicationID].json 
+    """
     if not is_public:
 
+      """
+      Since the Application requested is_public returned false, a bearer token
+      is required to see View this application.
+
+      This `allowed_applications` check compiles a list of `application_id` integers from the
+      `user_applications` table of the database, that the user has access to 'view'
+      """
       allowed_applications = self.allowed_applications()
 
+      """
+      If application_id requested by the user is not in the allowed_applications 'view' list
+      then we need to give the user an 401 UNAUTHORIZED Response
+      """
       if not application_id in allowed_applications:
         return status_.status_401('You need to be logged in to access applications'), 401
 
-    return Application.query.get(application_id)
+    """
+    If the Application exists, go ahead and send it back to our View for formatting and display to the user
+    """
+    return application
 
 
   """

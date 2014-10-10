@@ -248,13 +248,15 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_403(self):
+  def status_403(self, system_message=''):
+
+    if not system_message:
+      system_message = 'You are forbidden from accessing the requested resource.'
 
     message = {
       'status': '403 Forbidden',
       'code': '403',
-      'message': 'The server has not found anything matching the Request-URI.',
-      'details': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
+      'message': system_message
     }
 
     response = jsonify(message)
@@ -283,12 +285,15 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_404(self):
+  def status_404(self, system_message=''):
+
+    if not system_message:
+      system_message = 'The server has not found anything matching the Request-URI.'
 
     message = {
       'status': '404 Not Found',
       'code': '404',
-      'message': 'The server has not found anything matching the Request-URI.',
+      'message': system_message,
       'details': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
     }
 

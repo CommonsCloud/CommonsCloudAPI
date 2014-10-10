@@ -1,6 +1,6 @@
 The Commons Cloud API License
 
-Copyright (C) 2014 Viable Industries, L.L.C.
+Copyright (c) 2014 Viable Industries, L.L.C.
 
 
 This program is free software: you can redistribute it and/or modify
