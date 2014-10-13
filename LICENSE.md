@@ -1,7 +1,21 @@
-The Commons Cloud API License
+The CommonsCloudAPI License
 
 Copyright (c) 2014 Viable Industries, L.L.C.
 
+The CommonsCloudAPI is licensed under the terms of the GNU Affero General
+Public License as published by the Free Software Foundation, version 3 of
+the License (see Appendix A) for official non-profit organizations and
+charities that are non-government, non-academic, non-commercial, non-political
+in nature, and have no religious affiliation.
+
+If your organization is not covered under our official open-source non-profit
+license structure, you can still use our software under our commercial license.
+If you are interested in doing so please contact us at business@commonscloud.org
+for pricing and details.
+
+---
+
+Appendix A
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
