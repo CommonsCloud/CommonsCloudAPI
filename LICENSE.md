@@ -1,4 +1,4 @@
-The CommonsCloudAPI License
+# The CommonsCloudAPI License
 
 Copyright (c) 2014 Viable Industries, L.L.C.
 
@@ -15,7 +15,7 @@ for pricing and details.
 
 ---
 
-Appendix A
+## Appendix A
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
