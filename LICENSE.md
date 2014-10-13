@@ -13,8 +13,6 @@ license structure, you can still use our software under our commercial license.
 If you are interested in doing so please contact us at business@commonscloud.org
 for pricing and details.
 
----
-
 ## Appendix A
 
 This program is free software: you can redistribute it and/or modify
