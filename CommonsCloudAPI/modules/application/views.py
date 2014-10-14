@@ -25,6 +25,7 @@ from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.application import Application
+from CommonsCloudAPI.models.application import UserApplications
 from CommonsCloudAPI.models.application import is_public
 
 from . import module
@@ -38,7 +39,12 @@ def application_preflight(extension):
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['OPTIONS'])
 def application_single_preflight(application_id, extension):
   return status_.status_200(), 200
-  
+
+
+@module.route('/v2/applications/<int:application_id>/users.<string:extension>', methods=['OPTIONS'])
+def application_users_preflight(application_id, extension):
+  return status_.status_200(), 200
+
 
 @module.route('/v2/applications.<string:extension>', methods=['GET'])
 @oauth.require_oauth('applications')
@@ -138,5 +144,61 @@ def application_delete(oauth_request, application_id, extension):
   return status_.status_204(), 204
 
 
+@module.route('/v2/applications/<int:application_id>/users/<int:user_id>.<string:extension>', methods=['GET'])
+@oauth.require_oauth('applications')
+def application_user_get(oauth_request, application_id, user_id, extension):
+
+  UserApplications_ = UserApplications(application_id, user_id)
+  UserApplications_.current_user = oauth_request.user
+
+  user_permissions = UserApplications_.permission_get(application_id, user_id)
+
+  if type(user_permissions) is tuple:
+    return user_permissions
+
+  arguments = {
+    'the_content': user_permissions,
+    'extension': extension
+  }
+
+  return UserApplications_.endpoint_response(**arguments)
 
 
+@module.route('/v2/applications/<int:application_id>/users/<int:user_id>.<string:extension>', methods=['PUT', 'PATCH'])
+@oauth.require_oauth('applications')
+def application_user_update(oauth_request, application_id, user_id, extension):
+
+  UserApplications_ = UserApplications(application_id, user_id)
+  UserApplications_.current_user = oauth_request.user
+
+  user_permissions = UserApplications_.permission_update(application_id, user_id, request)
+
+  if type(user_permissions) is tuple:
+    return user_permissions
+
+  arguments = {
+    'the_content': user_permissions,
+    'extension': extension
+  }
+
+  return UserApplications_.endpoint_response(**arguments)
+
+
+@module.route('/v2/applications/<int:application_id>/users/<int:user_id>.<string:extension>', methods=['DELETE'])
+@oauth.require_oauth('applications')
+def application_user_delete(oauth_request, application_id, user_id, extension):
+
+  UserApplications_ = UserApplications(application_id, user_id)
+  UserApplications_.current_user = oauth_request.user
+
+  user_permissions = UserApplications_.permission_delete(application_id, user_id)
+
+  if type(user_permissions) is tuple:
+    return user_permissions
+
+  arguments = {
+    'the_content': user_permissions,
+    'extension': extension
+  }
+
+  return status_.status_204(), 204

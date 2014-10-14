@@ -33,6 +33,8 @@ from CommonsCloudAPI.extensions import status as status_
 
 class UserApplications(db.Model, CommonsModel):
 
+  __public__ = {'default': ['view', 'edit', 'delete', 'is_moderator', 'is_admin']}
+
   __tablename__ = 'user_applications'
   __table_args__ = {
     'extend_existing': True
@@ -46,6 +48,108 @@ class UserApplications(db.Model, CommonsModel):
   is_moderator = db.Column(db.Boolean())
   is_admin = db.Column(db.Boolean())
   applications = db.relationship('Application', backref=db.backref("user_applications", cascade="all,delete"))
+
+  def __init__(self, user_id, application_id, view=True, edit=False, delete=False, is_moderator=False, is_admin=False):
+    self.user_id = user_id
+    self.application_id = application_id
+    self.view = view
+    self.edit = edit
+    self.delete = delete
+    self.is_moderator = is_moderator
+    self.is_admin = is_admin
+
+  def permission_create(self, application_id, user_id):
+    pass
+
+  def permission_get(self, application_id, user_id):
+    
+    """
+    Before we get the User permissions for this application, we need to make sure that
+    the user requesting them is authenticated and has the `is_admin` permission for the
+    application_id being requested.
+    """
+    allowed_applications = self.allowed_applications('is_admin')
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to access Users for Application %d', \
+          self.current_user.id, allowed_applications, application_id)
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Application'), 401
+
+    permissions = UserApplications.query.filter_by(application_id=application_id,user_id=user_id).first()
+
+    if not permissions:
+      return status_.status_404('We couldn\'t find the user permissions you were looking for. This user may have been removed from the Application or the Application may have been deleted.'), 404
+
+    return {
+      'view': permissions.view,
+      'edit': permissions.edit,
+      'delete': permissions.delete,
+      'is_moderator': permissions.is_moderator,
+      'is_admin': permissions.is_admin
+    }
+
+  def permission_update(self, application_id, user_id, request_object):
+    
+    """
+    Before we update the User permissions for this application, we need to make sure that
+    the user requesting them is authenticated and has the `is_admin` permission for the
+    application_id being requested.
+    """
+    allowed_applications = self.allowed_applications('is_admin')
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to access Users for Application %d', \
+          self.current_user.id, allowed_applications, application_id)
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Application'), 401
+
+    permissions = UserApplications.query.filter_by(application_id=application_id,user_id=user_id).first()
+
+    altered_permissions = json.loads(request_object.data)
+
+    if hasattr(permissions, 'view'):
+      permissions.view = sanitize.sanitize_boolean(altered_permissions.get('view', permissions.view)),
+
+    if hasattr(permissions, 'edit'):
+      permissions.edit = sanitize.sanitize_boolean(altered_permissions.get('edit', permissions.edit)),
+    
+    if hasattr(permissions, 'delete'):
+      permissions.delete = sanitize.sanitize_boolean(altered_permissions.get('delete', permissions.delete)),
+    
+    if hasattr(permissions, 'is_moderator'):
+      permissions.is_moderator = sanitize.sanitize_boolean(altered_permissions.get('is_moderator', permissions.is_moderator)),
+    
+    if hasattr(permissions, 'is_admin'):
+      permissions.is_admin = sanitize.sanitize_boolean(altered_permissions.get('is_admin', permissions.is_admin))
+
+    db.session.commit()
+
+    return {
+      'view': permissions.view,
+      'edit': permissions.edit,
+      'delete': permissions.delete,
+      'is_moderator': permissions.is_moderator,
+      'is_admin': permissions.is_admin
+    }
+
+
+  def permission_delete(self, application_id, user_id):
+    
+    """
+    Before we update the User permissions for this application, we need to make sure that
+    the user requesting them is authenticated and has the `is_admin` permission for the
+    application_id being requested.
+    """
+    allowed_applications = self.allowed_applications('is_admin')
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to access Users for Application %d', \
+          self.current_user.id, allowed_applications, application_id)
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Application'), 401
+
+    permissions = UserApplications.query.filter_by(application_id=application_id, user_id=user_id).first()
+
+    db.session.delete(permissions)
+    db.session.commit()
 
 
 """
