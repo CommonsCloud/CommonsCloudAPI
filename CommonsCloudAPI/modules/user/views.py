@@ -41,11 +41,13 @@ Basic route for currently logged in user
 def index():
   return redirect(url_for('user.user_profile_get')), 301
 
-
 @module.route('/v2/user/me.<string:extension>', methods=['OPTIONS'])
 def user_me_preflight(extension):
     return status_.status_200(), 200
 
+@module.route('/v2/applications/<int:application_id>/users.<string:extension>', methods=['OPTIONS'])
+def application_users_preflight(application_id, extension):
+  return status_.status_200(), 200
 
 @module.route('/v2/user/me.<string:extension>', methods=['GET'])
 @oauth.require_oauth('user')
@@ -119,3 +121,24 @@ def user_profile_post():
   flash('You\'re profile was updated successfully', 'success')
 
   return redirect(url_for('user.user_profile_get')), 301
+
+
+@module.route('/v2/applications/<int:application_id>/users.<string:extension>', methods=['GET'])
+@oauth.require_oauth('applications')
+def application_users(oauth_request, application_id, extension):
+
+  User_ = User()
+  User_.current_user = oauth_request.user
+
+  application_users = User_.application_users(application_id)
+
+  if type(application_users) is tuple:
+    return application_users
+
+  arguments = {
+    'the_content': application_users,
+    'list_name': 'users',
+    'extension': extension
+  }
+
+  return User_.endpoint_response(**arguments)

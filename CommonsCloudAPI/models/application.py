@@ -31,7 +31,6 @@ from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import sanitize
 from CommonsCloudAPI.extensions import status as status_
 
-
 class UserApplications(db.Model, CommonsModel):
 
   __tablename__ = 'user_applications'
@@ -308,7 +307,6 @@ class Application(db.Model, CommonsModel):
     db.session.commit()
 
 
-
   """
   Associate a user with a specific application
 
@@ -354,29 +352,3 @@ class Application(db.Model, CommonsModel):
     db.session.commit()
 
     return new_permission
-
-
-  """
-  Get a list of application ids from the current user and convert
-  them into a list of numbers so that our SQLAlchemy query can
-  understand what's going on
-
-  @param (object) self
-
-  @return (list) applications_
-      A list of applciations the current user has access to
-  """
-  def allowed_applications(self, permission_type='view'):
-
-    applications_ = []
-
-    if not hasattr(self.current_user, 'id'):
-      logger.warning('User did\'t submit their information %s', \
-          self.current_user)
-      return status_.status_401('You need to be logged in to access applications'), 401
-
-    for application in self.current_user.applications:
-      if permission_type and getattr(application, permission_type):
-        applications_.append(application.application_id)
-
-    return applications_

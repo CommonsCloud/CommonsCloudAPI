@@ -30,11 +30,13 @@ from werkzeug import check_password_hash
 Import Commons Cloud Dependencies
 """
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import sanitize
+from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.base import CommonsModel
 from CommonsCloudAPI.models.template import UserTemplates
-
+from CommonsCloudAPI.models.application import UserApplications
 
 
 user_roles = db.Table('user_roles',
@@ -154,6 +156,25 @@ class User(db.Model, UserMixin, CommonsModel):
     return users_
 
 
+  """
+  Get the a list of User objects limited to a specific Application
+
+  @return (array) users_
+      The array of objects for all Application Users in system
+
+  """
+  def application_user_list(self, application_id):
+
+    user_list = []
+
+    ApplicationUsers = UserApplications.query.filter_by(application_id=application_id).all()
+
+    for user in ApplicationUsers:
+      user_list.append(user.user_id)
+
+    return User.query.filter(User.id.in_(user_list)).all()
+
+
   def user_update(self, user_object_):
 
     """
@@ -207,6 +228,24 @@ class User(db.Model, UserMixin, CommonsModel):
     picture_url = '//www.gravatar.com/avatar/' + user_hash + '?s=172'
 
     return picture_url
+
+
+  """
+  Get a list of Users that have access to the Application requested by
+  the user, but make sure the User requesting this information is logged
+  in already and has `is_admin` permission to the requested Applciation
+  """
+  def application_users(self, application_id):
+
+    allowed_applications = self.allowed_applications('is_admin')
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to access Users for Application %d', \
+          self.current_user.id, allowed_applications, application_id)
+      return status_.status_401('You are not allowed to view the Users of this Application because you do not have the permission to do so'), 401
+
+    return self.application_user_list(application_id)
+
 
 
 """

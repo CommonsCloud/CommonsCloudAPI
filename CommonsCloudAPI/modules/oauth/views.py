@@ -64,6 +64,10 @@ def oauth_client():
 
   next_url = url_for('oauth.oauth_client', **request.args)
 
+  """
+  If the user is not authenticated we should redirect them
+  to the login page
+  """
   if not hasattr(current_user, 'id'):
     return redirect(url_for('security.login', next=next_url))
 
@@ -78,6 +82,9 @@ def oauth_client():
   """
   client_id = gen_salt(40)
   client_secret = gen_salt(50)
+  _redirect_uris = ''
+  _default_scopes = ''
+  user_id = this_user.id
 
   # @todo
   #
@@ -85,16 +92,23 @@ def oauth_client():
   # our application is doing the call to this url .... which should
   # actually just be a utility function
   #
-  item = Client(
-    client_id=client_id,
-    client_secret=client_secret,
-    _redirect_uris='http://localhost:9000/authorized',
-    _default_scopes='user,applications',
-    user_id=this_user.id,
-  )
+  # item = Client(
+  #   client_id=client_id,
+  #   client_secret=client_secret,
+  #   _redirect_uris='http://localhost:9000/authorized',
+  #   _default_scopes='user,applications',
+  #   user_id=this_user.id,
+  # )
   #
   # @end
   #
+  item = Client(
+    client_id = client_id,
+    client_secret = client_secret,
+    _redirect_uris = _redirect_uris,
+    _default_scopes = _default_scopes,
+    user_id = user_id,
+  )
   
   """
   Save the OAuth2 authentication information to the database

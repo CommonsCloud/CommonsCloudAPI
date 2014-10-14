@@ -38,7 +38,7 @@ def application_preflight(extension):
 @module.route('/v2/applications/<int:application_id>.<string:extension>', methods=['OPTIONS'])
 def application_single_preflight(application_id, extension):
   return status_.status_200(), 200
-
+  
 
 @module.route('/v2/applications.<string:extension>', methods=['GET'])
 @oauth.require_oauth('applications')
@@ -136,4 +136,7 @@ def application_delete(oauth_request, application_id, extension):
     return application_deleted
 
   return status_.status_204(), 204
+
+
+
 
