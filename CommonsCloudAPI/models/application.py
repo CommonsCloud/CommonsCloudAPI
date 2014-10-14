@@ -58,8 +58,47 @@ class UserApplications(db.Model, CommonsModel):
     self.is_moderator = is_moderator
     self.is_admin = is_admin
 
-  def permission_create(self, application_id, user_id):
-    pass
+  def permission_create(self, application_id, user_id, request_object):
+
+    """
+    Before we create the User permissions for this application, we need to make sure that
+    the user requesting them is authenticated and has the `is_admin` permission for the
+    application_id being requested.
+    """
+    allowed_applications = self.allowed_applications('is_admin')
+
+    if not application_id in allowed_applications:
+      logger.warning('User %d with Applications %s tried to access Users for Application %d', \
+          self.current_user.id, allowed_applications, application_id)
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Application'), 401
+
+    permissions_ = json.loads(request_object.data)
+
+    """
+    Add the new application to the database
+    """
+    new_permissions = {
+      'user_id': user_id,
+      'application_id': application_id,
+      'view': sanitize.sanitize_boolean(permissions_.get('view', '')),
+      'edit': sanitize.sanitize_boolean(permissions_.get('edit', '')),
+      'delete': sanitize.sanitize_boolean(permissions_.get('delete', '')),
+      'is_moderator': sanitize.sanitize_boolean(permissions_.get('is_moderator', '')),
+      'is_admin': sanitize.sanitize_boolean(permissions_.get('is_admin', ''))
+    }
+
+    permission_object = UserApplications(**new_permissions)
+
+    db.session.add(permission_object)
+    db.session.commit()
+
+    return {
+      'view': permission_object.view,
+      'edit': permission_object.edit,
+      'delete': permission_object.delete,
+      'is_moderator': permission_object.is_moderator,
+      'is_admin': permission_object.is_admin
+    }
 
   def permission_get(self, application_id, user_id):
     
@@ -135,7 +174,7 @@ class UserApplications(db.Model, CommonsModel):
   def permission_delete(self, application_id, user_id):
     
     """
-    Before we update the User permissions for this application, we need to make sure that
+    Before we delete the User permissions for this application, we need to make sure that
     the user requesting them is authenticated and has the `is_admin` permission for the
     application_id being requested.
     """

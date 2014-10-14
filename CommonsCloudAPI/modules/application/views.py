@@ -164,6 +164,26 @@ def application_user_get(oauth_request, application_id, user_id, extension):
   return UserApplications_.endpoint_response(**arguments)
 
 
+@module.route('/v2/applications/<int:application_id>/users/<int:user_id>.<string:extension>', methods=['POST'])
+@oauth.require_oauth('applications')
+def application_user_create(oauth_request, application_id, user_id, extension):
+
+  UserApplications_ = UserApplications(application_id, user_id)
+  UserApplications_.current_user = oauth_request.user
+
+  user_permissions = UserApplications_.permission_create(application_id, user_id, request)
+
+  if type(user_permissions) is tuple:
+    return user_permissions
+
+  arguments = {
+    'the_content': user_permissions,
+    'extension': extension
+  }
+
+  return UserApplications_.endpoint_response(**arguments)
+
+
 @module.route('/v2/applications/<int:application_id>/users/<int:user_id>.<string:extension>', methods=['PUT', 'PATCH'])
 @oauth.require_oauth('applications')
 def application_user_update(oauth_request, application_id, user_id, extension):
