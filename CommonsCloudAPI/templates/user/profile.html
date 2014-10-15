@@ -12,7 +12,7 @@
             <!-- <li><a href="" class="notifications"><span class="glyphicon glyphicon-bell"></span></a></li> -->
             <li><a href="http://app.commonscloud.org/">Explorer</a></li>
             <li>
-            <a href="//api.commonscloud.org/user/profile" class="user"><img class="decorate" src="{{ picture }}?size=24" width="24" height="24" alt="" title="" /></a></li>
+            <a href="//api.commonscloud.org/user/profile" class="user"><img class="decorate" src="{{ user.picture }}?size=24" width="24" height="24" alt="" title="" /></a></li>
           </ul>
         </div>
       </div>
@@ -25,7 +25,7 @@
   <div class="row">
     <div class="col-xs-12 col-xs-offset-0 col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-3">
       <form method="POST" action="{{ url_for('user.user_profile_post') }}" class="card" id="user_profile_form" name="user_profile_form">
-        <legend class="pull-left">Edit Profile <small class="pull-right">Member Since {{ member_since }}</small></legend>
+        <legend class="pull-left">Edit Profile <small class="pull-right">Member Since {{ user.member_since }}</small></legend>
 
         <fieldset>
 
@@ -33,7 +33,7 @@
 
           <div class="row">
             <div class="col-xs-12 text-center">
-              <img class="decorate" src="{{ picture }}" alt="" title="" />
+              <img class="decorate" src="{{ user.picture }}?size=172" alt="" title="" />
             </div>
           </div>
 

@@ -158,10 +158,7 @@ def user_profile_get():
   user_ = User()
   this_user = user_.user_get(current_user.id)
 
-  picture = user_.user_picture(this_user.email)
-  member_since = this_user.confirmed_at.strftime('%b %d, %Y')
-
-  return render_template('user/profile.html', user=this_user, picture=picture, member_since=member_since), 200
+  return render_template('user/profile.html', user=this_user), 200
 
 
 # @module.route('/user/remove/', methods=['GET', 'POST'])
