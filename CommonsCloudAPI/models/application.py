@@ -33,7 +33,7 @@ from CommonsCloudAPI.extensions import status as status_
 
 class UserApplications(db.Model, CommonsModel):
 
-  __public__ = {'default': ['read', 'write', 'is_moderator', 'is_admin']}
+  __public__ = {'default': ['read', 'write', 'is_admin']}
 
   __tablename__ = 'user_applications'
   __table_args__ = {
