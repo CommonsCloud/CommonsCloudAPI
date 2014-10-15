@@ -280,6 +280,8 @@ class Application(db.Model, CommonsModel):
     access the newly created application
     """
     permission = {
+      'user_id': self.current_user.id,
+      'application_id': application_.id,
       'read': True,
       'write': True,
       'is_admin': True
