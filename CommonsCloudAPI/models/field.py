@@ -95,9 +95,9 @@ class UserFields(db.Model):
 
   user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
   field_id = db.Column(db.Integer(), db.ForeignKey('field.id'), primary_key=True)
-  view = db.Column(db.Boolean())
-  edit = db.Column(db.Boolean())
-  delete = db.Column(db.Boolean())
+  read = db.Column(db.Boolean())
+  write = db.Column(db.Boolean())
+  is_admin = db.Column(db.Boolean())
   templates = db.relationship('Field', backref=db.backref("user_fields", cascade="all,delete"))
 
 
@@ -281,9 +281,9 @@ class Field(db.Model, CommonsModel):
         Section 2: Relate the Template with the Field and the User with the Field
         """
         permission = {
-          'view': True,
-          'edit': True,
-          'delete': True
+          'read': True,
+          'write': True,
+          'is_admin': True
         }
 
         self.set_user_field_permissions(field_, permission, self.current_user)
@@ -331,7 +331,7 @@ class Field(db.Model, CommonsModel):
         own outside of Templates. Because of that we need to instantiate a
         Template object that we can work with
         """
-        allowed_fields = self.allowed_fields(permission_type='edit')
+        allowed_fields = self.allowed_fields(permission_type='write')
         if not field_id in allowed_fields:
           logger.warning('User %d with Fields %s tried to access Field %d', \
               self.current_user.id, allowed_fields, field_id)
@@ -428,7 +428,7 @@ class Field(db.Model, CommonsModel):
         own outside of Templates. Because of that we need to instantiate a
         Template object that we can work with
         """
-        allowed_fields = self.allowed_fields(permission_type='view')
+        allowed_fields = self.allowed_fields(permission_type='read')
 
         public_fields_ = self.public_templates()
 
@@ -455,14 +455,14 @@ class Field(db.Model, CommonsModel):
       A fully qualified Field object to act on
 
     @param (dict) permission
-      A dictionary containing boolean values for the `view`, `edit`, and `delete` properties
+      A dictionary containing boolean values for the `read`, `write`, and `is_admin` properties
 
       Example:
 
         permission = {
-          'view': True,
-          'edit': True,
-          'delete': True
+          'read': True,
+          'write': True,
+          'is_admin': True
         }
 
     @param (object) user
@@ -616,14 +616,14 @@ class Field(db.Model, CommonsModel):
         own outside of Templates. Because of that we need to instantiate a
         Template object that we can work with
         """
-        allowed_templates = self.allowed_fields(template_id=template_id,permission_type='delete')
+        allowed_templates = self.allowed_fields(template_id=template_id,permission_type='is_admin')
 
         if not template_id in allowed_templates:
           logger.warning('User %d with Templates %s tried to access Template Fields %d', \
               self.current_user.id, allowed_templates, template_id)
           return status_.status_401('You can\'t delete this Field because it\'s Template is not yours'), 401
 
-        allowed_fields = self.allowed_fields(permission_type='delete')
+        allowed_fields = self.allowed_fields(permission_type='is_admin')
 
         if not field_id in allowed_fields:
           logger.warning('User %d with Fields %s tried to delete Field %d', \
@@ -648,7 +648,7 @@ class Field(db.Model, CommonsModel):
         return True
 
 
-    def allowed_fields(self, template_id='', permission_type='view'):
+    def allowed_fields(self, template_id='', permission_type='read'):
 
         if template_id:
 
@@ -731,7 +731,7 @@ class Field(db.Model, CommonsModel):
     them into a list of numbers so that our SQLAlchemy query can
     understand what's going on
     """
-    def explicitly_allowed_templates(self, permission_type='view'):
+    def explicitly_allowed_templates(self, permission_type='read'):
 
         templates_ = []
 
@@ -752,7 +752,7 @@ class Field(db.Model, CommonsModel):
     them into a list of numbers so that our SQLAlchemy query can
     understand what's going on
     """
-    def explicitly_allowed_fields(self, permission_type='view'):
+    def explicitly_allowed_fields(self, permission_type='read'):
 
         fields_ = []
 
