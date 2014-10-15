@@ -33,7 +33,7 @@ from CommonsCloudAPI.extensions import status as status_
 
 class UserApplications(db.Model, CommonsModel):
 
-  __public__ = {'default': ['view', 'edit', 'delete', 'is_moderator', 'is_admin']}
+  __public__ = {'default': ['read', 'write', 'is_moderator', 'is_admin']}
 
   __tablename__ = 'user_applications'
   __table_args__ = {
@@ -42,20 +42,16 @@ class UserApplications(db.Model, CommonsModel):
 
   user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
   application_id = db.Column(db.Integer(), db.ForeignKey('application.id'), primary_key=True)
-  view = db.Column(db.Boolean())
-  edit = db.Column(db.Boolean())
-  delete = db.Column(db.Boolean())
-  is_moderator = db.Column(db.Boolean())
+  read = db.Column(db.Boolean())
+  write = db.Column(db.Boolean())
   is_admin = db.Column(db.Boolean())
   applications = db.relationship('Application', backref=db.backref("user_applications", cascade="all,delete"))
 
-  def __init__(self, user_id, application_id, view=True, edit=False, delete=False, is_moderator=False, is_admin=False):
+  def __init__(self, user_id, application_id, read=True, write=False, is_admin=False):
     self.user_id = user_id
     self.application_id = application_id
-    self.view = view
-    self.edit = edit
-    self.delete = delete
-    self.is_moderator = is_moderator
+    self.read = read
+    self.write = write
     self.is_admin = is_admin
 
   def permission_create(self, application_id, user_id, request_object):
@@ -80,10 +76,8 @@ class UserApplications(db.Model, CommonsModel):
     new_permissions = {
       'user_id': user_id,
       'application_id': application_id,
-      'view': sanitize.sanitize_boolean(permissions_.get('view', '')),
-      'edit': sanitize.sanitize_boolean(permissions_.get('edit', '')),
-      'delete': sanitize.sanitize_boolean(permissions_.get('delete', '')),
-      'is_moderator': sanitize.sanitize_boolean(permissions_.get('is_moderator', '')),
+      'read': sanitize.sanitize_boolean(permissions_.get('read', '')),
+      'write': sanitize.sanitize_boolean(permissions_.get('write', '')),
       'is_admin': sanitize.sanitize_boolean(permissions_.get('is_admin', ''))
     }
 
@@ -93,10 +87,8 @@ class UserApplications(db.Model, CommonsModel):
     db.session.commit()
 
     return {
-      'view': permission_object.view,
-      'edit': permission_object.edit,
-      'delete': permission_object.delete,
-      'is_moderator': permission_object.is_moderator,
+      'read': permission_object.read,
+      'write': permission_object.write,
       'is_admin': permission_object.is_admin
     }
 
@@ -120,10 +112,8 @@ class UserApplications(db.Model, CommonsModel):
       return status_.status_404('We couldn\'t find the user permissions you were looking for. This user may have been removed from the Application or the Application may have been deleted.'), 404
 
     return {
-      'view': permissions.view,
-      'edit': permissions.edit,
-      'delete': permissions.delete,
-      'is_moderator': permissions.is_moderator,
+      'read': permissions.read,
+      'write': permissions.write,
       'is_admin': permissions.is_admin
     }
 
@@ -145,17 +135,11 @@ class UserApplications(db.Model, CommonsModel):
 
     altered_permissions = json.loads(request_object.data)
 
-    if hasattr(permissions, 'view'):
-      permissions.view = sanitize.sanitize_boolean(altered_permissions.get('view', permissions.view)),
+    if hasattr(permissions, 'read'):
+      permissions.read = sanitize.sanitize_boolean(altered_permissions.get('read', permissions.read)),
 
-    if hasattr(permissions, 'edit'):
-      permissions.edit = sanitize.sanitize_boolean(altered_permissions.get('edit', permissions.edit)),
-    
-    if hasattr(permissions, 'delete'):
-      permissions.delete = sanitize.sanitize_boolean(altered_permissions.get('delete', permissions.delete)),
-    
-    if hasattr(permissions, 'is_moderator'):
-      permissions.is_moderator = sanitize.sanitize_boolean(altered_permissions.get('is_moderator', permissions.is_moderator)),
+    if hasattr(permissions, 'write'):
+      permissions.write = sanitize.sanitize_boolean(altered_permissions.get('write', permissions.edit)),
     
     if hasattr(permissions, 'is_admin'):
       permissions.is_admin = sanitize.sanitize_boolean(altered_permissions.get('is_admin', permissions.is_admin))
@@ -163,10 +147,8 @@ class UserApplications(db.Model, CommonsModel):
     db.session.commit()
 
     return {
-      'view': permissions.view,
-      'edit': permissions.edit,
-      'delete': permissions.delete,
-      'is_moderator': permissions.is_moderator,
+      'read': permissions.read,
+      'write': permissions.write,
       'is_admin': permissions.is_admin
     }
 
@@ -298,11 +280,9 @@ class Application(db.Model, CommonsModel):
     access the newly created application
     """
     permission = {
-      'view': True,
-      'edit': True,
-      'delete': True,
-      'is_admin': True,
-      'is_moderator': True
+      'read': True,
+      'write': True,
+      'is_admin': True
     }
 
     self.set_user_application_permissions(application_, permission, self.current_user)
@@ -345,12 +325,12 @@ class Application(db.Model, CommonsModel):
       is required to see View this application.
 
       This `allowed_applications` check compiles a list of `application_id` integers from the
-      `user_applications` table of the database, that the user has access to 'view'
+      `user_applications` table of the database, that the user has access to 'read'
       """
-      allowed_applications = self.allowed_applications()
+      allowed_applications = self.allowed_applications('read')
 
       """
-      If application_id requested by the user is not in the allowed_applications 'view' list
+      If application_id requested by the user is not in the allowed_applications 'read' list
       then we need to give the user an 401 UNAUTHORIZED Response
       """
       if not application_id in allowed_applications:
@@ -371,7 +351,7 @@ class Application(db.Model, CommonsModel):
     Get a list of the applications the current user has access to
     and load their information from the database
     """
-    allowed_applications = self.allowed_applications()
+    allowed_applications = self.allowed_applications('read')
 
     """
     No further check is needed here because we're only return the ID's of the
@@ -395,7 +375,7 @@ class Application(db.Model, CommonsModel):
   """
   def application_update(self, application_id, request_object):
 
-    allowed_applications = self.allowed_applications('edit')
+    allowed_applications = self.allowed_applications('write')
     
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to update Application %d', \
@@ -437,7 +417,7 @@ class Application(db.Model, CommonsModel):
   """
   def application_delete(self, application_id):
 
-    allowed_applications = self.allowed_applications('delete')
+    allowed_applications = self.allowed_applications('is_admin')
 
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to delete Application %d', \
@@ -459,14 +439,14 @@ class Application(db.Model, CommonsModel):
       A fully qualified Application object to act on
 
   @param (dict) permission
-      A dictionary containing boolean values for the `view`, `edit`, and `delete` properties
+      A dictionary containing boolean values for the `read`, `write`, and `is_admin` properties
 
       Example: 
 
         permission = {
-          'view': True,
-          'edit': True,
-          'delete': True
+          'read': True,
+          'write': True,
+          'is_admin': True
         }
 
   @param (object) user
