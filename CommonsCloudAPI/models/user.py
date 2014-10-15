@@ -140,8 +140,20 @@ class User(db.Model, UserMixin, CommonsModel):
 
   """
   def user_get(self, user_id):
+    
     user_ = User.query.get(user_id)
-    return user_
+
+    if not user_:
+      return status_.status_404('We couldn\'t find the user you were looking for.'), 404
+
+    return {
+      'active': user_.active,
+      'member_since': user_.confirmed_at.strftime('%b %d, %Y'),
+      'picture': self.user_picture(user_.email),
+      'email': user_.email,
+      'id': user_.id,
+      'name': user_.name
+    }
 
 
   """
@@ -225,7 +237,7 @@ class User(db.Model, UserMixin, CommonsModel):
     user_email = email.lower()
     user_hash = hashlib.md5(user_email).hexdigest()
 
-    picture_url = '//www.gravatar.com/avatar/' + user_hash + '?s=172'
+    picture_url = '//www.gravatar.com/avatar/' + user_hash
 
     return picture_url
 

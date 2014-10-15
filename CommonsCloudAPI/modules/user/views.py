@@ -45,9 +45,18 @@ def index():
 def user_me_preflight(extension):
     return status_.status_200(), 200
 
+@module.route('/v2/users.<string:extension>', methods=['OPTIONS'])
+def users_preflight(extension):
+    return status_.status_200(), 200
+
+@module.route('/v2/users/<int:user_id>.<string:extension>', methods=['OPTIONS'])
+def user_get_preflight(user_id, extension):
+    return status_.status_200(), 200
+
 @module.route('/v2/applications/<int:application_id>/users.<string:extension>', methods=['OPTIONS'])
 def application_users_preflight(application_id, extension):
   return status_.status_200(), 200
+
 
 @module.route('/v2/user/me.<string:extension>', methods=['GET'])
 @oauth.require_oauth('user')
@@ -68,7 +77,7 @@ def user_me(oauth_request, extension):
   return User_.endpoint_response(**arguments)
 
 
-@module.route('/v2/users/list.<string:extension>', methods=['GET'])
+@module.route('/v2/users.<string:extension>', methods=['GET'])
 @oauth.require_oauth('user')
 def user_list(oauth_request, extension):
 
@@ -86,6 +95,56 @@ def user_list(oauth_request, extension):
 
   return User_.endpoint_response(**arguments)
 
+
+@module.route('/v2/users/<int:user_id>.<string:extension>', methods=['GET'])
+@oauth.require_oauth('user')
+def user_get(oauth_request, user_id, extension):
+
+  User_ = User()
+  this_user = User_.user_get(user_id)
+
+  arguments = {
+    'the_content': this_user,
+    'extension': extension
+  }
+
+  return User_.endpoint_response(**arguments)
+
+@module.route('/v2/applications/<int:application_id>/users.<string:extension>', methods=['GET'])
+@oauth.require_oauth('applications')
+def application_users(oauth_request, application_id, extension):
+
+  User_ = User()
+  User_.current_user = oauth_request.user
+
+  application_users = User_.application_users(application_id)
+
+  if type(application_users) is tuple:
+    return application_users
+
+  arguments = {
+    'the_content': application_users,
+    'list_name': 'users',
+    'extension': extension
+  }
+
+  return User_.endpoint_response(**arguments)
+
+
+"""
+
+
+
+
+
+VIEWS BELOW HERE ARE SPECIFIC TO THE ACTUAL API AND ARE SERVED AS RENDERED PAGES
+NOT AS JSON/GEOJSON API ENDPOINTS.
+
+
+
+
+
+"""
 
 @module.route('/account/create/success/', methods=['GET'])
 def account_creation_success():
@@ -121,25 +180,4 @@ def user_profile_post():
   flash('You\'re profile was updated successfully', 'success')
 
   return redirect(url_for('user.user_profile_get')), 301
-
-
-@module.route('/v2/applications/<int:application_id>/users.<string:extension>', methods=['GET'])
-@oauth.require_oauth('applications')
-def application_users(oauth_request, application_id, extension):
-
-  User_ = User()
-  User_.current_user = oauth_request.user
-
-  application_users = User_.application_users(application_id)
-
-  if type(application_users) is tuple:
-    return application_users
-
-  arguments = {
-    'the_content': application_users,
-    'list_name': 'users',
-    'extension': extension
-  }
-
-  return User_.endpoint_response(**arguments)
 
