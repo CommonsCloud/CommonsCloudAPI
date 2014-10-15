@@ -139,7 +139,7 @@ class UserApplications(db.Model, CommonsModel):
       permissions.read = sanitize.sanitize_boolean(altered_permissions.get('read', permissions.read)),
 
     if hasattr(permissions, 'write'):
-      permissions.write = sanitize.sanitize_boolean(altered_permissions.get('write', permissions.edit)),
+      permissions.write = sanitize.sanitize_boolean(altered_permissions.get('write', permissions.write)),
     
     if hasattr(permissions, 'is_admin'):
       permissions.is_admin = sanitize.sanitize_boolean(altered_permissions.get('is_admin', permissions.is_admin))
