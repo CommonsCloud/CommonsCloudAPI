@@ -697,7 +697,7 @@ class CommonsModel(object):
   @return (list) applications_
       A list of applciations the current user has access to
   """
-  def allowed_applications(self, permission_type='view'):
+  def allowed_applications(self, permission_type='read'):
 
     applications_ = []
 

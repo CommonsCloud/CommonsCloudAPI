@@ -101,9 +101,8 @@ class UserTemplates(db.Model, CommonsModel):
 
   user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
   template_id = db.Column(db.Integer(), db.ForeignKey('template.id'), primary_key=True)
-  view = db.Column(db.Boolean())
-  edit = db.Column(db.Boolean())
-  delete = db.Column(db.Boolean())
+  read = db.Column(db.Boolean())
+  write = db.Column(db.Boolean())
   is_moderator = db.Column(db.Boolean())
   is_admin = db.Column(db.Boolean())
   templates = db.relationship('Template', backref=db.backref("user_templates", cascade="all,delete"))
@@ -191,7 +190,7 @@ class Template(db.Model, CommonsModel):
     """
     content_ = json.loads(request_object.data)
 
-    allowed_applications = self.allowed_applications()
+    allowed_applications = self.allowed_applications('read')
 
     if not application_id in allowed_applications:
       logger.warning('User %d with Applications %s tried to access Application %d', \
@@ -232,9 +231,8 @@ class Template(db.Model, CommonsModel):
     access the newly created application
     """
     permission = {
-      'view': True,
-      'edit': True,
-      'delete': True,
+      'read': True,
+      'write': True,
       'is_moderator': True,
       'is_admin': True
     }
@@ -394,7 +392,7 @@ class Template(db.Model, CommonsModel):
     they have explicit permission to access it (i.e., collaborator, owner) or
     the template is marked as `is_public`
     """
-    template_id_list_ = self.allowed_templates(permission_type='delete')
+    template_id_list_ = self.allowed_templates(permission_type='is_admin')
 
     if not template_id in template_id_list_:
       return status_.status_401('That isn\'t your template'), 401
@@ -434,14 +432,15 @@ class Template(db.Model, CommonsModel):
       A fully qualified Template object to act on
 
   @param (dict) permission
-      A dictionary containing boolean values for the `view`, `edit`, and `delete` properties
+      A dictionary containing boolean values for the `read`, `write`, `is_moderator` and `is_admin` properties
 
       Example:
 
         permission = {
-          'view': True,
-          'edit': True,
-          'delete': True
+          'read': True,
+          'write': True,
+          'is_moderator': True,
+          'is_admin': True
         }
 
   @param (object) user
@@ -544,7 +543,7 @@ class Template(db.Model, CommonsModel):
     return templates_
 
 
-  def allowed_templates(self, application_id='', permission_type='view'):
+  def allowed_templates(self, application_id='', permission_type='read'):
 
     if application_id:
 
@@ -552,7 +551,7 @@ class Template(db.Model, CommonsModel):
       Before doing anything make sure the user is allowed to access the
       application in the first place.
       """
-      allowed_applications = self.allowed_applications()
+      allowed_applications = self.allowed_applications('read')
 
       if not application_id in allowed_applications:
         logger.warning('User %d with Applications %s tried to access Application %d', \
@@ -623,7 +622,7 @@ class Template(db.Model, CommonsModel):
   them into a list of numbers so that our SQLAlchemy query can
   understand what's going on
   """
-  def explicitly_allowed_templates(self, permission_type='view'):
+  def explicitly_allowed_templates(self, permission_type='read'):
 
     templates_ = []
 
