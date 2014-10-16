@@ -367,7 +367,7 @@ class Template(db.Model, CommonsModel):
     """
     permission = {
       'user_id': self.current_user.id,
-      'template_id': template.id,
+      'template_id': template_.id,
       'read': True,
       'write': True,
       'is_moderator': True,
