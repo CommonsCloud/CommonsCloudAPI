@@ -452,7 +452,7 @@ class Template(db.Model, CommonsModel):
     they have explicit permission to access it (i.e., collaborator, owner) or
     the template is marked as `is_public`
     """
-    template_id_list_ = self.allowed_templates(permission_type='edit')
+    template_id_list_ = self.allowed_templates(permission_type='is_admin')
 
     if not template_id in template_id_list_:
       return status_.status_401('That isn\'t your template'), 401
