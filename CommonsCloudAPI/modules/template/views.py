@@ -39,10 +39,6 @@ def templates_preflight(extension):
 def templates_single_preflight(template_id, extension):
     return status_.status_200(), 200
 
-@module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['OPTIONS'])
-def templates_users_preflight(template_id, extension):
-    return status_.status_200(), 200
-
 @module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['OPTIONS'])
 def templates_users_single_preflight(template_id, user_id, extension):
     return status_.status_200(), 200
@@ -180,12 +176,6 @@ def template_delete(oauth_request, template_id, extension):
 """
 TEMPLATE USER PERMISSIONS
 """
-@module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['GET'])
-@oauth.require_oauth()
-def template_user_list(oauth_request, template_id, extension):
-  pass
-
-
 @module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
 def template_user_get(oauth_request, template_id, user_id, extension):

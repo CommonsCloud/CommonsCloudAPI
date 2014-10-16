@@ -57,6 +57,9 @@ def user_get_preflight(user_id, extension):
 def application_users_preflight(application_id, extension):
   return status_.status_200(), 200
 
+@module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['OPTIONS'])
+def templates_users_preflight(template_id, extension):
+    return status_.status_200(), 200
 
 @module.route('/v2/user/me.<string:extension>', methods=['GET'])
 @oauth.require_oauth('user')
@@ -129,6 +132,13 @@ def application_users(oauth_request, application_id, extension):
   }
 
   return User_.endpoint_response(**arguments)
+
+
+@module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['GET'])
+@oauth.require_oauth()
+def template_users(oauth_request, template_id, extension):
+  pass
+
 
 
 """

@@ -41,11 +41,6 @@ def application_single_preflight(application_id, extension):
   return status_.status_200(), 200
 
 
-@module.route('/v2/applications/<int:application_id>/users.<string:extension>', methods=['OPTIONS'])
-def application_users_preflight(application_id, extension):
-  return status_.status_200(), 200
-
-
 @module.route('/v2/applications/<int:application_id>/users/<int:user_id>.<string:extension>', methods=['OPTIONS'])
 def application_user_preflight(application_id, user_id, extension):
   return status_.status_200(), 200
