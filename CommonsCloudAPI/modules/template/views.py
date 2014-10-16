@@ -38,20 +38,20 @@ def templates_preflight(extension):
 def templates_single_preflight(template_id, extension):
     return status_.status_200(), 200
 
+@module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['OPTIONS'])
+def templates_users_preflight(template_id, extension):
+    return status_.status_200(), 200
+
+@module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['OPTIONS'])
+def templates_users_single_preflight(template_id, user_id, extension):
+    return status_.status_200(), 200
+
 @module.route('/v2/templates/<int:template_id>/activity.<string:extension>', methods=['OPTIONS'])
 def templates_activity_preflight(template_id, extension):
     return status_.status_200(), 200
 
 @module.route('/v2/applications/<int:application_id>/templates.<string:extension>', methods=['OPTIONS'])
 def application_templates_preflight(application_id, extension):
-    return status_.status_200(), 200
-
-@module.route('/v2/applications/<int:application_id>/templates/users.<string:extension>', methods=['OPTIONS'])
-def application_users_preflight(application_id, extension):
-    return status_.status_200(), 200
-
-@module.route('/v2/applications/<int:application_id>/templates/users/<int:user_id>.<string:extension>', methods=['OPTIONS'])
-def application_users_single_preflight(application_id, user_id, extension):
     return status_.status_200(), 200
 
 @module.route('/v2/templates.<string:extension>', methods=['GET'])
