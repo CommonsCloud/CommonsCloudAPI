@@ -46,6 +46,13 @@ def templates_activity_preflight(template_id, extension):
 def application_templates_preflight(application_id, extension):
     return status_.status_200(), 200
 
+@module.route('/v2/applications/<int:application_id>/templates/users.<string:extension>', methods=['OPTIONS'])
+def application_users_preflight(application_id, extension):
+    return status_.status_200(), 200
+
+@module.route('/v2/applications/<int:application_id>/templates/users/<int:user_id>.<string:extension>', methods=['OPTIONS'])
+def application_users_single_preflight(application_id, user_id, extension):
+    return status_.status_200(), 200
 
 @module.route('/v2/templates.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
