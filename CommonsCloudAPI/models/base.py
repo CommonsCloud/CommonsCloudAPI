@@ -336,6 +336,41 @@ class CommonsModel(object):
     """
     db.create_all()
 
+
+    """
+    Once the new table is created, we can create a permissions table for this feature table
+    """
+    self.create_storage_permissions(table_name);
+
+    return table_name
+
+
+  """
+  Create a table in the database that contains a base line of defaults
+  """
+  def create_storage_permissions(self, table_name):
+
+    """
+    Take the existing table name and append the '_users' extension to it
+    """
+    table_name = table_name + '_users'
+
+    """
+    Create a new custom table for a Feature Type
+    """
+    new_table = db.Table(table_name, db.metadata,
+      db.Column('user_id', db.Integer(), db.ForeignKey('user.id'), primary_key=True),
+      db.Column('feature_id', db.Integer(), db.ForeignKey('feature.id'), primary_key=True),
+      db.Column('read', db.Boolean()),
+      db.Column('write', db.Boolean()),
+      db.Column('is_admin', db.Boolean())
+    )
+
+    """
+    Make sure everything commits to the database
+    """
+    db.create_all()
+
     return table_name
 
 
