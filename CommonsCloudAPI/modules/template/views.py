@@ -24,6 +24,7 @@ from CommonsCloudAPI.extensions import oauth
 from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.models.template import Template
+from CommonsCloudAPI.models.template import UserTemplates
 from CommonsCloudAPI.models.template import is_public
 
 from . import module
@@ -175,3 +176,37 @@ def template_delete(oauth_request, template_id, extension):
 
   return status_.status_204(), 204
 
+
+"""
+TEMPLATE USER PERMISSIONS
+"""
+@module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['GET'])
+@oauth.require_oauth()
+def template_user_list(oauth_request, template_id, extension):
+  pass
+
+
+@module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['GET'])
+@oauth.require_oauth()
+def template_user_get(oauth_request, template_id, user_id, extension):
+  pass
+
+
+@module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['PUT', 'PATCH'])
+@oauth.require_oauth()
+def template_user_update(oauth_request, template_id, user_id, extension):
+  pass
+
+
+@module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['DELETE'])
+@oauth.require_oauth()
+def template_user_delete(oauth_request, template_id, user_id, extension):
+
+  UserTemplates_ = UserTemplates()
+  UserTemplates_.current_user = oauth_request.user
+  deleted_template = UserTemplates_.permission_delete(template_id)
+
+  if type(deleted_template) is tuple:
+    return deleted_template
+
+  return status_.status_204(), 204
