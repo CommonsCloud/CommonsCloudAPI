@@ -340,7 +340,7 @@ class CommonsModel(object):
     """
     Once the new table is created, we can create a permissions table for this feature table
     """
-    self.create_storage_permissions(table_name);
+    self.create_storage_permissions(table_name)
 
     return table_name
 
