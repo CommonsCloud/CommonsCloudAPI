@@ -391,6 +391,11 @@ class Template(db.Model, CommonsModel):
     """
     self.create_owner_field(template_)
 
+    """
+    Once the new table is created, we can create a permissions table for this feature table
+    """
+    self.create_storage_permissions(storage_name)
+
     return template_
 
 
