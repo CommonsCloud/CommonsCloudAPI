@@ -187,6 +187,25 @@ class User(db.Model, UserMixin, CommonsModel):
     return User.query.filter(User.id.in_(user_list)).all()
 
 
+  """
+  Get the a list of User objects limited to a specific Template
+
+  @return (array) users_
+      The array of objects for all Template Users in system
+
+  """
+  def template_user_list(self, template_id):
+
+    user_list = []
+
+    TemplateUsers = UserTemplates.query.filter_by(template_id=template_id).all()
+
+    for user in TemplateUsers:
+      user_list.append(user.user_id)
+
+    return User.query.filter(User.id.in_(user_list)).all()
+
+
   def user_update(self, user_object_):
 
     """
@@ -258,6 +277,22 @@ class User(db.Model, UserMixin, CommonsModel):
 
     return self.application_user_list(application_id)
 
+
+  """
+  Get a list of Users that have access to the Template requested by
+  the user, but make sure the User requesting this information is logged
+  in already and has `is_admin` permission to the requested Template
+  """
+  def template_users(self, template_id):
+
+    allowed_templates = self.allowed_templates('is_admin')
+
+    if not template_id in allowed_templates:
+      logger.warning('User %d tried to access Users for Template %d', \
+          self.current_user.id, template_id)
+      return status_.status_401('You are not allowed to view the Users of this Template because you do not have the permission to do so'), 401
+
+    return self.template_user_list(template_id)
 
 
 """

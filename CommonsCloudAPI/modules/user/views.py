@@ -137,7 +137,22 @@ def application_users(oauth_request, application_id, extension):
 @module.route('/v2/templates/<int:template_id>/users.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
 def template_users(oauth_request, template_id, extension):
-  pass
+  
+  User_ = User()
+  User_.current_user = oauth_request.user
+
+  template_users = User_.template_users(template_id)
+
+  if type(template_users) is tuple:
+    return template_users
+
+  arguments = {
+    'the_content': template_users,
+    'list_name': 'users',
+    'extension': extension
+  }
+
+  return User_.endpoint_response(**arguments)
 
 
 

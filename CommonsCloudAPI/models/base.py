@@ -711,3 +711,28 @@ class CommonsModel(object):
         applications_.append(application.application_id)
 
     return applications_
+
+  """
+  Get a list of template ids from the current user and convert
+  them into a list of numbers so that our SQLAlchemy query can
+  understand what's going on
+
+  @param (object) self
+
+  @return (list) templates_
+      A list of templates the current user has access to
+  """
+  def allowed_templates(self, permission_type='read'):
+
+    templates_ = []
+
+    if not hasattr(self.current_user, 'id'):
+      logger.warning('User did\'t submit their information %s', \
+          self.current_user)
+      return status_.status_401('You need to be logged in to access applications'), 401
+
+    for template in self.current_user.templates:
+      if permission_type and getattr(template, permission_type):
+        templates_.append(template.template_id)
+
+    return templates_
