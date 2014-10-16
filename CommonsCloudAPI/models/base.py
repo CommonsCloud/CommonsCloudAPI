@@ -353,14 +353,18 @@ class CommonsModel(object):
     """
     Take the existing table name and append the '_users' extension to it
     """
-    table_name = table_name + '_users'
+    users_table_name = table_name + '_users'
+
+    """
+    """
+    feature_id = table_name + '.id'
 
     """
     Create a new custom table for a Feature Type
     """
-    new_table = db.Table(table_name, db.metadata,
+    new_table = db.Table(users_table_name, db.metadata,
       db.Column('user_id', db.Integer(), db.ForeignKey('user.id'), primary_key=True),
-      db.Column('feature_id', db.Integer(), db.ForeignKey('feature.id'), primary_key=True),
+      db.Column('feature_id', db.Integer(), db.ForeignKey(feature_id), primary_key=True),
       db.Column('read', db.Boolean()),
       db.Column('write', db.Boolean()),
       db.Column('is_admin', db.Boolean())
@@ -371,7 +375,7 @@ class CommonsModel(object):
     """
     db.create_all()
 
-    return table_name
+    return users_table_name
 
 
   """
