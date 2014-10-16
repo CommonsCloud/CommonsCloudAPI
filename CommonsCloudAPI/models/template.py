@@ -94,6 +94,8 @@ User to Template Association
 """
 class UserTemplates(db.Model, CommonsModel):
 
+  __public__ = {'default': ['read', 'write', 'is_moderator', 'is_admin']}
+
   __tablename__ = 'user_templates'
   __table_args__ = {
     'extend_existing': True
@@ -106,6 +108,139 @@ class UserTemplates(db.Model, CommonsModel):
   is_moderator = db.Column(db.Boolean())
   is_admin = db.Column(db.Boolean())
   templates = db.relationship('Template', backref=db.backref("user_templates", cascade="all,delete"))
+
+  def __init__(self, user_id, template_id, read=True, write=False, is_moderator=False, is_admin=False):
+    self.user_id = user_id
+    self.template_id = template_id
+    self.read = read
+    self.write = write
+    self.is_moderator = is_moderator
+    self.is_admin = is_admin
+
+  def permission_create(self, template_id, user_id, request_object):
+
+    """
+    Before we get the User permissions for this template, we need to make sure that
+    the user requesting them is authenticated and has the `is_admin` permission for the
+    template_id being requested.
+    """
+    allowed_templates = self.allowed_templates('is_admin')
+
+    if not template_id in allowed_templates:
+      logger.warning('User %d tried to access Users for Template %d', \
+          self.current_user.id, template_id)
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Template'), 401
+
+    permissions_ = json.loads(request_object.data)
+
+    """
+    Add the new application to the database
+    """
+    new_permissions = {
+      'user_id': user_id,
+      'template_id': template_id,
+      'read': sanitize.sanitize_boolean(permissions_.get('read', '')),
+      'write': sanitize.sanitize_boolean(permissions_.get('write', '')),
+      'is_moderator': sanitize.sanitize_boolean(permissions_.get('is_moderator', '')),
+      'is_admin': sanitize.sanitize_boolean(permissions_.get('is_admin', ''))
+    }
+
+    permission_object = UserTemplates(**new_permissions)
+
+    db.session.add(permission_object)
+    db.session.commit()
+
+    return {
+      'read': permission_object.read,
+      'write': permission_object.write,
+      'is_moderator': permission_object.is_moderator,
+      'is_admin': permission_object.is_admin
+    }
+
+  def permission_get(self, template_id, user_id):
+    
+    """
+    Before we get the User permissions for this template, we need to make sure that
+    the user requesting them is authenticated and has the `is_admin` permission for the
+    template_id being requested.
+    """
+    allowed_templates = self.allowed_templates('is_admin')
+
+    if not template_id in allowed_templates:
+      logger.warning('User %d tried to access Users for Template %d', \
+          self.current_user.id, template_id)
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Template'), 401
+
+    permissions = UserTemplates.query.filter_by(template_id=template_id,user_id=user_id).first()
+
+    if not permissions:
+      return status_.status_404('We couldn\'t find the user permissions you were looking for. This user may have been removed from the Template or the Template may have been deleted.'), 404
+
+    return {
+      'read': permissions.read,
+      'write': permissions.write,
+      'is_moderator': permissions.is_moderator,
+      'is_admin': permissions.is_admin
+    }
+
+  def permission_update(self, template_id, user_id, request_object):
+    
+    """
+    Before we get the User permissions for this template, we need to make sure that
+    the user requesting them is authenticated and has the `is_admin` permission for the
+    template_id being requested.
+    """
+    allowed_templates = self.allowed_templates('is_admin')
+
+    if not template_id in allowed_templates:
+      logger.warning('User %d tried to access Users for Template %d', \
+          self.current_user.id, template_id)
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Template'), 401
+
+    permissions = UserTemplates.query.filter_by(template_id=template_id,user_id=user_id).first()
+
+    altered_permissions = json.loads(request_object.data)
+
+    if hasattr(permissions, 'read'):
+      permissions.read = sanitize.sanitize_boolean(altered_permissions.get('read', permissions.read)),
+
+    if hasattr(permissions, 'write'):
+      permissions.write = sanitize.sanitize_boolean(altered_permissions.get('write', permissions.write)),
+    
+    if hasattr(permissions, 'is_moderator'):
+      permissions.is_moderator = sanitize.sanitize_boolean(altered_permissions.get('is_moderator', permissions.is_moderator))
+
+    if hasattr(permissions, 'is_admin'):
+      permissions.is_admin = sanitize.sanitize_boolean(altered_permissions.get('is_admin', permissions.is_admin))
+
+    db.session.commit()
+
+    return {
+      'read': permissions.read,
+      'write': permissions.write,
+      'is_moderator': permissions.is_moderator,
+      'is_admin': permissions.is_admin
+    }
+
+
+  def permission_delete(self, template_id, user_id):
+    
+    """
+    Before we get the User permissions for this template, we need to make sure that
+    the user requesting them is authenticated and has the `is_admin` permission for the
+    template_id being requested.
+    """
+    allowed_templates = self.allowed_templates('is_admin')
+
+    if not template_id in allowed_templates:
+      logger.warning('User %d tried to access Users for Template %d', \
+          self.current_user.id, template_id)
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Template'), 401
+
+    permissions = UserTemplates.query.filter_by(template_id=template_id, user_id=user_id).first()
+
+    db.session.delete(permissions)
+    db.session.commit()
 
 
 """
@@ -231,6 +366,8 @@ class Template(db.Model, CommonsModel):
     access the newly created application
     """
     permission = {
+      'user_id': self.current_user.id,
+      'template_id': template.id,
       'read': True,
       'write': True,
       'is_moderator': True,

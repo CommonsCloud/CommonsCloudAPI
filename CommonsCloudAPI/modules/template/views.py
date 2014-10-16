@@ -179,22 +179,69 @@ TEMPLATE USER PERMISSIONS
 @module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
 def template_user_get(oauth_request, template_id, user_id, extension):
-  pass
 
+  UserTemplates_ = UserTemplates(template_id, user_id)
+  UserTemplates_.current_user = oauth_request.user
+
+  user_permissions = UserTemplates_.permission_get(template_id, user_id)
+
+  if type(user_permissions) is tuple:
+    return user_permissions
+
+  arguments = {
+    'the_content': user_permissions,
+    'extension': extension
+  }
+
+  return UserTemplates_.endpoint_response(**arguments)
+
+
+@module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['POST'])
+@oauth.require_oauth()
+def template_user_create(oauth_request, template_id, user_id, extension):
+
+  UserTemplates_ = UserTemplates(template_id, user_id)
+  UserTemplates_.current_user = oauth_request.user
+
+  user_permissions = UserTemplates_.permission_create(template_id, user_id, request)
+
+  if type(user_permissions) is tuple:
+    return user_permissions
+
+  arguments = {
+    'the_content': user_permissions,
+    'extension': extension
+  }
+
+  return UserTemplates_.endpoint_response(**arguments)
 
 @module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['PUT', 'PATCH'])
 @oauth.require_oauth()
 def template_user_update(oauth_request, template_id, user_id, extension):
-  pass
+
+  UserTemplates_ = UserTemplates(template_id, user_id)
+  UserTemplates_.current_user = oauth_request.user
+
+  user_permissions = UserTemplates_.permission_update(template_id, user_id, request)
+
+  if type(user_permissions) is tuple:
+    return user_permissions
+
+  arguments = {
+    'the_content': user_permissions,
+    'extension': extension
+  }
+
+  return UserTemplates_.endpoint_response(**arguments)
 
 
 @module.route('/v2/templates/<int:template_id>/users/<int:user_id>.<string:extension>', methods=['DELETE'])
 @oauth.require_oauth()
 def template_user_delete(oauth_request, template_id, user_id, extension):
 
-  UserTemplates_ = UserTemplates()
+  UserTemplates_ = UserTemplates(template_id, user_id)
   UserTemplates_.current_user = oauth_request.user
-  deleted_template = UserTemplates_.permission_delete(template_id)
+  deleted_template = UserTemplates_.permission_delete(template_id, user_id)
 
   if type(deleted_template) is tuple:
     return deleted_template
