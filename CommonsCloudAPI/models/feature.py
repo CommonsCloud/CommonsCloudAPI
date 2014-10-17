@@ -368,9 +368,17 @@ class Feature(CommonsModel):
 
     def feature_get(self, storage_, feature_id):
 
+
+        """
+        Before sending off our request to the API, we need to make sure that
+        we're only showing the user what they have permission to see.
+        """
+
         storage = self.validate_storage(storage_)
 
         this_template = Template.query.filter_by(storage=storage).first()
+
+        logger.warning('this_template.is_public %s', this_template)
 
         Model_ = self.get_storage(this_template, this_template.fields)
 
@@ -607,14 +615,80 @@ class Feature(CommonsModel):
 
         this_template = Template.query.filter_by(storage=storage).first()
 
+        logger.warning('this_template.is_public %s', this_template.is_public)
+        
+        if not this_template.is_public:
+          logger.warning('The template is not public, require OAuth and template access')
+          logger.warning('self.current_user.templates %s', this_template.id in self.allowed_templates())
+          if not this_template.id in self.allowed_templates():
+            logger.warning('User has no access to this template')
+            abort(403)
+          return self.feature_list_secure(storage_, results_per_page)
+        else:
+          return self.feature_list_public(storage_, results_per_page)
+
+
+    def feature_list_public(self, storage_, results_per_page=25):
+
+        storage = self.validate_storage(storage_)
+
+        this_template = Template.query.filter_by(storage=storage).first()
+
         Model_ = self.get_storage(this_template, this_template.fields)
-        logger.warning('feature list called')
 
         endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
-        logger.warning('endpoint created')
-        results = endpoint_._search()
-        # @todo loop over these and make sure we're dropping anything that isn't
-        # set to 'public' unless the user has the appropriate permissions
+
+        search_params = json.loads(request.args.get('q', '{}'))
+
+        """
+        Only display public posts
+        """
+        if 'filters' in search_params:
+          search_params['filters'].append({
+            "name": "status",
+            "op": "eq",
+            "val": "public"
+          })
+        else:
+          search_params
+
+        results = endpoint_._search(search_params)
+
+        return {
+          'results': results.get('results'),
+          'model': Model_,
+          'template': this_template
+        }
+
+    def feature_list_secure(self, storage_, results_per_page=25):
+        
+        storage = self.validate_storage(storage_)
+
+        this_template = Template.query.filter_by(storage=storage).first()
+
+        Model_ = self.get_storage(this_template, this_template.fields)
+
+        endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
+
+        search_params = json.loads(request.args.get('q', '{}'))
+
+        """
+        Only display public posts
+        """
+        public_filter = {
+          "name": "status",
+          "op": "eq",
+          "val": "public"
+        }
+
+        if 'filters' in search_params:
+          search_params['filters'].append(public_filter)
+        else:
+          search_params = {
+            "filters": [public_filter]
+          }
+
+        results = endpoint_._search(search_params)
 
         return {
           'results': results.get('results'),
@@ -651,7 +725,7 @@ class Feature(CommonsModel):
         assoc_ = self._feature_relationship_associate(Template_, attachment_storage)
         Relationship_ = self.get_storage(str(assoc_))
 
-        if not Template_.id in self.allowed_templates(self.current_user.templates):
+        if not Template_.id in self.allowed_templates(permission_type='read'):
           return status_.status_401('That isn\'t your feature'), 401
 
         try:
@@ -932,14 +1006,14 @@ class Feature(CommonsModel):
 
       return last_modified_date
 
-    def allowed_templates(self, permissions):
+    # def allowed_templates(self, permissions):
 
-      templates_ = []
+    #   templates_ = []
 
-      for permission in permissions:
-        templates_.append(permission.template_id)
+    #   for permission in permissions:
+    #     templates_.append(permission.template_id)
 
-      return templates_
+    #   return templates_
 
     def feature_get_excel_template(self, storage_):
 
@@ -1065,3 +1139,5 @@ class Feature(CommonsModel):
 
         mail = current_app.extensions.get('mail')
         mail.send(msg)
+
+
