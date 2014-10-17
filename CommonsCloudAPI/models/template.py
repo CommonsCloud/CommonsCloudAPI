@@ -266,6 +266,7 @@ class Template(db.Model, CommonsModel):
   name = db.Column(db.String(60))
   help = db.Column(db.String(255))
   storage = db.Column(db.String(255))
+  # is_secure = db.Column(db.Boolean)
   is_public = db.Column(db.Boolean)
   is_crowdsourced = db.Column(db.Boolean)
   is_moderated = db.Column(db.Boolean)
@@ -282,6 +283,7 @@ class Template(db.Model, CommonsModel):
     self.name = name
     self.help = help
     self.storage = storage
+    # self.is_secure = is_secure
     self.is_public = is_public
     self.is_crowdsourced = is_crowdsourced
     self.is_moderated = is_moderated

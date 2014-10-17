@@ -626,6 +626,7 @@ class Feature(CommonsModel):
           return self.feature_list_secure(storage_, results_per_page)
         else:
           return self.feature_list_public(storage_, results_per_page)
+        return status_.status_200(), 200
 
 
     def feature_list_public(self, storage_, results_per_page=25):
@@ -643,14 +644,18 @@ class Feature(CommonsModel):
         """
         Only display public posts
         """
+        public_filter = {
+          "name": "status",
+          "op": "eq",
+          "val": "public"
+        }
+
         if 'filters' in search_params:
-          search_params['filters'].append({
-            "name": "status",
-            "op": "eq",
-            "val": "public"
-          })
+          search_params['filters'].append(public_filter)
         else:
-          search_params
+          search_params = {
+            "filters": [public_filter]
+          }
 
         results = endpoint_._search(search_params)
 
@@ -687,6 +692,26 @@ class Feature(CommonsModel):
           search_params = {
             "filters": [public_filter]
           }
+
+        """
+        If the Template has Feature level permission enabled, then we need to build a list
+        of Feature IDs from this Feature Collection, that the user can access
+        """
+        # if ...
+        # allowed_features = self.allowed_features(storage=storage, permission_type='read')
+        # logger.warning('Allowed Features %s', allowed_features)
+        # features_filter = {
+        #   "name": "id",
+        #   "op": "in",
+        #   "val": allowed_features
+        # }
+
+        # if 'filters' in search_params:
+        #   search_params['filters'].append(features_filter)
+        # else:
+        #   search_params = {
+        #     "filters": [features_filter]
+        #   }
 
         results = endpoint_._search(search_params)
 
@@ -1141,3 +1166,37 @@ class Feature(CommonsModel):
         mail.send(msg)
 
 
+    """
+    Get a list of feature ids from the current user and convert
+    them into a list of numbers so that our SQLAlchemy query can
+    understand what's going on
+
+    @param (object) self
+
+    @param (string) storage
+
+    @return (list) features_
+        A list of features the current user has access to
+    """
+    def allowed_features(self, storage, permission_type='read'):
+
+      if not hasattr(self.current_user, 'id'):
+        logger.warning('User did\'t submit their information %s', \
+            self.current_user)
+        return status_.status_401('You need to be logged in to access applications'), 401
+
+      logger.warning('allowed_features %s', storage)
+
+      user_storage = storage + '_users'
+      UserFeatures = self.get_storage(user_storage)
+
+      features = UserFeatures.query.filter_by(user_id=self.current_user.id).all()
+      logger.warning('UserFeatures %s', features)
+
+      features_ = []
+
+      for feature in features:
+        if permission_type and getattr(feature, permission_type):
+          features_.append(feature.feature_id)
+
+      return features_
