@@ -418,8 +418,48 @@ class Feature(CommonsModel):
           rStorage_ = self.get_storage(rtemplate, rtemplate.fields)
           logger.warning('Template in database %s', rstorage)
 
-        for child_feature in getattr(feature, relationship):
-          logger.warning('relationship %s from %s', child_feature, relationship)
+        for child_feature in getattr(feature, rstorage):
+          logger.warning('relationship %s from %s', child_feature, rstorage)
+          relationships.append(child_feature)
+
+        return relationships
+
+    def feature_get_attachment_relationship(self, storage_, feature_id, relationship):
+
+        storage = self.validate_storage(storage_)
+
+        this_template = Template.query.filter_by(storage=storage).first()
+
+        Storage_ = self.get_storage(this_template, this_template.fields)
+
+        feature = Storage_.query.get(feature_id)
+
+        if not hasattr(feature, 'id'):
+            return abort(404)
+
+        """
+        We need to create a generic list of each of the features because we
+        cannot display a InstrumentedList via `endpoint_response`
+        """
+        relationships = []
+
+        relationship_ = str('attachment_' + relationship)
+        rstorage = self.validate_storage(relationship_)
+        rtemplate = Template.query.filter_by(storage=rstorage).first()
+
+        logger.warning('rtemplate %s', type(rtemplate))
+
+        if rtemplate is None:
+          if relationship.startswith('attachment_'):
+            self.__public__['default'] += ['filepath', 'caption', 'credit', 'credit_link']
+          rStorage_ = self.get_storage(str(rstorage))
+          logger.warning('Template not in database', rstorage)
+        else:
+          rStorage_ = self.get_storage(rtemplate, rtemplate.fields)
+          logger.warning('Template in database %s', rstorage)
+
+        for child_feature in getattr(feature, rstorage):
+          logger.warning('relationship %s from %s', child_feature, rstorage)
           relationships.append(child_feature)
 
         return relationships
@@ -1595,3 +1635,26 @@ class Feature(CommonsModel):
         users = User.query.filter(User.id.in_(user_list)).all()
 
       return users
+
+    def feature_evaluate_function(self, storage_, results_per_page=25):
+
+        storage = self.validate_storage(storage_)
+
+        Template_ = Template.query.filter_by(storage=storage).first()
+
+        Model_ = self.get_storage(Template_, Template_.fields)
+
+        endpoint_ = FunctionAPI(db.session, Model_)
+
+        return endpoint_.get()
+        
+        # if not Template_.is_public or self.current_user:
+        #   logger.warning('The template is not public, require OAuth and template access')
+        #   logger.warning('self.current_user.templates %s', Template_.id in self.allowed_templates())
+        #   if not Template_.id in self.allowed_templates():
+        #     logger.warning('User has no access to this template')
+        #     abort(403)
+        #   return self.feature_list_secure(storage_, Template_, Model_, endpoint_, results_per_page)
+        # elif Template_.is_public:
+        #   return self.feature_list_public(storage_, Template_, Model_, endpoint_, results_per_page)
+        # return status_.status_200(), 200

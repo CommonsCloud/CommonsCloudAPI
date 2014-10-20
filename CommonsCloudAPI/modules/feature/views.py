@@ -36,12 +36,20 @@ from . import module
 def features_preflight(storage, extension):
     return status_.status_200(), 200
 
+@module.route('/v2/type_<string:storage>/func.<string:extension>', methods=['OPTIONS'])
+def features_func_preflight(storage, extension):
+    return status_.status_200(), 200
+
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['OPTIONS'])
 def features_single_preflight(storage, feature_id, extension):
     return status_.status_200(), 200
 
-@module.route('/v2/type_<string:storage>/<int:feature_id>/<string:relationship>.<string:extension>', methods=['OPTIONS'])
+@module.route('/v2/type_<string:storage>/<int:feature_id>/type_<string:relationship>.<string:extension>', methods=['OPTIONS'])
 def features_relationship_preflight(storage, feature_id, relationship, extension):
+    return status_.status_200(), 200
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/attachment_<string:relationship>.<string:extension>', methods=['OPTIONS'])
+def features_attachment_preflight(storage, feature_id, relationship, extension):
     return status_.status_200(), 200
 
 @module.route('/v2/type_<string:storage>/intersects.<string:extension>', methods=['OPTIONS'])
@@ -109,6 +117,25 @@ def feature_list(oauth_request, storage, extension, is_public):
     return Feature_.endpoint_response(**arguments)
 
 
+@module.route('/v2/type_<string:storage>/func.<string:extension>', methods=['GET'])
+@is_public()
+@oauth.oauth_or_public()
+def feature_func(oauth_request, storage, extension, is_public):
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    function_return = Feature_.feature_evaluate_function(storage)
+
+    if type(function_return) is tuple:
+        return function_return
+
+    arguments = {
+        'the_content': function_return,
+        'extension': extension
+    }
+
+    return Feature_.endpoint_response(**arguments)
+
 @module.route('/v2/type_<string:storage>/<int:feature_id>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()
@@ -133,6 +160,30 @@ def feature_get(oauth_request, storage, feature_id, extension, is_public):
     return Feature_.endpoint_response(**arguments)
 
 
+@module.route('/v2/type_<string:storage>/<int:feature_id>/attachment_<string:relationship>.<string:extension>', methods=['GET'])
+@is_public()
+@oauth.oauth_or_public()
+def feature_get_attachment_relationship(oauth_request, storage, feature_id, relationship, extension, is_public):
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    feature = Feature_.feature_get_attachment_relationship(storage, feature_id, relationship)
+
+    if type(feature) is tuple:
+        return feature
+
+    arguments = {
+        "the_content": feature,
+        "list_name": "features",
+        "extension": extension,
+        "code": 200
+    }
+
+    if (extension == 'csv'):
+        return status_.status_415("We do not support exporting a single item or it's relationships as a CSV file."), 415
+
+    return Feature_.endpoint_response(**arguments)
+
 @module.route('/v2/type_<string:storage>/<int:feature_id>/type_<string:relationship>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()
@@ -156,7 +207,6 @@ def feature_get_relationship(oauth_request, storage, feature_id, relationship, e
         return status_.status_415("We do not support exporting a single item or it's relationships as a CSV file."), 415
 
     return Feature_.endpoint_response(**arguments)
-
 
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['POST'])
 @is_crowdsourced()
