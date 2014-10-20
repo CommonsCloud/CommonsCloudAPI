@@ -213,6 +213,12 @@ class Feature(CommonsModel):
 
         storage = self.validate_storage(storage_)
         Template_ = Template.query.filter_by(storage=storage).first()
+
+        feature_create_access = self.feature_create_check_access(Template_)
+        
+        if not feature_create_access:
+          return status_.status_403(), 403
+
         Storage_ = self.get_storage(Template_)
 
         """
@@ -1253,6 +1259,23 @@ class Feature(CommonsModel):
       logger.warning('UserFeatures %s', features_)
 
       return features_
+
+
+    def feature_create_check_access(self, Template_):
+
+      """
+      Allow Feature creation if user has Feature Collection/Template `write` permission
+      """
+      if Template_.id in self.allowed_templates(permission_type='write'):
+        return True
+
+      """
+      Allow Feature creation if Feature Collection/Template has Crowd Sourcing `is_crowdsourced` enabled
+      """
+      if Template_.is_crowdsourced:
+        return True
+
+      return False
 
 
     def feature_read_check_access(self, feature_id, storage_, Template_, Model_, endpoint_):

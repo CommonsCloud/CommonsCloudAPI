@@ -163,23 +163,16 @@ def feature_get_relationship(oauth_request, storage, feature_id, relationship, e
 @oauth.oauth_or_crowdsourced()
 def feature_create(oauth_request, storage, extension, is_crowdsourced):
 
-    logger.warning('1')
     Feature_ = Feature()
-    logger.warning('2')
     Feature_.current_user = oauth_request.user
-    logger.warning('3')
     new_feature = Feature_.feature_create(request, storage)
 
-    logger.warning('4')
     if type(new_feature) is tuple:
-        logger.warning('5')
         return new_feature
 
     try:
-        logger.warning('6')
         return status_.status_201(new_feature.id), 201
     except Exception as e:
-        logger.warning('7')
         return status_.status_500(e), 500
 
 
