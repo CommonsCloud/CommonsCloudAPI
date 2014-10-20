@@ -59,6 +59,7 @@ from CommonsCloudAPI.models.activity import Activity
 from CommonsCloudAPI.models.template import Template
 from CommonsCloudAPI.models.field import Field
 from CommonsCloudAPI.models.statistic import Statistic
+from CommonsCloudAPI.models.user import User
 
 from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import rq
@@ -215,7 +216,7 @@ class Feature(CommonsModel):
         Template_ = Template.query.filter_by(storage=storage).first()
 
         feature_create_access = self.feature_create_check_access(Template_)
-        
+
         if not feature_create_access:
           return status_.status_403(), 403
 
@@ -1341,3 +1342,54 @@ class Feature(CommonsModel):
 
       return False
 
+
+    """
+    Get the a list of User objects limited to a specific Feature
+
+    @return (array) users_
+        The array of objects for all Feature Users in system
+
+    """
+    def feature_users(self, storage, feature_id):
+
+      user_storage = str(storage + '_users')
+      user_storage_ = self.validate_storage(user_storage)
+      FeatureUsers = self.get_storage(user_storage_)
+      FeatureUsers_ = FeatureUsers.query.filter_by(feature_id=feature_id).all()
+
+      storage_ = self.validate_storage(storage)
+      Template_ = Template.query.filter_by(storage=storage_).first()
+      Feature_ = self.get_storage(Template_, Template_.fields)
+
+      feature = Feature_.query.get(feature_id)
+
+      """
+      If the current user has Feature Collection `is_moderator` or `is_admin` access or
+      if the current user is the owner of the originating Feature or is the user is a Feature admin
+      then we need to allow them to see the list of users associate with this Feature
+      """
+      allowed_features = self.allowed_features(storage=storage_, permission_type='is_admin')
+
+      if self.current_user.id is feature.owner or \
+          feature.id in allowed_features or \
+          Template_.id in self.allowed_templates(permission_type='is_moderator') or \
+          Template_.id in self.allowed_templates(permission_type='is_admin'):
+        return self.feature_user_list(FeatureUsers_)
+
+      return status_.status_403(), 403
+
+    def feature_user_list(self, FeatureUsers):
+
+      self.__public__ = {'default': ['id', 'name', 'email', 'active', 'confirmed_at']}
+
+      users = []
+      user_list = []
+
+      for user in FeatureUsers:
+        logger.warning('user %s', user.user_id)
+        user_list.append(user.user_id)
+
+      if len(user_list):
+        users = User.query.filter(User.id.in_(user_list)).all()
+
+      return users

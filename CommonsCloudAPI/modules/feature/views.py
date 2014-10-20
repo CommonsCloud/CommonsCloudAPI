@@ -133,7 +133,7 @@ def feature_get(oauth_request, storage, feature_id, extension, is_public):
     return Feature_.endpoint_response(**arguments)
 
 
-@module.route('/v2/type_<string:storage>/<int:feature_id>/<string:relationship>.<string:extension>', methods=['GET'])
+@module.route('/v2/type_<string:storage>/<int:feature_id>/type_<string:relationship>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()
 def feature_get_relationship(oauth_request, storage, feature_id, relationship, extension, is_public):
@@ -319,9 +319,22 @@ def feature_batch(storage, extension):
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>/users.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
-def features_users(storage, feature_id, extension):
-    return status_.status_200(), 200
+def features_users(oauth_request, storage, feature_id, extension):
 
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    feature_user_list = Feature_.feature_users(storage, feature_id)
+
+    if type(feature_user_list) is tuple:
+        return feature_user_list
+
+    arguments = {
+        'the_content': feature_user_list,
+        'list_name': 'users',
+        'extension': extension
+    }
+
+    return Feature_.endpoint_response(**arguments)
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['GET'])
 @oauth.require_oauth()
@@ -345,6 +358,3 @@ def features_users_update(storage, feature_id, user_id, extension):
 @oauth.require_oauth()
 def features_users_delete(storage, feature_id, user_id, extension):
     return status_.status_200(), 200
-
-
-
