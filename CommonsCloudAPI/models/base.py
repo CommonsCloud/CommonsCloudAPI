@@ -357,8 +357,8 @@ class CommonsModel(object):
     Create a new custom table for a Feature Type
     """
     new_table = db.Table(users_table_name, db.metadata,
-      db.Column('user_id', db.Integer(), db.ForeignKey('user.id'), primary_key=True),
-      db.Column('feature_id', db.Integer(), db.ForeignKey(feature_id), primary_key=True),
+      db.Column('user_id', db.Integer(), db.ForeignKey('user.id'), primary_key=True, cascade="all,delete"),
+      db.Column('feature_id', db.Integer(), db.ForeignKey(feature_id), primary_key=True, cascade="all,delete"),
       db.Column('read', db.Boolean()),
       db.Column('write', db.Boolean()),
       db.Column('is_admin', db.Boolean())

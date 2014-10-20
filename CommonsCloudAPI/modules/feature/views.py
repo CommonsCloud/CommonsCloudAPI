@@ -211,7 +211,10 @@ def feature_delete(oauth_request, storage, feature_id, extension):
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
-    Feature_.feature_delete(storage, feature_id)
+    deleted_feature = Feature_.feature_delete(storage, feature_id)
+
+    if type(deleted_feature) is tuple:
+        return deleted_feature
 
     try:
         return status_.status_204(), 204
@@ -319,3 +322,36 @@ def feature_batch(storage, extension):
         return import_features
 
     return status_.status_200(), 200
+
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/users.<string:extension>', methods=['GET'])
+@oauth.require_oauth()
+def features_users(storage, feature_id, extension):
+    return status_.status_200(), 200
+
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['GET'])
+@oauth.require_oauth()
+def features_users_get(storage, feature_id, user_id, extension):
+    return status_.status_200(), 200
+
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['POST'])
+@oauth.require_oauth()
+def features_users_create(storage, feature_id, user_id, extension):
+    return status_.status_200(), 200
+
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['PUT', 'PATCH'])
+@oauth.require_oauth()
+def features_users_update(storage, feature_id, user_id, extension):
+    return status_.status_200(), 200
+
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['DELETE'])
+@oauth.require_oauth()
+def features_users_delete(storage, feature_id, user_id, extension):
+    return status_.status_200(), 200
+
+
+

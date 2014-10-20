@@ -368,25 +368,15 @@ class Feature(CommonsModel):
 
     def feature_get(self, storage_, feature_id):
 
-
-        """
-        Before sending off our request to the API, we need to make sure that
-        we're only showing the user what they have permission to see.
-        """
-
         storage = self.validate_storage(storage_)
 
-        this_template = Template.query.filter_by(storage=storage).first()
+        Template_ = Template.query.filter_by(storage=storage).first()
 
-        logger.warning('this_template.is_public %s', this_template)
-
-        Model_ = self.get_storage(this_template, this_template.fields)
+        Model_ = self.get_storage(Template_, Template_.fields)
 
         endpoint_ = API(db.session, Model_)
-
-        result = endpoint_.get(feature_id, None, None)
-
-        return result
+        
+        return self.feature_read_check_access(feature_id, storage_, Template_, Model_, endpoint_)
 
     def feature_get_relationship(self, storage_, feature_id, relationship):
 
@@ -437,6 +427,14 @@ class Feature(CommonsModel):
       Storage_ = self.get_storage(Template_)
 
       feature_ = Storage_.query.get(feature_id)
+
+      """
+      Check to see if the User that wants to update this Feature is allowed to. This function will
+      ABORT the `feature_update` method if user access does not match. 
+      """
+      feature_write_access = self.feature_write_check_access(feature_, storage, Template_, Storage_)
+      if not feature_write_access:
+        return status_.status_403(), 403
 
       """
       Get a list of File and Relationship fields that belong to our dynamic
@@ -626,7 +624,7 @@ class Feature(CommonsModel):
             logger.warning('User has no access to this template')
             abort(403)
           return self.feature_list_secure(storage_, Template_, Model_, endpoint_, results_per_page)
-        if Template_.is_public:
+        elif Template_.is_public:
           return self.feature_list_public(storage_, Template_, Model_, endpoint_, results_per_page)
         return status_.status_200(), 200
 
@@ -778,11 +776,19 @@ class Feature(CommonsModel):
 
         storage = self.validate_storage(storage_)
 
-        this_template = Template.query.filter_by(storage=storage).first()
+        Template_ = Template.query.filter_by(storage=storage).first()
 
-        Storage_ = self.get_storage(this_template)
+        Storage_ = self.get_storage(Template_)
 
         feature = Storage_.query.get(feature_id)
+
+        """
+        Check to see if the User that wants to update this Feature is allowed to. This function will
+        ABORT the `feature_update` method if user access does not match. 
+        """
+        feature_write_access = self.feature_write_check_access(feature, storage, Template_, Storage_)
+        if not feature_write_access:
+          return status_.status_403(), 403
 
         if not hasattr(feature, 'id'):
             return abort(404)
@@ -790,7 +796,7 @@ class Feature(CommonsModel):
         db.session.delete(feature)
         db.session.commit()
 
-        return True
+        return status_.status_204(), 204
 
     def attachment_delete(self, storage_, feature_id, attachment_storage_, attachment_id):
 
@@ -1247,3 +1253,68 @@ class Feature(CommonsModel):
       logger.warning('UserFeatures %s', features_)
 
       return features_
+
+
+    def feature_read_check_access(self, feature_id, storage_, Template_, Model_, endpoint_):
+
+      result = endpoint_.get(feature_id, None, None)
+
+      """
+      Display the Feature if it Feature Status is 'public'
+      """
+      if 'status' in result:
+        if 'public' in result['status']:
+          return result
+
+      """
+      Display is the Feature Owner is requesting the Feature
+      """
+      if 'owner' in result:
+        if self.current_user.id is result['owner']:
+          return result
+
+      """
+      Display if user has Feature Collection/Template is_moderator or is_admin permission
+      """
+      if Template_.id in self.allowed_templates(permission_type='is_moderator') or \
+            Template_.id in self.allowed_templates(permission_type='is_admin'):
+        return result
+
+      """
+      If Feature ACL is enabled, then we need to do some more digging
+      """
+      if Template_.has_acl:
+        allowed_features = self.allowed_features(storage=storage_, permission_type="read")
+        if result['id'] in allowed_features:
+          return result
+
+      """
+      Otherwise the user doesn't have access to this feature
+      """
+      return status_.status_403(), 403
+
+    def feature_write_check_access(self, feature, storage_, Template_, Model_):
+
+      """
+      Display is the Feature Owner is requesting the Feature
+      """
+      if self.current_user.id is feature.owner:
+        return True
+
+      """
+      Display if user has Feature Collection/Template is_moderator or is_admin permission
+      """
+      if Template_.id in self.allowed_templates(permission_type='is_moderator') or \
+            Template_.id in self.allowed_templates(permission_type='is_admin'):
+        return True
+
+      """
+      If Feature ACL is enabled, then we need to do some more digging
+      """
+      if Template_.has_acl:
+        allowed_features = self.allowed_features(storage=storage_, permission_type="write")
+        if feature.id in allowed_features:
+          return True
+
+      return False
+
