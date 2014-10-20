@@ -60,6 +60,14 @@ def attachment_delete_preflight(storage, feature_id, attachment_storage, attachm
 def features_import_preflight(storage, extension):
     return status_.status_200(), 200
 
+@module.route('/v2/type_<string:storage>/<int:feature_id>/users.<string:extension>', methods=['OPTIONS'])
+def features_users_preflight(storage, feature_id, extension):
+    return status_.status_200(), 200
+
+@module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['OPTIONS'])
+def features_users_single_preflight(storage, feature_id, user_id, extension):
+    return status_.status_200(), 200
+
 @module.route('/v2/type_<string:storage>.<string:extension>', methods=['GET'])
 @is_public()
 @oauth.oauth_or_public()

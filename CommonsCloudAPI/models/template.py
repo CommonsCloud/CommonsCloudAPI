@@ -255,7 +255,7 @@ the system.
 """
 class Template(db.Model, CommonsModel):
 
-  __public__ = {'default': ['id', 'name', 'help', 'storage', 'is_public', 'is_crowdsourced', 'is_moderated', 'is_listed', 'is_geospatial', 'created', 'status', 'fields']}
+  __public__ = {'default': ['id', 'name', 'help', 'storage', 'is_public', 'is_crowdsourced', 'is_moderated', 'is_listed', 'is_geospatial', 'has_acl', 'created', 'status', 'fields']}
 
   __tablename__ = 'template'
   __table_args__ = {
@@ -266,7 +266,7 @@ class Template(db.Model, CommonsModel):
   name = db.Column(db.String(60))
   help = db.Column(db.String(255))
   storage = db.Column(db.String(255))
-  # is_secure = db.Column(db.Boolean)
+  has_acl = db.Column(db.Boolean)
   is_public = db.Column(db.Boolean)
   is_crowdsourced = db.Column(db.Boolean)
   is_moderated = db.Column(db.Boolean)
@@ -279,11 +279,11 @@ class Template(db.Model, CommonsModel):
   activity = db.relationship('Activity', backref=db.backref('template'), cascade="all,delete")
 
 
-  def __init__(self, name="", help="", storage="", is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, is_geospatial=True, is_community=True, created=datetime.now(), status=True):
+  def __init__(self, name="", help="", storage="", has_acl=True, is_public=True, is_crowdsourced=False, is_moderated=True, is_listed=True, is_geospatial=True, is_community=True, created=datetime.now(), status=True):
     self.name = name
     self.help = help
     self.storage = storage
-    # self.is_secure = is_secure
+    self.has_acl = has_acl
     self.is_public = is_public
     self.is_crowdsourced = is_crowdsourced
     self.is_moderated = is_moderated

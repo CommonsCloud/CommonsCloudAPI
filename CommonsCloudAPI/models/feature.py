@@ -613,31 +613,31 @@ class Feature(CommonsModel):
 
         storage = self.validate_storage(storage_)
 
-        this_template = Template.query.filter_by(storage=storage).first()
+        Template_ = Template.query.filter_by(storage=storage).first()
 
-        logger.warning('this_template.is_public %s', this_template.is_public)
+        Model_ = self.get_storage(Template_, Template_.fields)
+
+        endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
         
-        if not this_template.is_public:
+        if not Template_.is_public or self.current_user:
           logger.warning('The template is not public, require OAuth and template access')
-          logger.warning('self.current_user.templates %s', this_template.id in self.allowed_templates())
-          if not this_template.id in self.allowed_templates():
+          logger.warning('self.current_user.templates %s', Template_.id in self.allowed_templates())
+          if not Template_.id in self.allowed_templates():
             logger.warning('User has no access to this template')
             abort(403)
-          return self.feature_list_secure(storage_, results_per_page)
-        else:
-          return self.feature_list_public(storage_, results_per_page)
+          return self.feature_list_secure(storage_, Template_, Model_, endpoint_, results_per_page)
+        if Template_.is_public:
+          return self.feature_list_public(storage_, Template_, Model_, endpoint_, results_per_page)
         return status_.status_200(), 200
 
 
-    def feature_list_public(self, storage_, results_per_page=25):
-
-        storage = self.validate_storage(storage_)
-
-        this_template = Template.query.filter_by(storage=storage).first()
-
-        Model_ = self.get_storage(this_template, this_template.fields)
-
-        endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
+    """
+    The Feature Collection/Template is marked as a public resource and therefore requires no
+    further authentication on the requesting user's behalf. The API should select a list of 
+    Features with a Feature Status of 'public' and display them to the user. All other Feature
+    Status' should be hidden at this point (e.g., private, crowd, draft)
+    """
+    def feature_list_public(self, storage_, Template_, Model_, endpoint_, results_per_page=25):
 
         search_params = json.loads(request.args.get('q', '{}'))
 
@@ -662,63 +662,116 @@ class Feature(CommonsModel):
         return {
           'results': results.get('results'),
           'model': Model_,
-          'template': this_template
+          'template': Template_
         }
 
-    def feature_list_secure(self, storage_, results_per_page=25):
-        
-        storage = self.validate_storage(storage_)
+    """
+    The Feature Collection/Template was marked as a not is_public and therefore requires that the 
+    requesting user have at minimum 'read' access to this Feature Collection being requested. Varying
+    Features may be displayed based on the user's exact permissions. Use cases covered here are:
 
-        this_template = Template.query.filter_by(storage=storage).first()
+    1. A user with `read/write` permission to the Template_ being requested will display Features (a) with a status
+       of 'public', (b) with owner === current_user.id, or (c) with Feature 'read' permission or higher
 
-        Model_ = self.get_storage(this_template, this_template.fields)
-
-        endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
+    2. A user with 'is_moderator/is_admin' permission to the Template_ being requested will display all Features in
+       the Feature Collection
+    """
+    def feature_list_secure(self, storage_, Template_, Model_, endpoint_, results_per_page=25):
 
         search_params = json.loads(request.args.get('q', '{}'))
-
-        """
-        Only display public posts
-        """
-        public_filter = {
-          "name": "status",
-          "op": "eq",
-          "val": "public"
-        }
-
-        if 'filters' in search_params:
-          search_params['filters'].append(public_filter)
-        else:
-          search_params = {
-            "filters": [public_filter]
-          }
 
         """
         If the Template has Feature level permission enabled, then we need to build a list
-        of Feature IDs from this Feature Collection, that the user can access
-        """
-        # if ...
-        # allowed_features = self.allowed_features(storage=storage, permission_type='read')
-        # logger.warning('Allowed Features %s', allowed_features)
-        # features_filter = {
-        #   "name": "id",
-        #   "op": "in",
-        #   "val": allowed_features
-        # }
+        of Feature IDs from this Feature Collection, that the user can access.
 
-        # if 'filters' in search_params:
-        #   search_params['filters'].append(features_filter)
-        # else:
-        #   search_params = {
-        #     "filters": [features_filter]
-        #   }
+        We need to make sure though that we merge together 'public' features with the 'explicitly allowed'
+        features, this meets one of the following criteria:
+
+        1. User has Feature `read` (including `is_admin`, `is_moderator`) permission
+        2. User has Template `is_moderator` or `is_admin` permission
+        3. User id matches Feature.owner
+
+        """
+
+        """
+        Check to see if the current_user has Feature Collection/Template is_moderator or is_admin
+        level of permissions. If so, then they should see every Feature in the Collection regardless
+        of Feature Status (e.g., published, private, draft, crowd) and Feature-level Permission
+        """
+        if Template_.id in self.allowed_templates(permission_type='is_moderator') or \
+            Template_.id in self.allowed_templates(permission_type='is_admin'):
+            # Do nothing, go ahead and display everything, this is just a stub for any
+            # future necessary admin or moderator specific permissions.
+            pass
+        else:
+          access_filters = []
+
+          """
+          Display all Features marked as 'public' within the Collection
+          """
+          access_filters.append({
+            "name": "status",
+            "op": "eq",
+            "val": "public"
+          })
+
+          """
+          Display all Features user is the 'owner' of in this Collection
+          """
+          access_filters.append({
+            "name": "owner",
+            "op": "eq",
+            "val": self.current_user.id
+          })
+
+          """
+          Check to see if this template has Feature Level ACL enabled
+          """
+          if Template_.has_acl:
+            """
+            Display all Features user has Feature-level 'read' or higher access to, within this Collection
+            """
+            allowed_features = self.allowed_features(storage=storage_, permission_type='read')
+            access_filters.append({
+              "name": "id",
+              "op": "in",
+              "val": allowed_features
+            })
+
+          """
+          Combine new Filters with the preexisting_fitlers defined by the user in the original Request
+          """
+          if 'filters' in search_params:
+            preexisting_fitlers = search_params['filters']
+            search_params['filters'] = preexisting_fitlers + access_filters
+
+            """
+            disjunction is required as True so that we submit this filter statement as an OR statement
+            and not as an AND statement.
+
+            @todo The only problem is that this then takes all the existing filters and then adds in
+                  additional filters ... assuming we want a mixed AND/OR statement this could be tricky
+                  and right now we don't have a solid process for combining those.
+            """
+            search_params.disjunction = True
+
+          else:
+            """
+            If there are no existing search filters then we need to start an entirely new object and
+            add our access_filters as a list to that object
+            """
+            search_params = {
+              "filters": access_filters,
+              "disjunction": True
+            }
+
 
         results = endpoint_._search(search_params)
 
         return {
           'results': results.get('results'),
           'model': Model_,
-          'template': this_template
+          'template': Template_
         }
 
     def feature_delete(self, storage_, feature_id):
@@ -1031,14 +1084,6 @@ class Feature(CommonsModel):
 
       return last_modified_date
 
-    # def allowed_templates(self, permissions):
-
-    #   templates_ = []
-
-    #   for permission in permissions:
-    #     templates_.append(permission.template_id)
-
-    #   return templates_
 
     def feature_get_excel_template(self, storage_):
 
@@ -1187,16 +1232,18 @@ class Feature(CommonsModel):
 
       logger.warning('allowed_features %s', storage)
 
-      user_storage = storage + '_users'
-      UserFeatures = self.get_storage(user_storage)
+      user_storage = str(storage + '_users')
+      clear_user_storage = self.validate_storage(user_storage)
+      UserFeatures = self.get_storage(clear_user_storage)
 
       features = UserFeatures.query.filter_by(user_id=self.current_user.id).all()
-      logger.warning('UserFeatures %s', features)
 
       features_ = []
 
       for feature in features:
         if permission_type and getattr(feature, permission_type):
           features_.append(feature.feature_id)
+
+      logger.warning('UserFeatures %s', features_)
 
       return features_
