@@ -357,16 +357,48 @@ def features_users_get(oauth_request, storage, feature_id, user_id, extension):
 @module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['POST'])
 @oauth.require_oauth()
 def features_users_create(oauth_request, storage, feature_id, user_id, extension):
-    return status_.status_200(), 200
 
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    user_permissions = Feature_.permission_create(storage, feature_id, user_id, request)
+
+    if type(user_permissions) is tuple:
+        return user_permissions
+
+    arguments = {
+        'the_content': user_permissions,
+        'extension': extension
+    }
+
+    return Feature_.endpoint_response(**arguments)
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['PUT', 'PATCH'])
 @oauth.require_oauth()
 def features_users_update(oauth_request, storage, feature_id, user_id, extension):
-    return status_.status_200(), 200
 
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    user_permissions = Feature_.permission_update(storage, feature_id, user_id, request)
+
+    if type(user_permissions) is tuple:
+        return user_permissions
+
+    arguments = {
+        'the_content': user_permissions,
+        'extension': extension
+    }
+
+    return Feature_.endpoint_response(**arguments)
 
 @module.route('/v2/type_<string:storage>/<int:feature_id>/users/<int:user_id>.<string:extension>', methods=['DELETE'])
 @oauth.require_oauth()
 def features_users_delete(oauth_request, storage, feature_id, user_id, extension):
-    return status_.status_200(), 200
+
+    Feature_ = Feature()
+    Feature_.current_user = oauth_request.user
+    user_permissions = Feature_.permission_delete(storage, feature_id, user_id)
+
+    if type(user_permissions) is tuple:
+        return user_permissions
+
+    return status_.status_204(), 204

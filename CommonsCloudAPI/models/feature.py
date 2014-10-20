@@ -1422,6 +1422,164 @@ class Feature(CommonsModel):
       return status_.status_403(), 403
 
 
+    """
+    Create permissions of User for the specified Feature
+
+    @return (object) permissions_
+        The object of permissions for requested User and requested Feature
+
+    """
+    def permission_create(self, storage, feature_id, user_id, request_object):
+
+      user_storage = str(storage + '_users')
+      user_storage_ = self.validate_storage(user_storage)
+      FeatureUsers = self.get_storage(user_storage_)
+
+      storage_ = self.validate_storage(storage)
+      Template_ = Template.query.filter_by(storage=storage_).first()
+      Feature_ = self.get_storage(Template_, Template_.fields)
+
+      feature = Feature_.query.get(feature_id)
+
+      """
+      If the current user has Feature Collection `is_moderator` or `is_admin` access or
+      if the current user is the owner of the originating Feature or is the user is a Feature admin
+      then we need to allow them to see the list of users associate with this Feature
+      """
+      allowed_features = self.allowed_features(storage=storage_, permission_type='is_admin')
+
+      if self.current_user.id is feature.owner or \
+          feature.id in allowed_features or \
+          Template_.id in self.allowed_templates(permission_type='is_moderator') or \
+          Template_.id in self.allowed_templates(permission_type='is_admin'):
+        
+        permissions_ = json.loads(request_object.data)
+
+        """
+        Add the new application to the database
+        """
+        new_permissions = {
+          'user_id': user_id,
+          'feature_id': feature_id,
+          'read': sanitize.sanitize_boolean(permissions_.get('read', '')),
+          'write': sanitize.sanitize_boolean(permissions_.get('write', '')),
+          'is_admin': sanitize.sanitize_boolean(permissions_.get('is_admin', ''))
+        }
+
+        permission_object = FeatureUsers(**new_permissions)
+
+        db.session.add(permission_object)
+        db.session.commit()
+
+        return {
+          'read': permission_object.read,
+          'write': permission_object.write,
+          'is_admin': permission_object.is_admin
+        }
+
+      return status_.status_403(), 403
+
+    """
+    Update the permissions of User for the specified Feature
+
+    @return (object) permissions_
+        The object of permissions for requested User and requested Feature
+
+    """
+    def permission_update(self, storage, feature_id, user_id, request_object):
+      user_storage = str(storage + '_users')
+      user_storage_ = self.validate_storage(user_storage)
+      FeatureUsers = self.get_storage(user_storage_)
+
+      storage_ = self.validate_storage(storage)
+      Template_ = Template.query.filter_by(storage=storage_).first()
+      Feature_ = self.get_storage(Template_, Template_.fields)
+
+      feature = Feature_.query.get(feature_id)
+      permissions = FeatureUsers.query.filter_by(feature_id=feature_id,user_id=user_id).first()
+
+      """
+      If the current user has Feature Collection `is_moderator` or `is_admin` access or
+      if the current user is the owner of the originating Feature or is the user is a Feature admin
+      then we need to allow them to see the list of users associate with this Feature
+      """
+      allowed_features = self.allowed_features(storage=storage_, permission_type='is_admin')
+
+      if self.current_user.id is feature.owner or \
+          feature.id in allowed_features or \
+          Template_.id in self.allowed_templates(permission_type='is_moderator') or \
+          Template_.id in self.allowed_templates(permission_type='is_admin'):
+        
+        altered_permissions = json.loads(request_object.data)
+
+        if hasattr(permissions, 'read'):
+          permissions.read = sanitize.sanitize_boolean(altered_permissions.get('read', permissions.read)),
+
+        if hasattr(permissions, 'write'):
+          permissions.write = sanitize.sanitize_boolean(altered_permissions.get('write', permissions.write)),
+        
+        if hasattr(permissions, 'is_admin'):
+          permissions.is_admin = sanitize.sanitize_boolean(altered_permissions.get('is_admin', permissions.is_admin))
+
+        db.session.commit()
+
+        return {
+          'read': permissions.read,
+          'write': permissions.write,
+          'is_admin': permissions.is_admin
+        }
+
+      return status_.status_403(), 403
+
+    """
+    Delete the permissions of User for the specified Feature
+
+    @return (object) permissions_
+        The object of permissions for requested User and requested Feature
+
+    """
+    def permission_delete(self, storage, feature_id, user_id):
+
+      """
+      Do not allow a user to remove themselves from a specific feature
+
+      @todo: This may change in the future, but for now, we are disallowing this_template
+             because we disallow it for Applications and Templates
+      """
+      if self.current_user.id is user_id:
+        return status_.status_403(), 403
+
+      user_storage = str(storage + '_users')
+      user_storage_ = self.validate_storage(user_storage)
+      FeatureUsers = self.get_storage(user_storage_)
+      permissions = FeatureUsers.query.filter_by(feature_id=feature_id,user_id=user_id).first()
+
+      if not permissions:
+        return status_.status_404('We couldn\'t find the user permissions you were looking for. This user may have been removed from the Feature or the Feature may have been deleted.'), 404
+
+      storage_ = self.validate_storage(storage)
+      Template_ = Template.query.filter_by(storage=storage_).first()
+      Feature_ = self.get_storage(Template_, Template_.fields)
+
+      feature = Feature_.query.get(feature_id)
+
+      """
+      If the current user has Feature Collection `is_moderator` or `is_admin` access or
+      if the current user is the owner of the originating Feature or is the user is a Feature admin
+      then we need to allow them to see the list of users associate with this Feature
+      """
+      allowed_features = self.allowed_features(storage=storage_, permission_type='is_admin')
+
+      if self.current_user.id is feature.owner or \
+          feature.id in allowed_features or \
+          Template_.id in self.allowed_templates(permission_type='is_moderator') or \
+          Template_.id in self.allowed_templates(permission_type='is_admin'):
+        db.session.delete(permissions)
+        db.session.commit()
+        return True
+
+      return status_.status_403(), 403
+
     def feature_user_list(self, FeatureUsers):
 
       self.__public__ = {'default': ['id', 'name', 'email', 'active', 'confirmed_at']}
