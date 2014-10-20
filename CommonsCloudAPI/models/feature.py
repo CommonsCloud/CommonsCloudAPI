@@ -1378,6 +1378,50 @@ class Feature(CommonsModel):
 
       return status_.status_403(), 403
 
+
+    """
+    Get the permissions of User for the specified Feature
+
+    @return (object) permissions_
+        The object of permissions for requested User and requested Feature
+
+    """
+    def permission_get(self, storage, feature_id, user_id):
+
+      user_storage = str(storage + '_users')
+      user_storage_ = self.validate_storage(user_storage)
+      FeatureUsers = self.get_storage(user_storage_)
+      permissions = FeatureUsers.query.filter_by(feature_id=feature_id,user_id=user_id).first()
+
+      if not permissions:
+        return status_.status_404('We couldn\'t find the user permissions you were looking for. This user may have been removed from the Feature or the Feature may have been deleted.'), 404
+
+      storage_ = self.validate_storage(storage)
+      Template_ = Template.query.filter_by(storage=storage_).first()
+      Feature_ = self.get_storage(Template_, Template_.fields)
+
+      feature = Feature_.query.get(feature_id)
+
+      """
+      If the current user has Feature Collection `is_moderator` or `is_admin` access or
+      if the current user is the owner of the originating Feature or is the user is a Feature admin
+      then we need to allow them to see the list of users associate with this Feature
+      """
+      allowed_features = self.allowed_features(storage=storage_, permission_type='is_admin')
+
+      if self.current_user.id is feature.owner or \
+          feature.id in allowed_features or \
+          Template_.id in self.allowed_templates(permission_type='is_moderator') or \
+          Template_.id in self.allowed_templates(permission_type='is_admin'):
+        return {
+          'read': permissions.read,
+          'write': permissions.write,
+          'is_admin': permissions.is_admin
+        }
+
+      return status_.status_403(), 403
+
+
     def feature_user_list(self, FeatureUsers):
 
       self.__public__ = {'default': ['id', 'name', 'email', 'active', 'confirmed_at']}
