@@ -749,12 +749,12 @@ class Feature(CommonsModel):
             # future necessary admin or moderator specific permissions.
             pass
         else:
-          access_filters = []
+          permissions = []
 
           """
           Display all Features marked as 'public' within the Collection
           """
-          access_filters.append({
+          permissions.append({
             "name": "status",
             "op": "eq",
             "val": "public"
@@ -763,7 +763,7 @@ class Feature(CommonsModel):
           """
           Display all Features user is the 'owner' of in this Collection
           """
-          access_filters.append({
+          permissions.append({
             "name": "owner",
             "op": "eq",
             "val": self.current_user.id
@@ -777,7 +777,7 @@ class Feature(CommonsModel):
             Display all Features user has Feature-level 'read' or higher access to, within this Collection
             """
             allowed_features = self.allowed_features(storage=storage_, permission_type='read')
-            access_filters.append({
+            permissions.append({
               "name": "id",
               "op": "in",
               "val": allowed_features
@@ -785,29 +785,15 @@ class Feature(CommonsModel):
 
           """
           Combine new Filters with the preexisting_fitlers defined by the user in the original Request
+
+          If there are no existing search filters then we need to start an entirely new object and
+          add our access_filters as a list to that object
           """
           if 'filters' in search_params:
-            preexisting_fitlers = search_params['filters']
-            search_params['filters'] = preexisting_fitlers + access_filters
-
-            """
-            disjunction is required as True so that we submit this filter statement as an OR statement
-            and not as an AND statement.
-
-            @todo The only problem is that this then takes all the existing filters and then adds in
-                  additional filters ... assuming we want a mixed AND/OR statement this could be tricky
-                  and right now we don't have a solid process for combining those.
-            """
-            search_params['disjunction'] = True
-
+            search_params['permissions'] = permissions
           else:
-            """
-            If there are no existing search filters then we need to start an entirely new object and
-            add our access_filters as a list to that object
-            """
             search_params = {
-              "filters": access_filters,
-              "disjunction": True
+              "filters": permissions
             }
 
 
