@@ -166,10 +166,10 @@ class UserTemplates(db.Model, CommonsModel):
     """
     allowed_templates = self.allowed_templates('is_admin')
 
-    if not template_id in allowed_templates:
-      logger.warning('User %d tried to access Users for Template %d', \
-          self.current_user.id, template_id)
-      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Template'), 401
+    if not user_id is self.current_user.id and not template_id in allowed_templates:
+        logger.warning('User %d tried to access Users for Template %d', \
+            self.current_user.id, template_id)
+        return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this Template'), 401
 
     permissions = UserTemplates.query.filter_by(template_id=template_id,user_id=user_id).first()
 
