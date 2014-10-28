@@ -798,7 +798,11 @@ class Feature(CommonsModel):
                   additional filters ... assuming we want a mixed AND/OR statement this could be tricky
                   and right now we don't have a solid process for combining those.
             """
-            search_params.disjunction = True
+            search_params['disjunction'] = True
+            # if 'disjunction' in search_params:
+            #   search_params.disjunction = True
+            # else:
+            #   search_params['disjunction'] = True
 
           else:
             """

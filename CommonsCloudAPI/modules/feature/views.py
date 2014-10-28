@@ -95,12 +95,13 @@ def feature_list(oauth_request, storage, extension, is_public):
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
     feature_list = Feature_.feature_list(storage, results_per_page)
+
+    if type(feature_list) is tuple:
+        return feature_list
+
     feature_results = feature_list.get('results')
     feature_statistics = Feature_.feature_statistic(feature_list.get('model'),feature_list.get('template'))
     features_last_modified = Feature_.features_last_modified(feature_list.get('model'))
-
-    if type(feature_results) is tuple:
-        return feature_results
 
     arguments = {
         'the_content': feature_results.get('objects'),
