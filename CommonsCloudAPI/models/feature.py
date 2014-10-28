@@ -799,10 +799,6 @@ class Feature(CommonsModel):
                   and right now we don't have a solid process for combining those.
             """
             search_params['disjunction'] = True
-            # if 'disjunction' in search_params:
-            #   search_params.disjunction = True
-            # else:
-            #   search_params['disjunction'] = True
 
           else:
             """
