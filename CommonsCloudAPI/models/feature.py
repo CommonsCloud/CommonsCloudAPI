@@ -793,6 +793,7 @@ class Feature(CommonsModel):
             search_params['permissions'] = permissions
           else:
             search_params = {
+              "filters": [],
               "permissions": permissions
             }
 
@@ -1319,7 +1320,7 @@ class Feature(CommonsModel):
       """
       Display is the Feature Owner is requesting the Feature
       """
-      if 'owner' in result:
+      if 'owner' in result and hasattr(self.current_user, 'id'):
         if self.current_user.id is result['owner']:
           return result
 
