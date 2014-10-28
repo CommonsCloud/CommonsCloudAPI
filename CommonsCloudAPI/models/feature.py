@@ -1421,7 +1421,7 @@ class Feature(CommonsModel):
       permissions = FeatureUsers.query.filter_by(feature_id=feature_id,user_id=user_id).first()
 
       if not permissions:
-        return status_.status_404('We couldn\'t find the user permissions you were looking for. This user may have been removed from the Feature or the Feature may have been deleted.'), 404
+        return status_.status_200('We couldn\'t find the user permissions you were looking for. This user may have been removed from the Feature or the Feature may have been deleted.'), 200
 
       storage_ = self.validate_storage(storage)
       Template_ = Template.query.filter_by(storage=storage_).first()
@@ -1436,7 +1436,8 @@ class Feature(CommonsModel):
       """
       allowed_features = self.allowed_features(storage=storage_, permission_type='is_admin')
 
-      if self.current_user.id is feature.owner or \
+      if self.current_user.id is user_id or \
+          self.current_user.id is feature.owner or \
           feature.id in allowed_features or \
           Template_.id in self.allowed_templates(permission_type='is_moderator') or \
           Template_.id in self.allowed_templates(permission_type='is_admin'):
@@ -1446,7 +1447,7 @@ class Feature(CommonsModel):
           'is_admin': permissions.is_admin
         }
 
-      return status_.status_403(), 403
+      return status_.status_401('You are not allowed to view this User\'s permissions because you are not an administrator of this resouce'), 401
 
 
     """

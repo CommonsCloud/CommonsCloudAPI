@@ -57,12 +57,12 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_200(self):
+  def status_200(self, system_message=""):
 
     message = {
       'status': '200 OK',
       'code': '200',
-      'message': 'Looking good McFly'
+      'message': system_message or 'Looking good McFly'
     }
 
     response = jsonify(message)
