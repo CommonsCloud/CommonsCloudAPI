@@ -793,7 +793,7 @@ class Feature(CommonsModel):
             search_params['permissions'] = permissions
           else:
             search_params = {
-              "filters": permissions
+              "permissions": permissions
             }
 
 
