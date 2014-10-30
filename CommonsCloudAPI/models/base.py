@@ -96,7 +96,7 @@ class CommonsModel(object):
           result[key] = self.serialize_field(key, value)
         elif single is True:
           result[key] = self.serialize_field(key, value)
-    elif 'keys' in object_:
+    elif hasattr(object_, 'keys'):
       for key in object_.keys():
         value = object_.get(key, None)
         if key in self.__public__['default']:
@@ -104,7 +104,7 @@ class CommonsModel(object):
         elif single is True:
           result[key] = self.serialize_field(key, value)
     else:
-      logger.warning('object_ %s', object_)
+      logger.error('Could not serialize object')
 
 
     return result
