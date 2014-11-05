@@ -581,15 +581,15 @@ class Field(db.Model, CommonsModel):
                 self.current_user.id, allowed_templates, template_id)
             return status_.status_401('You can\'t edit this Template because it\'s not yours'), 401
 
-          allowed_fields = self.allowed_fields()
-          public_fields_ = self.public_templates()
+          # allowed_fields = self.allowed_fields()
+          # public_fields_ = self.public_templates()
 
-          allowed_fields_list = allowed_fields + public_fields_
+          # allowed_fields_list = allowed_fields + public_fields_
 
           for field in template_.fields:
-              if field.id in allowed_fields_list:
-                  fields_.append(field)
-  
+              # if field.id in allowed_fields_list:
+              fields_.append(field)
+
         else:
           for field in template_.fields:
             fields_.append(field)
