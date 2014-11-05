@@ -375,6 +375,8 @@ class Feature(CommonsModel):
 
     def feature_get(self, storage_, feature_id):
 
+        logger.warning('feature_get current_user %s', self.current_user)
+
         storage = self.validate_storage(storage_)
 
         Template_ = Template.query.filter_by(storage=storage).first()
@@ -1315,6 +1317,8 @@ class Feature(CommonsModel):
       """
       if 'status' in result:
         if 'public' in result['status']:
+          return result
+        elif 'crowd' in result['status'] and self.current_user is not None:
           return result
 
       """
