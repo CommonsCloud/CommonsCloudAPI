@@ -247,7 +247,7 @@ class Field(db.Model, CommonsModel):
           duplicate_check = self.check_relationship_field_duplicate(Template_.fields, relationship_storage)
           if duplicate_check:
             logger.warning('User %d tried to add a duplicate relationship type', \
-                self.current_user.id, template_id)
+                self.current_user.id)
             return status_.status_400('You already defined a relationship with this Template, you cannot create two relationship fields with the same relationship table.'), 400
 
         new_field = {
