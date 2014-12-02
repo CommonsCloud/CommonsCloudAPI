@@ -260,15 +260,14 @@ def fetch_dynamic_recipients(feature, **options):
 
     # logger.debug('Geometry %s', feature.geometry)
 
-    if feature.geometry is None:
-      return abort(400)
+    if feature.geometry:
 
-    Feature_ = Feature()
-    intersection_options = {
-      "storage_": options.get('from_storage', None),
-      "geometry": feature.geometry
-    }
-    features = Feature_.feature_get_intersection(**intersection_options)
+      Feature_ = Feature()
+      intersection_options = {
+        "storage_": options.get('from_storage', None),
+        "geometry": feature.geometry
+      }
+      features = Feature_.feature_get_intersection(**intersection_options)
 
     # logger.debug('features from get intersects %s', features)
 
