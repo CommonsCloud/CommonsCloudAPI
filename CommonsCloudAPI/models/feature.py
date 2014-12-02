@@ -367,7 +367,7 @@ class Feature(CommonsModel):
         """
         if not bulk:
           feature_json = self.serialize_object(self.feature_get(storage, new_feature.id))
-          logger.info('A new feature was created in %s with an id of %d', 
+          logger.info('A new feature was created in %s with an id of %d %s', 
               storage, new_feature.id, type(feature_json))
           trigger_feature_created.send(current_app._get_current_object(),
                                storage=storage, template=Template_, feature=new_feature, feature_json=feature_json)
