@@ -213,8 +213,11 @@ def execute_actions(actions, **data):
             recipients.get('from_storage', None):
           feature = data.get('feature', None)
           recipients_list = fetch_dynamic_recipients(feature, **recipients)
-          
-          recipient_data = recipients_list.get('recipients', None)
+
+          if recipients_list is None:
+            recipient_data = []
+          else:
+            recipient_data = recipients_list.get('recipients', None)
           # logger.debug('XXXXX recipient_data %s', recipient_data)
           
           recipients_emailaddresses = recipients_list.get('email_addresses', ['error@commonscloud.org'])
