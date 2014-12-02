@@ -216,12 +216,14 @@ def execute_actions(actions, **data):
 
           if recipients_list is None:
             recipient_data = []
+            recipients_emailaddresses = []
           else:
             recipient_data = recipients_list.get('recipients', None)
-          # logger.debug('XXXXX recipient_data %s', recipient_data)
+            # logger.debug('XXXXX recipient_data %s', recipient_data)
+
+            recipients_emailaddresses = recipients_list.get('email_addresses', ['error@commonscloud.org'])
+            # logger.debug('XXXXX email_addresses %s', recipients_emailaddresses)
           
-          recipients_emailaddresses = recipients_list.get('email_addresses', ['error@commonscloud.org'])
-          # logger.debug('XXXXX email_addresses %s', recipients_emailaddresses)
 
           copy = recipients.get('copy', False)
           if copy:
