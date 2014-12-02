@@ -213,17 +213,12 @@ def execute_actions(actions, **data):
             recipients.get('from_storage', None):
           feature = data.get('feature', None)
           recipients_list = fetch_dynamic_recipients(feature, **recipients)
-
-          if recipients_list is None:
-            recipient_data = []
-            recipients_emailaddresses = []
-          else:
-            recipient_data = recipients_list.get('recipients', None)
-            # logger.debug('XXXXX recipient_data %s', recipient_data)
-
-            recipients_emailaddresses = recipients_list.get('email_addresses', ['error@commonscloud.org'])
-            # logger.debug('XXXXX email_addresses %s', recipients_emailaddresses)
           
+          recipient_data = recipients_list.get('recipients', None)
+          # logger.debug('XXXXX recipient_data %s', recipient_data)
+          
+          recipients_emailaddresses = recipients_list.get('email_addresses', ['error@commonscloud.org'])
+          # logger.debug('XXXXX email_addresses %s', recipients_emailaddresses)
 
           copy = recipients.get('copy', False)
           if copy:
@@ -266,7 +261,7 @@ def fetch_dynamic_recipients(feature, **options):
     # logger.debug('Geometry %s', feature.geometry)
 
     if feature.geometry is None:
-      return
+      return abort(400)
 
     Feature_ = Feature()
     intersection_options = {
