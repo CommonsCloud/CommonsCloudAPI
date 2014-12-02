@@ -256,6 +256,8 @@ def fetch_dynamic_recipients(feature, **options):
 
   from CommonsCloudAPI.models.feature import Feature
 
+  features = []
+
   if 'geometry_intersects' in options.get('conditions', None):
 
     # logger.debug('Geometry %s', feature.geometry)
