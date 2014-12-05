@@ -509,6 +509,8 @@ class CommonsModel(object):
       for field in fields:
         if field.is_listed and field.data_type == 'relationship':
           public_fields.append(field.relationship)
+        elif field.is_listed and field.data_type == 'file':
+          public_fields.append(field.relationship)
         elif field.is_listed:
           public_fields.append(field.name)
 
