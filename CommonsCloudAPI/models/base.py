@@ -474,14 +474,24 @@ class CommonsModel(object):
 
     return new_column
 
-  def get_storage(self, template, fields=[], relationship=False):
+  def get_storage(self, template, fields=[], relationship=True):
 
     if type(template) is str:
       class_name = str(template)
       relationships = []
     else:
       class_name = str(template.storage)
-      relationships = self.get_relationship_fields(template.fields)
+
+      """
+      Check to see if we need to load the full model or a slim model.
+
+      A full model includes all relationships, a slim model only includes
+      first level field and excludes all attachments and relationships.
+      """
+      if relationship:
+        relationships = self.get_relationship_fields(template.fields)
+      else:
+        relationships = []
 
     logger.debug('Dynamic Model executed for %s', class_name)
 

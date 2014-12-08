@@ -97,9 +97,14 @@ def feature_list(oauth_request, storage, extension, is_public):
     else:
         show_statistics = True
 
+    if 'false' == request.args.get('relationship'):
+        show_relationship = False
+    else:
+        show_relationship = True
+
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
-    feature_list = Feature_.feature_list(storage, results_per_page, show_statistics)
+    feature_list = Feature_.feature_list(storage, results_per_page, show_statistics, show_relationship)
 
     if type(feature_list) is tuple:
         return feature_list
