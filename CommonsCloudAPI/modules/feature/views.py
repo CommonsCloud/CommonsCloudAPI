@@ -92,7 +92,7 @@ def feature_list(oauth_request, storage, extension, is_public):
     else:
         results_per_page = int(request.args.get('results_per_page'))
 
-    show_statistics = request.args.get('statistics') or False
+    show_statistics = request.args.get('statistics') or True
 
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
