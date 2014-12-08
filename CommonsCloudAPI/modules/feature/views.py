@@ -92,7 +92,7 @@ def feature_list(oauth_request, storage, extension, is_public):
     else:
         results_per_page = int(request.args.get('results_per_page'))
 
-    if 'false' in request.args.get('statistics'):
+    if 'false' == request.args.get('statistics'):
         show_statistics = False
     else:
         show_statistics = True
