@@ -656,7 +656,7 @@ class CommonsModel(object):
     # existing_table = db.Table(template.storage, MetaData(db.engine), autoload=True, autoload_with=db.engine)
     # db.metadata.bind = db.engine
 
-    db.engine.execute('ALTER TABLE %s DROP COLUMN %s' % (template.storage, field.name))
+    # db.engine.execute('ALTER TABLE %s DROP COLUMN %s' % (template.storage, field.name))
     db.session.close()
     db.engine.connect()
 
