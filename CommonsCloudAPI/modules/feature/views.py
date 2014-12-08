@@ -92,16 +92,24 @@ def feature_list(oauth_request, storage, extension, is_public):
     else:
         results_per_page = int(request.args.get('results_per_page'))
 
+    show_statistics = request.args.get('statistics') or False
+
     Feature_ = Feature()
     Feature_.current_user = oauth_request.user
-    feature_list = Feature_.feature_list(storage, results_per_page)
+    feature_list = Feature_.feature_list(storage, results_per_page, show_statistics)
 
     if type(feature_list) is tuple:
         return feature_list
 
     feature_results = feature_list.get('results')
-    feature_statistics = Feature_.feature_statistic(feature_list.get('model'),feature_list.get('template'))
     features_last_modified = Feature_.features_last_modified(feature_list.get('model'))
+
+    """
+    Get Statistics for this Feature set if they are requested by setting statistics to True
+    """
+    feature_statistics = None
+    if show_statistics:
+        feature_statistics = Feature_.feature_statistic(feature_list.get('model'),feature_list.get('template'))
 
     arguments = {
         'the_content': feature_results.get('objects'),

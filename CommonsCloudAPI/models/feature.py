@@ -656,13 +656,15 @@ class Feature(CommonsModel):
 
         return self.get_statistics(results.get('statistics'), Template_)
 
-    def feature_list(self, storage_, results_per_page=25):
+    def feature_list(self, storage_, results_per_page=25, show_statistics=False):
 
         storage = self.validate_storage(storage_)
 
         Template_ = Template.query.filter_by(storage=storage).first()
 
         Model_ = self.get_storage(Template_, Template_.fields)
+
+        Model_.statistics = show_statistics
 
         endpoint_ = API(db.session, Model_, results_per_page=results_per_page)
         
