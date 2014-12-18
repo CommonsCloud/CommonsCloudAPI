@@ -235,7 +235,7 @@ class Statistic(db.Model, CommonsModel):
     them into a list of numbers so that our SQLAlchemy query can
     understand what's going on
     """
-    def explicitly_allowed_templates(self, permission_type='view'):
+    def explicitly_allowed_templates(self, permission_type='read'):
 
         templates_ = []
 
@@ -256,7 +256,7 @@ class Statistic(db.Model, CommonsModel):
     them into a list of numbers so that our SQLAlchemy query can
     understand what's going on
     """
-    def explicitly_allowed_fields(self, permission_type='edit'):
+    def explicitly_allowed_fields(self, permission_type='write'):
 
         fields_ = []
 
