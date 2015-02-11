@@ -1,6 +1,6 @@
 # The CommonsCloudAPI License
 
-Copyright (c) 2014 Joshua I. Powell, R. John Dawes, and Brendan McIntrye.
+Copyright (c) 2013-2015 Viable Industries, L.L.C.
 
 The CommonsCloudAPI is licensed under the terms of the GNU Affero General
 Public License as published by the Free Software Foundation, version 3 of
