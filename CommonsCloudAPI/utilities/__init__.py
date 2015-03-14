@@ -16,6 +16,10 @@ Import System Dependencies
 """
 import imp
 import os
+import flask.ext.restless
+import json
+
+from flask import jsonify
 
 
 """
@@ -37,9 +41,35 @@ def load_configuration(app, environment):
 
 
 """
-Load all of our application's blueprints
+Load all of our application's endpoints
 """
-def load_blueprints(app):
+def load_endpoints(app, db):
+
+  """
+  Load dynamic endpoints
+  """
+  manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
+
+  path = 'CommonsCloudAPI/endpoints'
+  endpoints = os.listdir(path)
+  
+  for endpoint in endpoints:
+
+    if os.path.isdir(os.path.join(path, endpoint)) and os.path.exists(os.path.join(path, endpoint, '__init__.py')):
+
+      f, filename, descr = imp.find_module(endpoint, [path])
+
+      Packet = imp.load_module(endpoint, f, filename, descr)
+
+      if hasattr(Packet, 'Model'):
+        Seed_ = Packet.Seed()
+        manager.create_api(Packet.Model, **Seed_.__arguments__)
+
+
+"""
+Load all of our application's modules
+"""
+def load_modules(app):
 
     path = 'CommonsCloudAPI/modules'
     dir_list = os.listdir(path)
@@ -56,4 +86,3 @@ def load_blueprints(app):
                 f, filename, descr = imp.find_module(name, [path])
                 mods[fname] = imp.load_module(name, f, filename, descr)
                 app.register_blueprint(getattr(mods[fname], 'module'))
-

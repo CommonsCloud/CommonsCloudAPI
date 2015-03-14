@@ -8,68 +8,8 @@
 
 ## API Documentation
 
-All API endpoints are based on the assumed base url of https://api.commonscloud.org/v2/[endpoint]
+All API endpoints are based on the assumed base url of https://api.commonscloud.org/v3/[endpoint]
 
-#### /application
-
-| Method | URL | Description | Example
-| --- | --- | --- | --- | --- | ---
-| GET | /application/ | Show a list of my applications | [example](#get-application)
-| GET | /application/&lt;int:application_id&gt; | Show an existing application | [example](#get-application1)
-| POST | /application/ | Create a new application |
-| PUT | /application/&lt;int:application_id&gt; | Update an existing application |
-| PATCH | /application/&lt;int:application_id&gt; | Update an existing application |
-| DELETE | /application/&lt;int:application_id&gt; | Delete an existing application | 
-
-
-###### [GET] /application
-```javascript
-{
-  "response": {
-    "applications": [
-      {
-        "created": "Mon, 03 Mar 2014 14:41:15 GMT",
-        "description": "",
-        "id": 1,
-        "name": "My Project Name",
-        "status": true,
-        "url": "http://www.mycommonscloud.com/"
-      }
-    ]
-  }
-}
-```
-
-###### [GET] /application/1
-```javascript
-{
-  "response": {
-    "created": "Mon, 03 Mar 2014 14:41:15 GMT",
-    "description": "",
-    "id": 1,
-    "name": "My Project Name",
-    "status": true,
-    "url": "http://www.mycommonscloud.com/"
-  }
-}
-```
-
-
-#### /template
-
-#### /field
-
-#### /statistic
-
-#### /feature
-
-#### errors
-
-From time to time you'll run into an error message within the system, below we've outlined what you may encounter. In the future we'll add possible solutions for each of these.
-
-| Code | Status | Solution
-| --- | --- | ---
-| 415 | Unsupported Media Type | This normally happens when you forget to append a 'Content-Type' header to the request or when you ask for a format that we don't support. CommonsCloud currently supports text/csv and application/json Content-Types and can also support the 'format' URL parameter with either json or csv as the value
 
 ### Version
 

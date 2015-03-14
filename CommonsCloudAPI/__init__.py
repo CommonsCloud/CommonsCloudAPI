@@ -20,16 +20,17 @@ from flask import Flask
 """
 Import Application Dependencies
 """
+from .errors import load_errorhandlers
+
 from .extensions import db
 from .extensions import mail
 from .extensions import security
 from .extensions import oauth
 from .extensions import rq
 
-from .errors import load_errorhandlers
-
-from .utilities import load_blueprints
 from .utilities import load_configuration
+from .utilities import load_endpoints
+from .utilities import load_modules
 
 
 
@@ -51,9 +52,13 @@ def create_application(name = __name__, env = 'testing'):
     oauth.init_app(app)
 
     # Load our application's blueprints
-    load_blueprints(app)
+    load_modules(app)
 
-    rq.init_app(app)
+    """
+    Setup SnapologyAPI Endpoints
+    """
+    load_endpoints(app, db)
+
 
     """
     Setup Flask Security 
@@ -61,15 +66,28 @@ def create_application(name = __name__, env = 'testing'):
     We cannot load the security information until after our blueprints
     have been loaded into our application.
     """
-    from CommonsCloudAPI.models.user import user_datastore
-    security.init_app(app, user_datastore)
+    # from CommonsCloudAPI.models.user import user_datastore
+    # security.init_app(app, user_datastore)
     
-    # Initialize our database and create tables
+    """
+    Initialize our database and create tables
+    """
     db.init_app(app)
     db.app = app
     db.create_all()
 
-    # Load default application routes/paths
+    """
+    Load default application routes/paths
+    """
     load_errorhandlers(app)
+
+    def add_cors_header(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Cache-Control, Expires, Set-Cookie'
+        response.headers['Access-Control-Allow-Credentials'] = True
+        return response
+
+    app.after_request(add_cors_header)
 
     return app
