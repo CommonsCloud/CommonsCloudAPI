@@ -54,10 +54,13 @@ def create_application(name = __name__, env = 'testing'):
     # Load our application's blueprints
     load_modules(app)
 
+    
     """
-    Setup SnapologyAPI Endpoints
+    Initialize our database and create tables
     """
-    load_endpoints(app, db)
+    db.init_app(app)
+    db.app = app
+    db.create_all()
 
 
     """
@@ -66,15 +69,21 @@ def create_application(name = __name__, env = 'testing'):
     We cannot load the security information until after our blueprints
     have been loaded into our application.
     """
-    # from CommonsCloudAPI.models.user import user_datastore
-    # security.init_app(app, user_datastore)
-    
+    from CommonsCloudAPI.models.user import User
+    from CommonsCloudAPI.models.role import Role
+
+    from flask.ext.security import SQLAlchemyUserDatastore
+
     """
-    Initialize our database and create tables
+    Hook the User model and the Role model up to the User Datastore provided
+    by SQLAlchemy's Engine's datastore that provides Flask-Security with
+    User/Role information so we can lock down access to the system and it's
+    resources.
     """
-    db.init_app(app)
-    db.app = app
-    db.create_all()
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+
+    security.init_app(app, user_datastore)
+
 
     """
     Load default application routes/paths
