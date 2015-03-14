@@ -110,7 +110,7 @@ class Pod():
   @see https://flask-restless.readthedocs.org/en/latest/customizing.html
   """
   __arguments__ = {
-    'url_prefix': '/v1',
+    'url_prefix': '/v2.1',
     'exclude_columns': [],
     'methods': [
       'GET',
