@@ -12,9 +12,19 @@ limitations under the License.
 
 
 """
+Import System Dependencies
+"""
+import imp
+import os
+import flask.ext.restless
+import json
+
+
+"""
 Import Flask dependencies
 """
 from flask import Flask
+from flask import jsonify
 
 
 """
@@ -28,19 +38,17 @@ from .extensions import security
 from .extensions import oauth
 from .extensions import rq
 
-from .utilities import load_configuration
-from .utilities import load_endpoints
-from .utilities import load_modules
-
-
 
 """
 Setup our base Flask application, retaining it as our application
 object for use throughout the application
 """
-def create_application(name = __name__, env = 'testing'):
+def create_application(name=__name__, env='testing'):
     
-    app = Flask(__name__, static_path = '/static')
+    app = Flask(__name__, **{
+        'static_path': '/static',
+        'template_folder': 'static/templates'
+    })
 
     # Load our default configuration
     load_configuration(app, env)
@@ -100,3 +108,100 @@ def create_application(name = __name__, env = 'testing'):
     app.after_request(add_cors_header)
 
     return app
+
+
+"""
+Load the basic configuration settings for our application from
+another file that holds all of our default settings. All Flask
+and Flask Extension defaults/configuration handling should be
+placed in the this 'settings.py' folder in the application root.
+"""
+def load_configuration(app, environment):
+
+  """
+  Create the file path based on the selected environment
+  """
+  environment_configuration = ('config/settings_%s.py') % (environment)
+
+  app.config.from_object(__name__)
+  app.config.from_pyfile('config/settings_default.py')
+  app.config.from_pyfile(environment_configuration)
+
+
+"""
+Load all of our application's endpoints
+"""
+def load_endpoints(app, db, path):
+
+  """
+  Load dynamic endpoints
+  """
+  manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
+
+  endpoints = os.listdir(path)
+  
+  for endpoint in endpoints:
+
+    if os.path.isdir(os.path.join(path, endpoint)) and os.path.exists(os.path.join(path, endpoint, '__init__.py')):
+
+      f, filename, descr = imp.find_module(endpoint, [path])
+
+      Packet = imp.load_module(endpoint, f, filename, descr)
+
+      if hasattr(Packet, 'Model'):
+        Seed_ = Packet.Seed()
+        manager.create_api(Packet.Model, **Seed_.__arguments__)
+
+
+"""
+Load all of our application's modules
+"""
+def load_modules(app, db):
+
+    """
+    Load dynamic endpoints
+    """
+    manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
+
+    """
+    Check the `modules` directory to see if we need to load any modules
+    for our application to operate properly.
+    """
+    path = 'CommonsCloudAPI/modules'
+    module_list = os.listdir(path)
+    modules = {}
+    
+    """
+    Iterate over the list of modules from in the `modules` directory
+    """
+    for module in module_list:
+
+        """
+        Before loading our modules, we need to make sure if there's a directory
+        that exists, this will help us weed out broken modules
+        """
+        if os.path.isdir(os.path.join(path, module)) and \
+            os.path.exists(os.path.join(path, module, '__init__.py')):
+            
+            """
+            Check to see if this `module` has any API endpoints that need to be
+            created dynamically. If so, we should go ahead and load those now
+            so that they are loaded with the application
+            """
+            api_path = os.path.join(path, module, 'endpoints')
+
+            if os.path.isdir(api_path):
+              load_endpoints(app, db, api_path)
+
+            f, filename, descr = imp.find_module(module, [path])
+            
+            modules[module] = imp.load_module(module, f, filename, descr)
+
+            
+            """
+            Register the current module as an official `Module` within
+            Flask so that we can load views and other Flask specific
+            items within the `app`
+            """
+            app.register_blueprint(getattr(modules[module], 'module'))
+

@@ -19,11 +19,10 @@ from flask import Blueprint
 """
 Create a blueprint for the OAuth module
 """
-module = Blueprint('user', __name__, template_folder='templates')
+module = Blueprint('user', __name__)
 
 
 """
 Import OAuth dependencies
 """
-from . import user__api
 from . import user__views

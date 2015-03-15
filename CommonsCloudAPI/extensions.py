@@ -26,10 +26,10 @@ from flask.ext.mail import Mail
 from flask.ext.principal import Principal
 from flask.ext.rq import RQ
 
-from CommonsCloudAPI.utilities.sanitize import CommonsSanitize
-from CommonsCloudAPI.utilities.statuses import CommonsStatus
+from CommonsCloudAPI.sanitize import CommonsSanitize
+from CommonsCloudAPI.statuses import CommonsStatus
 
-from CommonsCloudAPI.utilities.oauth import CommonsOAuth2Provider
+from CommonsCloudAPI.oauth import CommonsOAuth2Provider
 
 
 """
