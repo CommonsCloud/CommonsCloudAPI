@@ -57,6 +57,6 @@ class Telephone(db.Model):
   Fields within the data model 
   """
   id = db.Column(db.Integer, primary_key=True)
-  number = db.Column(db.Integer)
+  number = db.Column(db.String(255))
   category = db.Column(db.String(255))
 
