@@ -130,11 +130,11 @@ class User(db.Model, UserMixin):
   """
   User Account Login Statistics
   """
-  last_login_date = db.Column(db.DateTime())
-  current_login_date = db.Column(db.DateTime())
-  last_login_ip_address = db.Column(db.String(16))
-  current_login_ip_address = db.Column(db.String(16))
-  total_login_count = db.Column(db.Integer)
+  last_login_at = db.Column(db.DateTime())
+  current_login_at = db.Column(db.DateTime())
+  last_login_ip = db.Column(db.String(16))
+  current_login_ip = db.Column(db.String(16))
+  login_count = db.Column(db.Integer)
 
   """
   Back References from other models
@@ -213,14 +213,14 @@ class User(db.Model, UserMixin):
       "active": user_.active,
       "addresses": process_nested_object(user_.addresses),
       "confirmed_at": user_.confirmed_at.isoformat(),
-      "current_login_date": user_.current_login_date,
-      "current_login_ip_address": user_.current_login_ip_address,
+      "current_login_at": user_.current_login_at,
+      "current_login_ip": user_.current_login_ip,
       "description": user_.description,
       "email": user_.email,
       "first_name": user_.first_name,
       "id": user_.id,
-      "last_login_date": user_.last_login_date,
-      "last_login_ip_address": user_.last_login_ip_address,
+      "last_login_at": user_.last_login_at,
+      "last_login_ip": user_.last_login_ip,
       "last_name": user_.last_name,
       "picture": user_.picture,
       "organizations": process_nested_object(user_.organizations),
@@ -228,7 +228,7 @@ class User(db.Model, UserMixin):
       "telephone": process_nested_object(user_.telephone),
       "territories": process_nested_object(user_.territories),
       "title": user_.title,
-      "total_login_count": user_.total_login_count
+      "login_count": user_.login_count
     }
 
 

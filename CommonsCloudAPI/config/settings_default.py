@@ -22,7 +22,12 @@ start on the rest, and ensuring we're being as DRY as possible.
 DEBUG = False
 SECRET_KEY = 'n@11%?-^j!v`oe7MPxM7sx41bqL=QDmfg+U5Ef6@.oYefGUu@`]&bAD5X&U7!B>G'
 
-# Flask-Security
+
+"""
+Security Settings
+"""
+SECURITY_TRACKABLE = True # Make sure we are tracking user login activity
+
 SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
 SECURITY_PASSWORD_SALT = 'd4i<879.Yj}HMPGmB^cLr2(3%&go8JD#b2yFEhT6QpA6Ke+{VaR+n3X4xaHdB734'
 
