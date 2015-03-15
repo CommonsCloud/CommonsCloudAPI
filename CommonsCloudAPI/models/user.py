@@ -14,16 +14,13 @@ limitations under the License.
 """
 Import System Dependencies
 """
-from datetime import date
 import hashlib
 
 
 """
 Import Flask Dependencies
 """
-from flask.ext.security import current_user
 from flask.ext.security import UserMixin
-from flask.ext.security import RoleMixin
 from flask.ext.security import SQLAlchemyUserDatastore
 
 from werkzeug import generate_password_hash
