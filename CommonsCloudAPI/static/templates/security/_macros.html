@@ -1,0 +1,39 @@
+{% macro render_field_with_errors(field, help='', placeholder='') %}
+
+          <div class="form-group {% if field.errors %}has-error{% endif %}">
+            <label class="control-label element-invisible">field.label</label>
+            {% if placeholder: %}
+              {% set placeholder = placeholder %}
+            {% elif 'email' in field.name: %}
+              {% set placeholder = 'Email address' %}
+              {% set tabindex = 1 %}
+            {% elif 'password' in field.name: %}
+              {% set placeholder = 'Password' %}
+              {% set tabindex = 2 %}
+            {% endif %}
+
+            {{ field(class="form-control input-lg",placeholder=placeholder,tabindex=tabindex)|safe }}
+            
+            {% if help and field.errors: %}
+              <p class="help-block">{{ field.errors[0] }}, {{ help|safe }}</p>
+            {% elif help: %}
+              <p class="help-block">{{ help|safe }}</p>
+            {% elif field.errors and not help: %}
+              <p class="help-block">{{ field.errors[0]|safe }}</p>
+            {% endif %}
+          </div>
+
+{% endmacro %}
+
+{% macro render_button(field, value, help='', align='text-right') %}
+          <div class="form-actions form-group {{align}}">
+            {{ field(class="button large",value=value)|safe }}
+            {% if help %}
+              <p class="help-block" style="margin-top: 16px;">{{ help|safe }}</p>
+            {% endif %}
+          </div>
+{% endmacro %}
+
+{% macro render_field(field) %}
+  <p>{{ field(**kwargs)|safe }}</p>
+{% endmacro %}
