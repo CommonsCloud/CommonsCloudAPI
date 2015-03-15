@@ -289,7 +289,7 @@ class User(db.Model, UserMixin):
     user_email = email.lower()
     user_hash = hashlib.md5(user_email).hexdigest()
 
-    picture_url = '//www.gravatar.com/avatar/' + user_hash
+    picture_url = 'https://www.gravatar.com/avatar/' + user_hash
 
     return picture_url
 

@@ -22,10 +22,6 @@ Create a blueprint for the OAuth module
 module = Blueprint('oauth', __name__, template_folder='templates')
 
 
-from CommonsCloudAPI.models.oauth import Client
-from CommonsCloudAPI.models.oauth import Grant
-from CommonsCloudAPI.models.oauth import Token
-
 """
 Import OAuth dependencies
 """

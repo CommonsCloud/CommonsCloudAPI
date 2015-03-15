@@ -17,6 +17,17 @@ from geoalchemy2 import Geometry
 from geoalchemy2.functions import GenericFunction
 
 
+"""
+ST_GeomFromGeoJSON
+
+This Class extends the existing Geoalchemy2 functionality by adding an existing
+PostGIS method to the Geoalchemy2 package.
+
+  @see http://postgis.net/docs/ST_GeomFromGeoJSON.html
+  @see http://geoalchemy-2.readthedocs.org/en/latest/spatial_functions.html
+      #geoalchemy2.functions.GenericFunction
+
+"""
 class ST_GeomFromGeoJSON(GenericFunction):
     name = 'ST_GeomFromGeoJSON'
     type = Geometry

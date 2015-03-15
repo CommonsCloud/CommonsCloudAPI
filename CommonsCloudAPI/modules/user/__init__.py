@@ -25,4 +25,5 @@ module = Blueprint('user', __name__, template_folder='templates')
 """
 Import OAuth dependencies
 """
-from . import views
+from . import user__api
+from . import user__views

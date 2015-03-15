@@ -52,7 +52,7 @@ def create_application(name = __name__, env = 'testing'):
     oauth.init_app(app)
 
     # Load our application's blueprints
-    load_modules(app)
+    load_modules(app, db)
 
     
     """

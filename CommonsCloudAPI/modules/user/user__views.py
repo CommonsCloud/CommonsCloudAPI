@@ -23,10 +23,15 @@ from flask import url_for
 from flask.ext.security import current_user
 from flask.ext.security import login_required
 
+from flask.ext.restless import APIManager
+
+
 """
-Import Module Dependencies
+Import CommonsCloud Dependencies
 """
-from . import module
+from CommonsCloudAPI.extensions import db
+
+from CommonsCloudAPI.utilities import process_nested_object
 
 from CommonsCloudAPI.models.user import User
 from CommonsCloudAPI.models.address import Address
@@ -36,19 +41,56 @@ from CommonsCloudAPI.models.telephone import Telephone
 from CommonsCloudAPI.models.territory import Territory
 
 
+"""
+Import Module Dependencies
+"""
+from . import module
+
+
 @module.route('/', methods=['GET'])
 def index():
   return redirect('/user/profile/'), 301
 
 
-@module.route('/v1/', methods=['GET'])
+@module.route('/v2.1/', methods=['GET'])
 def api():
   return jsonify(
     status = '200 OK',
     code = 200,
-    message = 'Welcome to the CommonsCloudAPI, to learn more about the api visit http://api.snapology.com/v1/docs'
+    message = 'Welcome to the CommonsCloudAPI, to learn more about the api visit https://docs.commonscloud.org/api/v2.1/'
   ), 200
 
+
+@module.route('/v2.1/user/me', methods=['GET'])
+def user_me():
+  
+  from CommonsCloudAPI.permissions import verify_authorization
+  from CommonsCloudAPI.models.user import User
+  
+  authorization = verify_authorization()
+
+  user_ = User()
+  user_object = user_.user_get(authorization.id)
+
+  addresses = process_nested_object(user_object.get('addresses'))
+  organizations = process_nested_object(user_object.get('organizations'))
+  telephone = process_nested_object(user_object.get('telephone'))
+  territories = process_nested_object(user_object.get('territories'))
+  roles = process_nested_object(user_object.get('roles'))
+
+  return jsonify({
+    "id": user_object.get('id'),
+    "first_name": user_object.get('first_name'),
+    "last_name": user_object.get('last_name'),
+    "email": user_object.get('email'),
+    "picture": user_object.get('picture'),
+    "member_since": user_object.get('confirmed_at'),
+    "addresses": addresses,
+    "organizations": organizations,
+    "telephone": telephone,
+    "territories": territories,
+    "roles": roles,
+  })
 
 @module.route('/user/profile/', methods=['GET'])
 @login_required

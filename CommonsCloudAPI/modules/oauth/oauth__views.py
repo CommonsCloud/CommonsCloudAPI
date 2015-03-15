@@ -40,6 +40,10 @@ from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.extensions import oauth
 
+from CommonsCloudAPI.models.oauth import Client
+from CommonsCloudAPI.models.oauth import Grant
+from CommonsCloudAPI.models.oauth import Token
+
 
 """
 Import Module Dependencies

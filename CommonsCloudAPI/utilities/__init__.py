@@ -43,14 +43,13 @@ def load_configuration(app, environment):
 """
 Load all of our application's endpoints
 """
-def load_endpoints(app, db):
+def load_endpoints(app, db, path):
 
   """
   Load dynamic endpoints
   """
   manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
 
-  path = 'CommonsCloudAPI/endpoints'
   endpoints = os.listdir(path)
   
   for endpoint in endpoints:
@@ -69,20 +68,72 @@ def load_endpoints(app, db):
 """
 Load all of our application's modules
 """
-def load_modules(app):
+def load_modules(app, db):
 
+    """
+    Load dynamic endpoints
+    """
+    manager = flask.ext.restless.APIManager(app, flask_sqlalchemy_db=db)
+
+    """
+    Check the `modules` directory to see if we need to load any modules
+    for our application to operate properly.
+    """
     path = 'CommonsCloudAPI/modules'
-    dir_list = os.listdir(path)
-    mods = {}
+    module_list = os.listdir(path)
+    modules = {}
     
-    for fname in dir_list:
-        if os.path.isdir(os.path.join(path, fname)) and os.path.exists(os.path.join(path, fname, '__init__.py')):
-            f, filename, descr = imp.find_module(fname, [path])
-            mods[fname] = imp.load_module(fname, f, filename, descr)
-            app.register_blueprint(getattr(mods[fname], 'module'))
-        elif os.path.isfile(os.path.join(path, fname)):
-            name, ext = os.path.splitext(fname)
-            if ext == '.py' and not name == '__init__':
-                f, filename, descr = imp.find_module(name, [path])
-                mods[fname] = imp.load_module(name, f, filename, descr)
-                app.register_blueprint(getattr(mods[fname], 'module'))
+    """
+    Iterate over the list of modules from in the `modules` directory
+    """
+    for module in module_list:
+
+        """
+        Before loading our modules, we need to make sure if there's a directory
+        that exists, this will help us weed out broken modules
+        """
+        if os.path.isdir(os.path.join(path, module)) and \
+            os.path.exists(os.path.join(path, module, '__init__.py')):
+            
+            """
+            Check to see if this `module` has any API endpoints that need to be
+            created dynamically. If so, we should go ahead and load those now
+            so that they are loaded with the application
+            """
+            api_path = os.path.join(path, module, 'endpoints')
+
+            if os.path.isdir(api_path):
+              load_endpoints(app, db, api_path)
+
+            f, filename, descr = imp.find_module(module, [path])
+            
+            modules[module] = imp.load_module(module, f, filename, descr)
+
+            
+            """
+            Register the current module as an official `Module` within
+            Flask so that we can load views and other Flask specific
+            items within the `app`
+            """
+            app.register_blueprint(getattr(modules[module], 'module'))
+
+
+def process_nested_object(nested_object):
+
+  processed_objects = []
+
+  if not nested_object:
+    return processed_objects
+
+  if len(nested_object):
+    
+    for index, object_ in enumerate(nested_object):
+      new_object = {}
+      
+      for key, value in object_.__dict__.iteritems():
+        if key != "_sa_instance_state":
+          new_object[key] = value
+
+      processed_objects.append(new_object)
+
+  return processed_objects

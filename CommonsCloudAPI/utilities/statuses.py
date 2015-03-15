@@ -43,9 +43,7 @@ class CommonsStatus():
 
   """
   def __init__(self):
-
     self.return_type = 'json'
-
 
   """
   200 OK
@@ -77,7 +75,6 @@ class CommonsStatus():
 
     return response
 
-
   """
   201 Created
 
@@ -108,7 +105,6 @@ class CommonsStatus():
     response.headers.add('Cache-Control', 'no-cache')
 
     return response
-
 
   """
   204 No Content
@@ -166,7 +162,6 @@ class CommonsStatus():
 
     return jsonify(message) if self.return_type == 'json' else message
 
-
   """
   400 Bad Request
 
@@ -200,7 +195,6 @@ class CommonsStatus():
 
     return response
 
-
   """
   401 Unauthorized
 
@@ -233,7 +227,6 @@ class CommonsStatus():
     response.headers.add('Cache-Control', 'no-cache')
 
     return response
-
 
   """
   403 Not Authorized
@@ -271,7 +264,6 @@ class CommonsStatus():
 
     return response
 
-
   """
   404 Not Found
 
@@ -299,7 +291,6 @@ class CommonsStatus():
 
     return jsonify(message) if self.return_type == 'json' else message
 
-
   """
   405 Method Not Allowed
 
@@ -324,7 +315,6 @@ class CommonsStatus():
 
     return jsonify(message) if self.return_type == 'json' else message
 
-
   """
   415 Unsupported Media Type
 
@@ -348,7 +338,6 @@ class CommonsStatus():
     }
 
     return jsonify(message) if self.return_type == 'json' else message
-
 
   """
   500 Internal Server Error
