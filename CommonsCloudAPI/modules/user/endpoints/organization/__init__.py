@@ -114,7 +114,7 @@ class Seed(Pod):
   """
   __model_arguments__ = {
     "exclude_columns": [
-      'password'
+      'users'
     ],
     'preprocessors': {
       'GET_SINGLE': [preprocessor_get_single],
