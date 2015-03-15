@@ -31,8 +31,6 @@ Import CommonsCloud Dependencies
 """
 from CommonsCloudAPI.extensions import db
 
-from CommonsCloudAPI.utilities import process_nested_object
-
 from CommonsCloudAPI.models.user import User
 from CommonsCloudAPI.models.address import Address
 from CommonsCloudAPI.models.organization import Organization
@@ -47,11 +45,9 @@ Import Module Dependencies
 from . import module
 
 
-@module.route('/', methods=['GET'])
-def index():
-  return redirect('/user/profile/'), 301
-
-
+"""
+API Endpoints that do not exist by default
+"""
 @module.route('/v2.1/', methods=['GET'])
 def api():
   return jsonify(
@@ -72,25 +68,16 @@ def user_me():
   user_ = User()
   user_object = user_.user_get(authorization.id)
 
-  addresses = process_nested_object(user_object.get('addresses'))
-  organizations = process_nested_object(user_object.get('organizations'))
-  telephone = process_nested_object(user_object.get('telephone'))
-  territories = process_nested_object(user_object.get('territories'))
-  roles = process_nested_object(user_object.get('roles'))
+  return jsonify(user_object)
 
-  return jsonify({
-    "id": user_object.get('id'),
-    "first_name": user_object.get('first_name'),
-    "last_name": user_object.get('last_name'),
-    "email": user_object.get('email'),
-    "picture": user_object.get('picture'),
-    "member_since": user_object.get('confirmed_at'),
-    "addresses": addresses,
-    "organizations": organizations,
-    "telephone": telephone,
-    "territories": territories,
-    "roles": roles,
-  })
+
+"""
+User Account Views/Routes
+"""
+@module.route('/', methods=['GET'])
+def index():
+  return redirect('/user/profile/'), 301
+
 
 @module.route('/user/profile/', methods=['GET'])
 @login_required

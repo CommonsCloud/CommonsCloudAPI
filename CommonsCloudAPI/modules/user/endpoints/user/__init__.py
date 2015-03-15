@@ -116,6 +116,48 @@ class Seed(Pod):
     send_mail('A Snapology Manager account has been added for you', user.email,
               'welcome', user=user, confirmation_link=reset_link)
 
+    """
+    Cache the user's Gravatar image within our database table
+    """
+    modified_user = db.session.query(Model).get(result['id'])
+    gravatar_url = modified_user.user_picture(modified_user.email)
+
+    modified_user.picture = gravatar_url
+
+    db.session.add(modified_user)
+    db.session.commit()
+
+  """
+  Postprocessors
+  """
+  def user_postprocessor_patch_single(result=None, **kw):
+
+    """
+    Cache the user's Gravatar image within our database table
+    """
+    modified_user = db.session.query(Model).get(result['id'])
+    gravatar_url = modified_user.user_picture(modified_user.email)
+
+    modified_user.picture = gravatar_url
+
+    db.session.add(modified_user)
+    db.session.commit()
+
+  """
+  Postprocessors
+  """
+  def user_postprocessor_put_single(result=None, **kw):
+
+    """
+    Cache the user's Gravatar image within our database table
+    """
+    modified_user = db.session.query(Model).get(result['id'])
+    gravatar_url = modified_user.user_picture(modified_user.email)
+
+    modified_user.picture = gravatar_url
+
+    db.session.add(modified_user)
+    db.session.commit()
 
   """
   Flask-Restless Endpoint Arguments
@@ -156,7 +198,9 @@ class Seed(Pod):
       'DELETE': [preprocessor_delete]
     },
     'postprocessors': {
-      'POST': [user_postprocessor_post]
+      'POST': [user_postprocessor_post],
+      'PATCH_SINGLE': [user_postprocessor_patch_single],
+      'PUT_SINGLE': [user_postprocessor_put_single]
     }
   }
 
