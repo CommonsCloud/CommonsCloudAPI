@@ -63,7 +63,7 @@ class Territory(db.Model):
   Fields within the data model 
   """
   id = db.Column(db.Integer, primary_key=True)
-  geography = db.Column(Geography(geometry_type='POINT', srid=4326))
+  geometry = db.Column(Geography(geometry_type='GEOMETRYCOLLECTION', srid=4326))
   name = db.Column(db.String(255))
   category = db.Column(db.String(255))
   description = db.Column(db.String(255))
