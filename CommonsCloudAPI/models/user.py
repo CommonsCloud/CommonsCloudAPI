@@ -46,10 +46,12 @@ Relationship Lookup Tables
 
 These tables are necessary to perform our many to many relationships
 
-@see https://pythonhosted.org/Flask-SQLAlchemy/models.html#many-to-many-relationships
+@see https://pythonhosted.org/Flask-SQLAlchemy/models.html\
+      #many-to-many-relationships
    This documentation is specific to Flask using sqlalchemy
 
-@see http://docs.sqlalchemy.org/en/rel_0_9/orm/relationships.html#relationships-many-to-many
+@see http://docs.sqlalchemy.org/en/rel_0_9/orm/relationships.html\
+      #relationships-many-to-many
    This documentation covers SQLAlchemy
 """
 user_roles = db.Table('user_roles',
@@ -94,7 +96,8 @@ class User(db.Model, UserMixin):
   """
   Name of the database table that holds `user` data
 
-  @see http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html#table-configuration
+  @see http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html\
+        #table-configuration
   """
   __tablename__ = 'user'
   __table_args__ = {
@@ -139,26 +142,45 @@ class User(db.Model, UserMixin):
   """
   Back References from other models
 
-  Relationships that are many-to-many need to contain a `secondary` keyword argument within the
-  db.relationship method in order to function properly.
+  Relationships that are many-to-many need to contain a `secondary` keyword
+  argument within the db.relationship method in order to function properly.
 
-  @see https://pythonhosted.org/Flask-SQLAlchemy/models.html#many-to-many-relationships
+  @see https://pythonhosted.org/Flask-SQLAlchemy/models.html\
+        #many-to-many-relationships
    This documentation is specific to Flask using sqlalchemy
 
-  @see http://docs.sqlalchemy.org/en/rel_0_9/orm/relationships.html#relationships-many-to-many
+  @see http://docs.sqlalchemy.org/en/rel_0_9/orm/relationships.html\
+        #relationships-many-to-many
    This documentation covers SQLAlchemy
   """
-  roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users'))
-  organizations = db.relationship('Organization', secondary=user_organizations, backref=db.backref('users'))
-  addresses = db.relationship('Address', secondary=user_addresses, backref=db.backref('users'))
-  territories = db.relationship('Territory', secondary=user_territories, backref=db.backref('users'))
-  telephone = db.relationship('Telephone', secondary=user_telephone, backref=db.backref('users'))
+  roles = db.relationship('Role', **{
+    'secondary': user_roles, 
+    'backref': db.backref('users')
+  })
+  organizations = db.relationship('Organization', **{
+    'secondary': user_organizations,
+    'backref': db.backref('users')
+  })
+  addresses = db.relationship('Address', **{
+    'secondary': user_addresses,
+    'backref': db.backref('users')
+  })
+  territories = db.relationship('Territory', **{
+    'secondary': user_territories,
+    'backref': db.backref('users')
+  })
+  telephone = db.relationship('Telephone', **{
+    'secondary': user_telephone,
+    'backref': db.backref('users')
+  })
 
   """
-  Initialize the data model and let the system know how each field should be handled by default 
+  Initialize the data model and let the system know how each field should be
+  handled by default 
   """
-  def __init__(self, first_name="", last_name="", email="", password="", active=True, roles=[], \
-      organizations=[], addresses=[], territories=[], telephone=[], permissions=[], picture=""):
+  def __init__(self, first_name="", last_name="", email="", password="",
+                active=True, roles=[], organizations=[], addresses=[],
+                territories=[], telephone=[], permissions=[], picture=""):
     self.first_name = first_name
     self.last_name = last_name
     self.email = email
@@ -176,7 +198,10 @@ class User(db.Model, UserMixin):
   Set the user password using the pbkdf2:sha1 method and a salt_length of 64
   """
   def set_password(self, password):
-    self.password = generate_password_hash(password, method='pbkdf2:sha1', salt_length=64)
+    self.password = generate_password_hash(password, **{
+      'method': 'pbkdf2:sha1',
+      'salt_length': 64
+    })
 
   """
   Check to see if the password entered by the user matches the password saved
@@ -207,7 +232,7 @@ class User(db.Model, UserMixin):
     user_ = User.query.get(user_id)
 
     if not user_:
-      return status_.status_404('We couldn\'t find the user you were looking for.'), 404
+      return status_.status_404('That user doesn\'t exist.'), 404
 
     return {
       "active": user_.active,
