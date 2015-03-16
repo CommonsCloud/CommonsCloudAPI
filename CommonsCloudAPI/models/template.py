@@ -36,15 +36,20 @@ These tables are necessary to perform our many to many relationships
       #relationships-many-to-many
    This documentation covers SQLAlchemy
 """
-application_templates = db.Table('application_templates',
-  db.Column('application', db.Integer(), db.ForeignKey('application.id')),
+template_fields = db.Table('template_fields',
   db.Column('template', db.Integer(), db.ForeignKey('template.id')),
+  db.Column('field', db.Integer(), db.ForeignKey('field.id')),
   extend_existing = True
 )
 
+# template_activity = db.Table('template_activity',
+#   db.Column('template', db.Integer(), db.ForeignKey('template.id')),
+#   db.Column('activity', db.Integer(), db.ForeignKey('activity.id')),
+#   extend_existing = True
+# )
 
 """
-Application Model
+Template Model
 
 @arg (object) db.Model
    This model is subclassed from the Flask-SQLAlchemy db.Model provided by
@@ -59,15 +64,15 @@ Application Model
    For more information about declaring models within Flask-SQLAlchemy
 
 """
-class Application(db.Model):
+class Template(db.Model):
 
   """
-  Name of the database table that holds `application` data
+  Name of the database table that holds `template` data
 
   @see http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html\
         #table-configuration
   """
-  __tablename__ = 'application'
+  __tablename__ = 'template'
   __table_args_ = {
     'extend_existing': True
   }
@@ -77,11 +82,18 @@ class Application(db.Model):
   """
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(60))
-  description = db.Column(db.String(255))
-  url = db.Column(db.String(255))
+  help = db.Column(db.String(255))
+  storage = db.Column(db.String(255))
   created = db.Column(db.DateTime)
   status = db.Column(db.Boolean)
+
+  has_acl = db.Column(db.Boolean)
   is_public = db.Column(db.Boolean)
+  is_crowdsourced = db.Column(db.Boolean)
+  is_moderated = db.Column(db.Boolean)
+  is_listed = db.Column(db.Boolean)
+  is_geospatial = db.Column(db.Boolean)
+  is_community = db.Column(db.Boolean)
 
   """
   Back References from other models
@@ -97,22 +109,38 @@ class Application(db.Model):
         #relationships-many-to-many
       This documentation covers SQLAlchemy
   """
-  templates = db.relationship('Template', **{
-    'secondary': application_templates, 
-    'backref': db.backref('application')
+  fields = db.relationship('Field', **{
+    'secondary': template_fields, 
+    'backref': db.backref('template')
   })
+
+  # activities = db.relationship('Activity', **{
+  #   'secondary': template_activity, 
+  #   'backref': db.backref('template')
+  # })
 
   """
   Initialize the data model and let the system know how each field should be
   handled by default 
   """
-  def __init__(self, name="", url="", description=None,
-                created=datetime.utcnow(), status=True,
-                is_public=True, templates=[]):
+  def __init__(self, name="", help="", storage="", has_acl=True,
+                is_public=True, is_crowdsourced=False, is_moderated=True,
+                is_listed=True, is_geospatial=True, is_community=True,
+                created=datetime.now(), status=True, fields=[], activities=[]):
     self.name = name
-    self.url = url
-    self.description = description
+    self.help = help
+    self.storage = storage
     self.created = created
     self.status = status
+
+    self.fields = fields
+    self.activities = activities
+
+    self.has_acl = has_acl
     self.is_public = is_public
+    self.is_crowdsourced = is_crowdsourced
+    self.is_moderated = is_moderated
+    self.is_listed = is_listed
+    self.is_geospatial = is_geospatial
+    self.is_community = is_community
 
