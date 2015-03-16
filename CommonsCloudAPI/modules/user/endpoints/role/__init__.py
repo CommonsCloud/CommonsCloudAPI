@@ -22,10 +22,6 @@ from CommonsCloudAPI.extensions import logger
 from CommonsCloudAPI.permissions import verify_authorization
 from CommonsCloudAPI.permissions import verify_roles
 
-from flask.ext.security import current_user
-from flask.ext.security.confirmable import generate_confirmation_link
-from flask.ext.security.utils import send_mail, config_value, url_for_security
-from flask.ext.security.recoverable import generate_reset_password_token
 
 """
 Import Data Model
@@ -50,7 +46,7 @@ class Seed(Pod):
   def preprocessor_get_many(**kw):
     logger.debug('`Organization` preprocessor_get_many')
     authorization = verify_authorization()
-    role = verify_roles(authorization, ['admin',])
+    role = verify_roles(authorization, ['admin'])
 
   def preprocessor_get_single(**kw):
     logger.debug('`Organization` preprocessor_get_single')
@@ -71,7 +67,6 @@ class Seed(Pod):
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
-
   def preprocessor_patch_many(**kw):
     logger.debug('`Organization` preprocessor_patch_many')
     authorization = abort(403)
@@ -80,7 +75,6 @@ class Seed(Pod):
     logger.debug('`Organization` preprocessor_post')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
-
 
   def preprocessor_delete(**kw):
     logger.debug('`Organization` preprocessor_delete')

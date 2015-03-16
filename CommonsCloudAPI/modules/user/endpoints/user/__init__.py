@@ -50,7 +50,7 @@ class Seed(Pod):
   def preprocessor_get_many(**kw):
     logger.debug('`User` preprocessor_get_many')
     authorization = verify_authorization()
-    role = verify_roles(authorization, ['admin',])
+    role = verify_roles(authorization, ['admin'])
 
   def preprocessor_get_single(**kw):
     logger.debug('`User` preprocessor_get_single')
@@ -71,7 +71,6 @@ class Seed(Pod):
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
-
   def preprocessor_patch_many(**kw):
     logger.debug('`User` preprocessor_patch_many')
     authorization = abort(403)
@@ -80,7 +79,6 @@ class Seed(Pod):
     logger.debug('`User` preprocessor_post')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
-
 
   def preprocessor_delete(**kw):
     logger.debug('`User` preprocessor_delete')
