@@ -17,10 +17,13 @@ from flask import request
 """
 Import CommonsCloudAPI Dependencies
 """
+from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import logger
 
 from CommonsCloudAPI.permissions import verify_authorization
 from CommonsCloudAPI.permissions import verify_roles
+
+from CommonsCloudAPI.utilities import create_storage
 
 
 """
@@ -33,8 +36,6 @@ Flask-Restless endpoints within our CommonsCloudAPI.create_application method
 from CommonsCloudAPI.models.pod import Pod
 from CommonsCloudAPI.models.template import Template as Model
 
-from CommonsCloudAPI.extensions import db
-
 
 """
 """
@@ -43,43 +44,68 @@ class Seed(Pod):
   """
   Preprocessors
   """
-  def preprocessor_get_many(**kw):
-    logger.debug('`Application` preprocessor_get_many')
+  def preprocessor_get_many(**kwargs):
+    logger.debug('`Template` preprocessor_get_many')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
-  def preprocessor_get_single(**kw):
-    logger.debug('`Application` preprocessor_get_single')
+  def preprocessor_get_single(**kwargs):
+    logger.debug('`Template` preprocessor_get_single')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
-  def preprocessor_put_single(data=None, **kw):
-    logger.debug('`Application` preprocessor_put_single')
+  def preprocessor_put_single(data=None, **kwargs):
+    logger.debug('`Template` preprocessor_put_single')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
-  def preprocessor_put_many(**kw):
-    logger.debug('`Application` preprocessor_put_many')
+  def preprocessor_put_many(**kwargs):
+    logger.debug('`Template` preprocessor_put_many')
     authorization = abort(403)
 
-  def preprocessor_patch_single(data=None, **kw):
-    logger.debug('`Application` preprocessor_patch_single')
+  def preprocessor_patch_single(data=None, **kwargs):
+    logger.debug('`Template` preprocessor_patch_single')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
-  def preprocessor_patch_many(**kw):
-    logger.debug('`Application` preprocessor_patch_many')
+  def preprocessor_patch_many(**kwargs):
+    logger.debug('`Template` preprocessor_patch_many')
     authorization = abort(403)
 
-  def preprocessor_post(data=None, **kw):
-    logger.debug('`Application` preprocessor_post')
+  def preprocessor_post(data=None, **kwargs):
+    logger.debug('`Template` preprocessor_post')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
-  def preprocessor_delete(**kw):
-    logger.debug('`Application` preprocessor_delete')
+  def preprocessor_delete(**kwargs):
+    logger.debug('`Template` preprocessor_delete')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
+
+  """
+  Postprocessors
+  """
+  def template_postprocessor_post(result=None, **kwargs):
+    logger.debug('`Template` template_postprocessor_post')
+
+    """
+    All Templates must have a storage mechanism and it must be attached to the
+    CommonsCloud in the same way that these endpoints are create. So, we must
+    create a table on the fly and associate that table with the Template we've
+    just created.
+    """
+    storage = create_storage()
+
+    """
+    Update the Template record to have the new storage hash associated with it
+    """
+    modified_template = db.session.query(Model).get(result['id'])
+    modified_template.storage = storage
+
+    db.session.add(modified_template)
+    db.session.commit()
+
+    pass
 
 
   """
@@ -118,6 +144,9 @@ class Seed(Pod):
       'PATCH_MANY': [preprocessor_patch_many],
       'POST': [preprocessor_post],
       'DELETE': [preprocessor_delete]
+    },
+    'postprocessors': {
+      'POST': [template_postprocessor_post]
     }
   }
 

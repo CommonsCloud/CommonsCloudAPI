@@ -11,6 +11,29 @@ limitations under the License.
 """
 
 
+"""
+Import System Dependencies
+"""
+import uuid
+
+from datetime import datetime
+
+
+"""
+Import Flask Dependencies
+"""
+from geoalchemy2.types import Geometry
+
+
+"""
+Import CommonsCloud Dependencies
+"""
+from CommonsCloudAPI.extensions import db
+
+
+"""
+Process a nested object
+"""
 def process_nested_object(nested_object):
 
   processed_objects = []
@@ -30,3 +53,42 @@ def process_nested_object(nested_object):
       processed_objects.append(new_object)
 
   return processed_objects
+
+
+"""
+This function simply creates a machine readable name with an optional
+prefix and/or suffix
+"""
+def generate_template_hash(_prefix='type_', _suffix=''):
+
+  unique_collection = str(uuid.uuid4()).replace('-', '')
+  collection_string = _prefix + unique_collection + _suffix
+
+  return collection_string
+
+
+"""
+Create a table in the database that contains a base line of defaults
+"""
+def create_storage():
+
+  table_name = generate_template_hash()
+
+  """
+  Create a new custom table for a Feature Type
+  """
+  new_table = db.Table(table_name, db.metadata,
+    db.Column('id', db.Integer(), primary_key=True),
+    db.Column('name', db.String(255)),
+    db.Column('created', db.DateTime(), default=datetime.now()),
+    db.Column('updated', db.DateTime(), default=datetime.now()),
+    db.Column('geometry', Geometry('GEOMETRY'), nullable=True),
+    db.Column('status', db.String(24), nullable=False)
+  )
+
+  """
+  Make sure everything commits to the database
+  """
+  db.create_all()
+
+  return table_name
