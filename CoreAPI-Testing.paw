@@ -1037,7 +1037,7 @@
         <attribute name="redirectauthorization" type="bool">0</attribute>
         <attribute name="method" type="string">POST</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
-        <attribute name="body" type="string">[{"data":{"json":"{\\"name\\":\\"report_types\\",\\"template\\":[{\\"id\\":\\"4\\"}],\\"data_type\\":\\"relationship\\",\\"relationship\\":\\"type_13e9c038a77c404b895c82bea2765072\\"}"},"identifier":"com.luckymarmot.JSONDynamicValue"}]</attribute>
+        <attribute name="body" type="string">[{"data":{"json":"{\\"name\\":\\"report_image\\",\\"template\\":[{\\"id\\":\\"4\\"}],\\"data_type\\":\\"file\\"}"},"identifier":"com.luckymarmot.JSONDynamicValue"}]</attribute>
         <attribute name="order" type="int64">2</attribute>
         <attribute name="name" type="string">[POST] field</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM" idrefs="z179"></relationship>

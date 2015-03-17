@@ -295,7 +295,7 @@ def generate_attachment_field(field):
   """
   Next we update the relationship field
   """
-  field.relationship = attachment_table_name
+  field['relationship'] = attachment_table_name
 
   """
   Finally we can create the actual relationship
@@ -307,3 +307,4 @@ def generate_attachment_field(field):
     'association': relationship_['association'],
     'relationship': attachment_table_name
   }
+
