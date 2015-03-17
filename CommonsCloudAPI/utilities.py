@@ -173,9 +173,9 @@ def generate_field_type(field):
   behaviour for now.
   """
   if field.get('data_type') == 'relationship':
-    return generate_relationship_field(field, template)
+    return generate_relationship_field(field)
   elif field.get('data_type') == 'file':
-    return generate_attachment_field(field, template)
+    return generate_attachment_field(field)
 
   """
   Define all of teh column types that our system currently allows the user to
@@ -210,6 +210,9 @@ in the API Request
 """
 def generate_relationship_field(field, template):
 
+  templates = field.get('template')
+  storage = templates[0].get('storage')
+
   """
   Make sure that the table we need to use for creating the relationship is loaded
   into our db.metadata, otherwise the whole process will fail
@@ -228,7 +231,7 @@ def generate_relationship_field(field, template):
   Create a new Association Table in our database, based up the two existing Tables
   we've previously created
   """
-  parent_foreign_key_id = ('%s.%s') % (template.storage,'id')
+  parent_foreign_key_id = ('%s.%s') % (storage,'id')
   child_foreign_key_id = ('%s.%s') % (field.relationship,'id')
 
   new_table = db.Table(table_name, db.metadata,
@@ -253,6 +256,7 @@ def generate_relationship_field(field, template):
     'relationship': field.relationship
   }
 
+
 """
 Create a new many-to-many relationship table using the information provided
 in the API Request
@@ -263,7 +267,7 @@ in the API Request
     @key (string) relationship
 
 """
-def generate_attachment_field(field, template):
+def generate_attachment_field(field):
 
   """
   Before we can create a relationship between Attachments and a Template
@@ -293,11 +297,10 @@ def generate_attachment_field(field, template):
   """
   field.relationship = attachment_table_name
 
-
   """
   Finally we can create the actual relationship
   """
-  relationship_ = generate_relationship_field(field, template)
+  relationship_ = generate_relationship_field(field)
 
   return {
     'type': 'file',
