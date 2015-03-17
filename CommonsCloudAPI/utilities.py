@@ -94,6 +94,66 @@ def create_storage():
   return table_name
 
 
+  """
+  Create a table in the database that contains a base line of defaults
+
+  @param (object) template
+      A fully qualified Template object
+
+  @param (object) field
+      A fully qualfied Field object
+
+  @see Documentation on the db.Column.create() functionality
+      https://sqlalchemy-migrate.readthedocs.org/en/latest/changeset.html\
+          #column-create
+  """
+  def create_storage_field(template, field):
+
+    if not template.storage or not hasattr(field, 'data_type'):
+      return abort(404)
+
+    """
+    Create a new custom table for a Feature Type
+    """
+    existing_table = db.Table(template.storage, db.metadata, **{
+      'autoload': True,
+      'autoload_with': db.engine
+    })
+
+    """
+    We must bind the engine to the metadata here in order for our fields to
+    recognize the existing Table we have loaded in the following steps
+    """
+    db.metadata.bind = db.engine
+
+    """
+    Retrieve the appropriate field data type that we'll be using to create the
+    field in our database table
+    """
+    field_type = generate_field_type(field, template)
+
+    if field.data_type == 'relationship':
+      return field_type
+
+    if field.data_type == 'file':
+      return field_type
+
+    """
+    Create the new column just like we would if we were hard coding the model
+    """
+    new_column = db.Column(field.name, field_type)
+    new_column.create(existing_table)
+
+    """
+    Finally we need to make sure that the existing table knows that we've have
+    just added a new column, otherwise we won't be able to use it until we
+    restart the application, which would be very bad
+    """
+    assert new_column is existing_table.c[field.name]
+
+    return new_column
+
+
 """
 Generate a PostgreSQL data type based off of a list of known strings. The
 reason we do this is to abstract away some details from the user making it
@@ -151,7 +211,10 @@ def generate_relationship_field(field, template):
   Make sure that the table we need to use for creating the relationship is loaded
   into our db.metadata, otherwise the whole process will fail
   """
-  existing_table = db.Table(field.relationship, db.metadata, autoload=True, autoload_with=db.engine)
+  existing_table = db.Table(field.relationship, db.metadata, **{
+    'autoload': True,
+    'autoload_with': db.engine
+  })
 
   """
   Create a name for our new field relationship table
@@ -166,8 +229,12 @@ def generate_relationship_field(field, template):
   child_foreign_key_id = ('%s.%s') % (field.relationship,'id')
 
   new_table = db.Table(table_name, db.metadata,
-    db.Column('parent_id', db.Integer, db.ForeignKey(parent_foreign_key_id), primary_key=True),
-    db.Column('child_id', db.Integer, db.ForeignKey(child_foreign_key_id), primary_key=True)
+    db.Column('parent_id', db.Integer, db.ForeignKey(parent_foreign_key_id), **{
+      'primary_key': True
+    }),
+    db.Column('child_id', db.Integer, db.ForeignKey(child_foreign_key_id), **{
+      'primary_key': True
+    })
   )
 
   db.metadata.bind = db.engine

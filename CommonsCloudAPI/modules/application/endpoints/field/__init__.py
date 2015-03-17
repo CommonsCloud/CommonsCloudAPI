@@ -38,6 +38,7 @@ Flask-Restless endpoints within our CommonsCloudAPI.create_application method
 """
 from CommonsCloudAPI.models.pod import Pod
 from CommonsCloudAPI.models.field import Field as Model
+from CommonsCloudAPI.models.template import Template
 
 from CommonsCloudAPI.extensions import db
 
@@ -91,12 +92,28 @@ class Seed(Pod):
       abort(400, **{
         'description': 'You must include a `name` for your field to be created'
       })
+    
+    if not data.get('data_type'):
+      abort(400, **{
+        'description': 'You must include a `data_type` for your field to be\
+          created'
+      })
 
     if not data.get('template'):
       abort(400, **{
         'description': 'You must include a `template` array with at least one\
           fully qualified `template` object'
       })
+
+    """
+    Now that we have all of the pieces we need, we can create the column in the
+    appropriate data base table. To begin the creation process, we need to make
+    sure that we have the Template object loaded so that we can access details
+    about it during the creation process.
+    """
+    template_id = int(data.get('template')[0].get('id'))
+
+    template = Template.query.get(template_id)
       
 
   def preprocessor_delete(**kw):

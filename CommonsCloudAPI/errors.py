@@ -39,27 +39,33 @@ def load_errorhandlers(app):
   """
   @app.errorhandler(400)
   def internal_error(error):
-    return status_.status_400(error.description), 400
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_400(error_message), 400
 
   @app.errorhandler(401)
   def internal_error(error):
-    return status_.status_401(error.description), 401
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_401(error_message), 401
 
   @app.errorhandler(403)
   def internal_error(error):
-    return status_.status_403(error.description), 403
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_403(error_messageerror_message), 403
 
   @app.errorhandler(404)
   def internal_error(error):
-    return status_.status_404(error.description), 404
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_404(error_message), 404
 
   @app.errorhandler(405)
   def internal_error(error):
-    return status_.status_405(error.description), 405
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_405(error_message), 405
 
   @app.errorhandler(BadRequestKeyError)
   def internal_error(error):
-    return status_.status_400(error.description), 400
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_400(error_message), 400
 
   @app.errorhandler(InvalidScopeError)
   def internal_error(error):
@@ -69,5 +75,7 @@ def load_errorhandlers(app):
   @app.errorhandler(500)
   @app.errorhandler(Exception)
   def internal_error(error, **kwargs):
-    return status_.status_500(error.description), 500
+    logger.error(error)
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_500(error_message), 500
   
