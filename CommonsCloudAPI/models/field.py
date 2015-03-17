@@ -72,7 +72,7 @@ class Field(db.Model):
   """
   def __init__(self, label="", name="", help="", data_type="", relationship="",
                 association="", is_public=True, is_visible=True, is_listed=True,
-                is_searchable=False, is_required=False, weight="", status=True,
+                is_searchable=False, is_required=False, weight=0, status=True,
                 options=""):
       self.label = label
       self.name = name

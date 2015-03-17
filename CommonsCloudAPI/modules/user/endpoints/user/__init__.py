@@ -111,7 +111,7 @@ class Seed(Pod):
     token = generate_reset_password_token(user)
     reset_link = url_for_security('reset_password', token=token, _external=True)
 
-    send_mail('A Snapology Manager account has been added for you', user.email,
+    send_mail('A account has been added for you', user.email,
               'welcome', user=user, confirmation_link=reset_link)
 
     """

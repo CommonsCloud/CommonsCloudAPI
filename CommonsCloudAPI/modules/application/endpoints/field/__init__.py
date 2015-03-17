@@ -10,6 +10,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+
+"""
+Import Flask Dependencies
+"""
+from flask import abort
 from flask import json
 from flask import request
 
@@ -18,6 +23,7 @@ from flask import request
 Import CommonsCloudAPI Dependencies
 """
 from CommonsCloudAPI.extensions import logger
+from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.permissions import verify_authorization
 from CommonsCloudAPI.permissions import verify_roles
@@ -75,6 +81,15 @@ class Seed(Pod):
     logger.debug('`Application` preprocessor_post')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
+
+    """
+    Check to ensure we have a `name` field and a `template` at minimum
+    so that we aren't orphaning fields or creating unnecessary database
+    errors because there's no `name` to name the database column
+    """
+    if not data.get('name'):
+      abort(500)
+      
 
   def preprocessor_delete(**kw):
     logger.debug('`Application` preprocessor_delete')

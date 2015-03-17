@@ -77,35 +77,19 @@ class Seed(Pod):
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
-  def preprocessor_delete(**kwargs):
-    logger.debug('`Template` preprocessor_delete')
-    authorization = verify_authorization()
-    role = verify_roles(authorization, ['admin'])
-
-  """
-  Postprocessors
-  """
-  def template_postprocessor_post(result=None, **kwargs):
-    logger.debug('`Template` template_postprocessor_post')
-
     """
     All Templates must have a storage mechanism and it must be attached to the
     CommonsCloud in the same way that these endpoints are create. So, we must
     create a table on the fly and associate that table with the Template we've
     just created.
     """
-    storage = create_storage()
+    data['storage'] = create_storage()
 
-    """
-    Update the Template record to have the new storage hash associated with it
-    """
-    modified_template = db.session.query(Model).get(result['id'])
-    modified_template.storage = storage
 
-    db.session.add(modified_template)
-    db.session.commit()
-
-    pass
+  def preprocessor_delete(**kwargs):
+    logger.debug('`Template` preprocessor_delete')
+    authorization = verify_authorization()
+    role = verify_roles(authorization, ['admin'])
 
 
   """
@@ -144,9 +128,6 @@ class Seed(Pod):
       'PATCH_MANY': [preprocessor_patch_many],
       'POST': [preprocessor_post],
       'DELETE': [preprocessor_delete]
-    },
-    'postprocessors': {
-      'POST': [template_postprocessor_post]
     }
   }
 
