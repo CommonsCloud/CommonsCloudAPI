@@ -24,6 +24,7 @@ from CommonsCloudAPI.extensions import status as status_
 
 from oauthlib.oauth2 import InvalidScopeError
 
+from sqlalchemy.exc import ProgrammingError
 
 """
 Setup some basic routes to get our application started, even if all
@@ -37,6 +38,11 @@ def load_errorhandlers(app):
   now we can at least make it look like they aren't completely leaving the
   system and lost with default server error pages.
   """
+  @app.errorhandler(ProgrammingError)
+  def internal_error(error):
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_400(error_message), 400
+
   @app.errorhandler(400)
   def internal_error(error):
     error_message = error.description if hasattr(error, 'description') else error

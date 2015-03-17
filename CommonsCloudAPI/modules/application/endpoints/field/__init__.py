@@ -28,6 +28,8 @@ from CommonsCloudAPI.extensions import status as status_
 from CommonsCloudAPI.permissions import verify_authorization
 from CommonsCloudAPI.permissions import verify_roles
 
+from CommonsCloudAPI.utilities import create_storage_field
+
 
 """
 Import Data Model
@@ -104,22 +106,24 @@ class Seed(Pod):
         'description': 'You must include a `template` array with at least one\
           fully qualified `template` object'
       })
-
-    """
-    Now that we have all of the pieces we need, we can create the column in the
-    appropriate data base table. To begin the creation process, we need to make
-    sure that we have the Template object loaded so that we can access details
-    about it during the creation process.
-    """
-    template_id = int(data.get('template')[0].get('id'))
-
-    template = Template.query.get(template_id)
       
 
   def preprocessor_delete(**kw):
     logger.debug('`Application` preprocessor_delete')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
+
+
+  """
+  Postprocessors
+  """
+  def field_postprocessor_post(result=None, **kwargs):
+
+    """
+    Now that we have all of the pieces we need, we can create the column in the
+    appropriate data base table.
+    """
+    create_storage_field(result)
 
 
   """
@@ -158,6 +162,9 @@ class Seed(Pod):
       'PATCH_MANY': [preprocessor_patch_many],
       'POST': [preprocessor_post],
       'DELETE': [preprocessor_delete]
+    },
+    'postprocessors': {
+      'POST': [field_postprocessor_post]
     }
   }
 

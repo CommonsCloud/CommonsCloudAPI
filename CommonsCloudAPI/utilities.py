@@ -24,11 +24,14 @@ Import Flask Dependencies
 """
 from geoalchemy2.types import Geometry
 
+from migrate.changeset import *
+
 
 """
 Import CommonsCloud Dependencies
 """
 from CommonsCloudAPI.extensions import db
+from CommonsCloudAPI.extensions import logger
 
 
 """
@@ -94,64 +97,64 @@ def create_storage():
   return table_name
 
 
+"""
+Create a table in the database that contains a base line of defaults
+
+@param (object) template
+    A fully qualified Template object
+
+@param (object) field
+    A fully qualfied Field object
+
+@see Documentation on the db.Column.create() functionality
+    https://sqlalchemy-migrate.readthedocs.org/en/latest/changeset.html\
+        #column-create
+"""
+def create_storage_field(field):
+
+  templates = field.get('template')
+  storage = templates[0].get('storage')
+
   """
-  Create a table in the database that contains a base line of defaults
-
-  @param (object) template
-      A fully qualified Template object
-
-  @param (object) field
-      A fully qualfied Field object
-
-  @see Documentation on the db.Column.create() functionality
-      https://sqlalchemy-migrate.readthedocs.org/en/latest/changeset.html\
-          #column-create
+  Create a new custom table for a Feature Type
   """
-  def create_storage_field(template, field):
+  existing_table = db.Table(storage, db.metadata, **{
+    'autoload': True,
+    'autoload_with': db.engine
+  })
 
-    if not template.storage or not hasattr(field, 'data_type'):
-      return abort(404)
+  """
+  We must bind the engine to the metadata here in order for our fields to
+  recognize the existing Table we have loaded in the following steps
+  """
+  db.metadata.bind = db.engine
 
-    """
-    Create a new custom table for a Feature Type
-    """
-    existing_table = db.Table(template.storage, db.metadata, **{
-      'autoload': True,
-      'autoload_with': db.engine
-    })
+  """
+  Retrieve the appropriate field data type that we'll be using to create the
+  field in our database table
+  """
+  field_type = generate_field_type(field)
 
-    """
-    We must bind the engine to the metadata here in order for our fields to
-    recognize the existing Table we have loaded in the following steps
-    """
-    db.metadata.bind = db.engine
+  if field.get('data_type') == 'relationship':
+    return field_type
 
-    """
-    Retrieve the appropriate field data type that we'll be using to create the
-    field in our database table
-    """
-    field_type = generate_field_type(field, template)
+  if field.get('data_type') == 'file':
+    return field_type
 
-    if field.data_type == 'relationship':
-      return field_type
+  """
+  Create the new column just like we would if we were hard coding the model
+  """
+  new_column = db.Column(field.get('name'), field_type)
+  new_column.create(existing_table)
 
-    if field.data_type == 'file':
-      return field_type
+  """
+  Finally we need to make sure that the existing table knows that we've have
+  just added a new column, otherwise we won't be able to use it until we
+  restart the application, which would be very bad
+  """
+  assert new_column is existing_table.c[field.get('name')]
 
-    """
-    Create the new column just like we would if we were hard coding the model
-    """
-    new_column = db.Column(field.name, field_type)
-    new_column.create(existing_table)
-
-    """
-    Finally we need to make sure that the existing table knows that we've have
-    just added a new column, otherwise we won't be able to use it until we
-    restart the application, which would be very bad
-    """
-    assert new_column is existing_table.c[field.name]
-
-    return new_column
+  return new_column
 
 
 """
@@ -162,16 +165,16 @@ easier for them to create new fields
 @param (object) field
     A fully qualified Field object
 """
-def generate_field_type(field, template):
+def generate_field_type(field):
 
   """
   If we are creating a `relationship` or an `attachment`/`file` field we can
   simply generate those right away and skip the rest of the field building
   behaviour for now.
   """
-  if field.data_type == 'relationship':
+  if field.get('data_type') == 'relationship':
     return generate_relationship_field(field, template)
-  elif field.data_type == 'file':
+  elif field.get('data_type') == 'file':
     return generate_attachment_field(field, template)
 
   """
@@ -192,7 +195,7 @@ def generate_field_type(field, template):
     "list": db.String(255)
   }
 
-  return fields[field.data_type]
+  return fields[field.get('data_type')]
 
 
 """
