@@ -208,7 +208,7 @@ in the API Request
     @key (string) relationship
 
 """
-def generate_relationship_field(field, template):
+def generate_relationship_field(field):
 
   templates = field.get('template')
   storage = templates[0].get('storage')
@@ -217,7 +217,7 @@ def generate_relationship_field(field, template):
   Make sure that the table we need to use for creating the relationship is loaded
   into our db.metadata, otherwise the whole process will fail
   """
-  existing_table = db.Table(field.relationship, db.metadata, **{
+  existing_table = db.Table(field.get('relationship'), db.metadata, **{
     'autoload': True,
     'autoload_with': db.engine
   })
@@ -232,7 +232,7 @@ def generate_relationship_field(field, template):
   we've previously created
   """
   parent_foreign_key_id = ('%s.%s') % (storage,'id')
-  child_foreign_key_id = ('%s.%s') % (field.relationship,'id')
+  child_foreign_key_id = ('%s.%s') % (field.get('relationship'),'id')
 
   new_table = db.Table(table_name, db.metadata,
     db.Column('parent_id', db.Integer, db.ForeignKey(parent_foreign_key_id), **{
@@ -253,7 +253,7 @@ def generate_relationship_field(field, template):
   return {
     'type': 'relationship',
     'association': table_name,
-    'relationship': field.relationship
+    'relationship': field.get('relationship')
   }
 
 

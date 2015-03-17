@@ -123,7 +123,20 @@ class Seed(Pod):
     Now that we have all of the pieces we need, we can create the column in the
     appropriate data base table.
     """
-    create_storage_field(result)
+    field_response = create_storage_field(result)
+
+    """
+    Make sure that all this new information gets saved back to the Field object
+    """
+    updated_field = Model.query.get(result.get('id'))
+    updated_field.association = field_response.get('association')
+    db.session.commit()
+
+    """
+    Make sure the `assocaition` field is filled in prior to dislaying the
+    Response back to the user
+    """
+    result['association'] = field_response.get('association')
 
 
   """
