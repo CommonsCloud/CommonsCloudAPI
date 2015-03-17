@@ -92,3 +92,145 @@ def create_storage():
   db.create_all()
 
   return table_name
+
+
+"""
+Generate a PostgreSQL data type based off of a list of known strings. The
+reason we do this is to abstract away some details from the user making it
+easier for them to create new fields
+
+@param (object) field
+    A fully qualified Field object
+"""
+def generate_field_type(field, template):
+
+  """
+  If we are creating a `relationship` or an `attachment`/`file` field we can
+  simply generate those right away and skip the rest of the field building
+  behaviour for now.
+  """
+  if field.data_type == 'relationship':
+    return generate_relationship_field(field, template)
+  elif field.data_type == 'file':
+    return generate_attachment_field(field, template)
+
+  """
+  Define all of teh column types that our system currently allows the user to
+  create with the API
+  """
+  fields = {
+    "float": db.Float(),
+    "whole_number": db.Integer(),
+    "text": db.String(255),
+    "email": db.String(255),
+    "phone": db.String(255),
+    "url": db.String(255),
+    "textarea": db.Text(),
+    "boolean": db.Boolean(),
+    "date": db.Date(),
+    "time": db.Time(),
+    "list": db.String(255)
+  }
+
+  return fields[field.data_type]
+
+
+"""
+Create a new many-to-many relationship table using the information provided
+in the API Request
+
+  @return (object)
+    @key (string) type
+    @key (string) association
+    @key (string) relationship
+
+"""
+def generate_relationship_field(field, template):
+
+  """
+  Make sure that the table we need to use for creating the relationship is loaded
+  into our db.metadata, otherwise the whole process will fail
+  """
+  existing_table = db.Table(field.relationship, db.metadata, autoload=True, autoload_with=db.engine)
+
+  """
+  Create a name for our new field relationship table
+  """
+  table_name = generate_template_hash(_prefix='ref_')
+
+  """
+  Create a new Association Table in our database, based up the two existing Tables
+  we've previously created
+  """
+  parent_foreign_key_id = ('%s.%s') % (template.storage,'id')
+  child_foreign_key_id = ('%s.%s') % (field.relationship,'id')
+
+  new_table = db.Table(table_name, db.metadata,
+    db.Column('parent_id', db.Integer, db.ForeignKey(parent_foreign_key_id), primary_key=True),
+    db.Column('child_id', db.Integer, db.ForeignKey(child_foreign_key_id), primary_key=True)
+  )
+
+  db.metadata.bind = db.engine
+
+  """
+  Make sure everything commits to the database
+  """
+  db.create_all()
+
+  return {
+    'type': 'relationship',
+    'association': table_name,
+    'relationship': field.relationship
+  }
+
+"""
+Create a new many-to-many relationship table using the information provided
+in the API Request
+
+  @return (object)
+    @key (string) type
+    @key (string) association
+    @key (string) relationship
+
+"""
+def generate_attachment_field(field, template):
+
+  """
+  Before we can create a relationship between Attachments and a Template
+  we need to create a Table in the database to retain our attachments
+  """
+  attachment_table_name = generate_template_hash(_prefix='attachment_')
+
+  new_table = db.Table(attachment_table_name, db.metadata,
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('caption', db.String(255)),
+    db.Column('credit', db.String(255)),
+    db.Column('credit_link', db.String(255)),
+    db.Column('filename', db.String(255)),
+    db.Column('filepath', db.String(255)),
+    db.Column('filetype', db.String(255)),
+    db.Column('filesize', db.Integer()),
+    db.Column('created', db.DateTime()),
+    db.Column('status', db.String(24), nullable=False)
+  )
+
+  db.metadata.bind = db.engine
+
+  db.create_all()
+
+  """
+  Next we update the relationship field
+  """
+  field.relationship = attachment_table_name
+
+
+  """
+  Finally we can create the actual relationship
+  """
+  relationship_ = generate_relationship_field(field, template)
+
+  return {
+    'type': 'file',
+    'association': relationship_['association'],
+    'relationship': attachment_table_name
+  }
