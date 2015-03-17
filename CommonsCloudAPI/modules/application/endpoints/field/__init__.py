@@ -88,8 +88,15 @@ class Seed(Pod):
     errors because there's no `name` to name the database column
     """
     if not data.get('name'):
-      abort(500, description='You must include a `name` for your field to be \
-              created')
+      abort(400, **{
+        'description': 'You must include a `name` for your field to be created'
+      })
+
+    if not data.get('template'):
+      abort(400, **{
+        'description': 'You must include a `template` array with at least one\
+          fully qualified `template` object'
+      })
       
 
   def preprocessor_delete(**kw):
