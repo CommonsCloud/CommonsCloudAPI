@@ -354,6 +354,8 @@ class CommonsStatus():
   """
   def status_500(self, system_message=""):
 
+    print dir(self)
+
     message = {
       'status': '500 Internal Server Error',
       'code': '500',
