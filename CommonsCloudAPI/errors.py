@@ -54,7 +54,7 @@ def load_errorhandlers(app):
   def internal_error(error):
     logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
-    return status_.status_400(error_message, message_), 400
+    return status_.status_400(error_message), 400
 
   @app.errorhandler(401)
   def internal_error(error):
