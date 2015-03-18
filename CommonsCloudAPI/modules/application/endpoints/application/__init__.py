@@ -84,6 +84,19 @@ class Seed(Pod):
       abort(400, **{
         'description': 'You must include a `name` for your field to be created'
       })
+
+    """
+    A `User` must be associated with an `Application` otherwise it will be
+    orphaned. The acting user will not have control over the initial `User`
+    configuration of this, we need to make sure the `User` creating the
+    `Application` gets assigned as it's administrator by default. Assigning
+    the `User` object in the manner below eliminates anything the acting
+    user has set in that `users` field.
+
+    To do this, we'll use the authorization variable from above, this variable
+    is a fully qualified and validated `User` object.
+    """
+    data['users'] = [authorization]
     
   def preprocessor_delete(**kw):
     logger.debug('`Application` preprocessor_delete')
