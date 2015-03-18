@@ -12,19 +12,30 @@ limitations under the License.
 
 
 """
-Import Flask dependencies
+Import System Dependencies
 """
+import sys
+import traceback
+
+
+"""
+Import Flask Dependencies
+"""
+from flask import json
 
 from werkzeug.exceptions import BadRequestKeyError
-
-from flask import render_template
-
-from CommonsCloudAPI.extensions import logger
-from CommonsCloudAPI.extensions import status as status_
 
 from oauthlib.oauth2 import InvalidScopeError
 
 from sqlalchemy.exc import ProgrammingError
+
+
+"""
+Import CommonsCloud Dependencies
+"""
+from CommonsCloudAPI.extensions import logger
+from CommonsCloudAPI.extensions import status as status_
+
 
 """
 Setup some basic routes to get our application started, even if all
@@ -38,50 +49,58 @@ def load_errorhandlers(app):
   now we can at least make it look like they aren't completely leaving the
   system and lost with default server error pages.
   """
-  @app.errorhandler(ProgrammingError)
-  def internal_error(error):
-    error_message = error.description if hasattr(error, 'description') else error
-    return status_.status_400(error_message), 400
-
   @app.errorhandler(400)
+  @app.errorhandler(Exception)
   def internal_error(error):
+    logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
-    return status_.status_400(error_message), 400
+    return status_.status_400(error_message, message_), 400
 
   @app.errorhandler(401)
   def internal_error(error):
+    logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
     return status_.status_401(error_message), 401
 
   @app.errorhandler(403)
   def internal_error(error):
+    logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
     return status_.status_403(error_messageerror_message), 403
 
   @app.errorhandler(404)
   def internal_error(error):
+    logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
     return status_.status_404(error_message), 404
 
   @app.errorhandler(405)
   def internal_error(error):
+    logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
     return status_.status_405(error_message), 405
 
   @app.errorhandler(BadRequestKeyError)
   def internal_error(error):
+    logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
     return status_.status_400(error_message), 400
 
   @app.errorhandler(InvalidScopeError)
   def internal_error(error):
+    logger.exception(error)
     return status_.status_500('Your OAuth Scopes don\'t match the ones \
         specified for your application'), 500
 
+  @app.errorhandler(ProgrammingError)
+  def internal_error(error):
+    logger.exception(error)
+    error_message = error.description if hasattr(error, 'description') else error
+    return status_.status_400(error_message), 400
+
   @app.errorhandler(500)
-  @app.errorhandler(Exception)
   def internal_error(error, **kwargs):
-    logger.error(error)
+    logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
     return status_.status_500(error_message), 500
   
