@@ -66,7 +66,7 @@ def load_errorhandlers(app):
   def internal_error(error):
     logger.exception(error)
     error_message = error.description if hasattr(error, 'description') else error
-    return status_.status_403(error_messageerror_message), 403
+    return status_.status_403(error_message), 403
 
   @app.errorhandler(404)
   def internal_error(error):

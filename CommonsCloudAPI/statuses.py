@@ -285,8 +285,7 @@ class CommonsStatus():
     message = {
       'status': '404 Not Found',
       'code': '404',
-      'message': system_message,
-      'details': 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
+      'message': system_message if system_message else 'You probably entered the URL wrong or perhaps what you were looking for has been removed.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message

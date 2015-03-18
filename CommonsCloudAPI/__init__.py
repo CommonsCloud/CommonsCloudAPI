@@ -26,6 +26,8 @@ Import Flask dependencies
 from flask import Flask
 from flask import jsonify
 
+from flask.ext.security import current_user
+
 
 """
 Import Application Dependencies
@@ -37,6 +39,8 @@ from .extensions import mail
 from .extensions import security
 from .extensions import oauth
 from .extensions import rq
+
+from .permissions import load_signals
 
 
 """
@@ -63,6 +67,7 @@ def create_application(name=__name__, env='testing'):
     load_modules(app, db)
 
     
+
     """
     Initialize our database and create tables
     """
@@ -97,6 +102,7 @@ def create_application(name=__name__, env='testing'):
     Load default application routes/paths
     """
     load_errorhandlers(app)
+    load_signals(app)
 
     def add_cors_header(response):
         response.headers['Access-Control-Allow-Origin'] = '*'
@@ -105,7 +111,8 @@ def create_application(name=__name__, env='testing'):
         response.headers['Access-Control-Allow-Credentials'] = True
         return response
 
-    app.after_request(add_cors_header)
+    app.after_request(add_cors_header) 
+
 
     return app
 

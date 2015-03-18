@@ -55,34 +55,74 @@ These tables are necessary to perform our many to many relationships
    This documentation covers SQLAlchemy
 """
 user_roles = db.Table('user_roles',
-  db.Column('user', db.Integer(), db.ForeignKey('user.id')),
-  db.Column('role', db.Integer(), db.ForeignKey('role.id')),
+  db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+  db.Column('role_id', db.Integer(), db.ForeignKey('role.id')),
   extend_existing = True
 )
 
 user_organizations = db.Table('user_organizations',
-  db.Column('user', db.Integer(), db.ForeignKey('user.id')),
+  db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
   db.Column('organization', db.Integer(), db.ForeignKey('organization.id')),
   extend_existing = True
 )
 
 user_addresses = db.Table('user_addresses',
-  db.Column('user', db.Integer(), db.ForeignKey('user.id')),
+  db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
   db.Column('address', db.Integer(), db.ForeignKey('address.id')),
   extend_existing = True
 )
 
 user_territories = db.Table('user_territories',
-  db.Column('user', db.Integer(), db.ForeignKey('user.id')),
-  db.Column('territory', db.Integer(), db.ForeignKey('territory.id')),
+  db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+  db.Column('territory_id', db.Integer(), db.ForeignKey('territory.id')),
   extend_existing = True
 )
 
 user_telephone = db.Table('user_telephone',
-  db.Column('user', db.Integer(), db.ForeignKey('user.id')),
-  db.Column('telephone', db.Integer(), db.ForeignKey('telephone.id')),
+  db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+  db.Column('telephone_id', db.Integer(), db.ForeignKey('telephone.id')),
   extend_existing = True
 )
+
+# user_applications = db.Table('user_applications',
+#   db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+#   db.Column('application_id', db.Integer(), db.ForeignKey('application.id')),
+#   db.Column('read', db.Boolean),
+#   db.Column('write', db.Boolean),
+#   db.Column('admin', db.Boolean),
+#   extend_existing = True
+# )
+
+# user_templates = db.Table('user_templates',
+#   db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+#   db.Column('template_id', db.Integer(), db.ForeignKey('template.id')),
+#   db.Column('read', db.Boolean),
+#   db.Column('write', db.Boolean),
+#   db.Column('admin', db.Boolean),
+#   extend_existing = True
+# )
+
+
+class UserApplications(db.Model):
+
+  __tablename__ = 'user_applications'
+  __table_args__ = {
+    'extend_existing': True
+  }
+
+  user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
+  application_id = db.Column(db.Integer(), db.ForeignKey('application.id'), primary_key=True)
+  read = db.Column(db.Boolean())
+  write = db.Column(db.Boolean())
+  admin = db.Column(db.Boolean())
+  users = db.relationship('User', backref=db.backref("user_applications", cascade="all,delete"))
+
+  def __init__(self, user_id, application_id, read=True, write=False, admin=False):
+    self.user_id = user_id
+    self.application_id = application_id
+    self.read = read
+    self.write = write
+    self.admin = admin
 
 
 """
@@ -157,22 +197,37 @@ class User(db.Model, UserMixin):
     'secondary': user_roles, 
     'backref': db.backref('users')
   })
+
   organizations = db.relationship('Organization', **{
     'secondary': user_organizations,
     'backref': db.backref('users')
   })
+
   addresses = db.relationship('Address', **{
     'secondary': user_addresses,
     'backref': db.backref('users')
   })
+
   territories = db.relationship('Territory', **{
     'secondary': user_territories,
     'backref': db.backref('users')
   })
+
   telephone = db.relationship('Telephone', **{
     'secondary': user_telephone,
     'backref': db.backref('users')
   })
+
+  # application_permissions = db.relationship('UserApplications', **{
+  #   'secondary': UserApplications,
+  #   'backref': db.backref('users')
+  # })
+
+  # # templates = db.relationship('Template', **{
+  # #   'secondary': user_templates,
+  # #   'backref': db.backref('users')
+  # # })
+
 
   """
   Initialize the data model and let the system know how each field should be

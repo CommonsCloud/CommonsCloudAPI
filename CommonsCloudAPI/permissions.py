@@ -16,8 +16,12 @@ Import Flask Dependencies
 """
 from flask import abort
 
-from flask.ext.security import current_user
 from flask.ext.security import roles_accepted
+
+from flask.ext.principal import identity_loaded
+from flask.ext.principal import Permission
+from flask.ext.principal import RoleNeed
+from flask.ext.principal import UserNeed
 
 
 """
@@ -118,4 +122,91 @@ def check_roles(role_required, role_list):
       return True
 
   abort(403)
-  
+
+
+"""
+Load all of our additional Permission Sign
+"""
+def load_signals(app):
+
+  """
+  Define the most basic Principal need for our Application module
+  """ 
+  # from CommonsCloudAPI.modules.application.permissions import ReadApplicationNeed
+  # from CommonsCloudAPI.modules.application.permissions import WriteApplicationNeed
+  # from CommonsCloudAPI.modules.application.permissions import AdminApplicationNeed
+
+
+  """
+  Import Python Dependencies
+  """
+  from collections import namedtuple
+  from functools import partial
+
+
+  """
+  Import Flask Dependencies
+  """
+  from flask import current_app
+
+  from flask.ext.security import current_user
+
+  from flask.ext.principal import identity_loaded
+  from flask.ext.principal import Permission
+  from flask.ext.principal import RoleNeed
+  from flask.ext.principal import UserNeed
+
+
+  """
+  Import CommonsCloud Dependencies
+  """
+  from CommonsCloudAPI.extensions import principal
+
+  ApplicationNeed = namedtuple('application', ['method', 'value'])
+
+  ReadApplicationNeed = partial(ApplicationNeed, 'read')
+  class ReadApplicationPermission(Permission):
+      def __init__(self, post_id):
+          need = ReadApplicationNeed(unicode(post_id))
+          super(ReadApplicationPermission, self).__init__(need)
+
+  WriteApplicationNeed = partial(ApplicationNeed, 'write')
+  class WriteApplicationPermission(Permission):
+      def __init__(self, application_id):
+          need = WriteApplicationNeed(application_id)
+          super(WriteApplicationPermission, self).__init__(need)
+
+
+  AdminApplicationNeed = partial(ApplicationNeed, 'admin')
+  class AdminApplicationPermission(Permission):
+      def __init__(self, application_id):
+          need = AdminApplicationNeed(application_id)
+          super(AdminApplicationPermission, self).__init__(need)
+
+  @identity_loaded.connect_via(app)
+  def on_identity_loaded(sender, identity):
+
+      print 'on_identity_loaded fired'
+
+      identity.user = identity.auth_type
+
+      current_user = identity.auth_type
+
+      # Add the UserNeed to the identity
+      if hasattr(current_user, 'id'):
+          identity.provides.add(UserNeed(identity.id))
+
+      # Assuming the User model has a list of roles, update the
+      # identity with the roles that the user provides
+      if hasattr(current_user, 'roles'):
+          for role in current_user.roles:
+              identity.provides.add(RoleNeed(role.name))
+
+      # Assuming the User model has a list of posts the user
+      # has authored, add the needs to the identity
+      if hasattr(current_user, 'user_applications'):
+        for application in current_user.user_applications:
+          identity.provides.add(ReadApplicationNeed(application.application_id))
+          identity.provides.add(WriteApplicationNeed(application.application_id))
+          identity.provides.add(AdminApplicationNeed(application.application_id))
+

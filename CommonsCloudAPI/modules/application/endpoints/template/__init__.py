@@ -48,8 +48,17 @@ class Seed(Pod):
   """
   def preprocessor_get_many(**kwargs):
     logger.debug('`Template` preprocessor_get_many')
-    authorization = verify_authorization()
-    role = verify_roles(authorization, ['admin'])
+
+    """
+    A giant list of `Template` objects is not useful outside of `Application`
+    context, therefore, this endpoint has been disabled. If the developer
+    wishes to access a list of `Template` objects specific to their
+    `Application` they will need to use the following endpoint:
+
+        `application/<int:application_id>/templates`
+
+    """
+    authorization = abort(404, 'The endpoint you are looking for is incorrect, please try your request again using the `application/<int:application_id>/templates` endpoint')
 
   def preprocessor_get_single(**kwargs):
     logger.debug('`Template` preprocessor_get_single')
@@ -101,7 +110,6 @@ class Seed(Pod):
     """
     data['storage'] = create_storage()
 
-
   def preprocessor_delete(**kwargs):
     logger.debug('`Template` preprocessor_delete')
     authorization = verify_authorization()
@@ -148,5 +156,4 @@ class Seed(Pod):
   }
 
   Pod.__arguments__.update(**__model_arguments__)
-
 

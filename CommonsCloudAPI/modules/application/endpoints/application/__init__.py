@@ -15,6 +15,10 @@ limitations under the License.
 Import Flask Dependencies
 """
 from flask import abort
+from flask import current_app
+
+from flask.ext.principal import Identity
+from flask.ext.principal import identity_loaded
 
 
 """
@@ -27,7 +31,7 @@ from CommonsCloudAPI.permissions import verify_roles
 
 
 """
-Import Data Model
+Import Data Model Dependencies
 
 We're importing in this manner so that we can dynamically load these as
 Flask-Restless endpoints within our CommonsCloudAPI.create_application method
@@ -35,6 +39,12 @@ Flask-Restless endpoints within our CommonsCloudAPI.create_application method
 """
 from CommonsCloudAPI.models.pod import Pod
 from CommonsCloudAPI.models.application import Application as Model
+
+
+"""
+Import Module Dependencies
+"""
+from CommonsCloudAPI.modules.application.permissions import ReadApplicationPermission
 
 
 """
@@ -53,6 +63,24 @@ class Seed(Pod):
     logger.debug('`Application` preprocessor_get_single')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
+
+    user_identity = Identity(authorization.id, auth_type=authorization)
+    identity_loaded.send(current_app._get_current_object(), **{
+      'identity': user_identity
+    })
+
+
+    """
+    Now that we've made sure the `User` object is valid we need to make sure
+    that the `User` requesting this resource, has the permission to do so
+    """
+    print "kw['instance_id']", kw['instance_id']
+    permission = ReadApplicationPermission(kw['instance_id'])
+    print permission.can()
+
+    # if not permission.get('can_read', False):
+    #   abort(403, 'You do not have permission to access this `Application`')
+
 
   def preprocessor_put_single(data=None, **kw):
     logger.debug('`Application` preprocessor_put_single')
@@ -129,7 +157,8 @@ class Seed(Pod):
      For more information on the correct way to `update` a Parent dictionary
   """
   __model_arguments__ = {
-    "exclude_columns": [
+    'exclude_columns': [
+      'users'
     ],
     'preprocessors': {
       'GET_SINGLE': [preprocessor_get_single],
