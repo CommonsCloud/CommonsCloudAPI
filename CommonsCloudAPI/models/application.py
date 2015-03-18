@@ -42,6 +42,12 @@ application_templates = db.Table('application_templates',
   extend_existing = True
 )
 
+application_users = db.Table('application_users',
+  db.Column('application_id', db.Integer(), db.ForeignKey('application.id')),
+  db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+  extend_existing = True
+)
+
 
 """
 Application Model
@@ -102,11 +108,17 @@ class Application(db.Model):
     'backref': db.backref('application')
   })
 
+  users = db.relationship('User', **{
+    'secondary': application_users, 
+    'backref': db.backref('application')
+  })
+
+
   """
   Initialize the data model and let the system know how each field should be
   handled by default 
   """
-  def __init__(self, name="", url="", description=None,
+  def __init__(self, name="", url="", description=None, 
                 created=datetime.utcnow(), status=True,
                 is_public=True, templates=[]):
     self.name = name

@@ -632,7 +632,7 @@
     </object>
     <object type="LMREQUEST" id="z150">
         <attribute name="uuid" type="string">892313A6-E88F-4F80-9A73-F82A5842E0EB</attribute>
-        <attribute name="url" type="string">http://127.0.0.1:5000/v2.1/application?access_token=tPChNypkSFZ0VS7Ta7L1V1Kgu2Xb61</attribute>
+        <attribute name="url" type="string">http://127.0.0.1:5000/v2.1/application/1/templates/4?access_token=tPChNypkSFZ0VS7Ta7L1V1Kgu2Xb61</attribute>
         <attribute name="storecookies" type="bool">1</attribute>
         <attribute name="sendcookies" type="bool">1</attribute>
         <attribute name="redirectmethod" type="bool">0</attribute>
