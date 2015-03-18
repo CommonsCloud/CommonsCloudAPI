@@ -10,8 +10,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from flask import json
-from flask import request
+
+"""
+Import Flask Dependencies
+"""
+from flask import abort
 
 
 """
@@ -32,8 +35,6 @@ Flask-Restless endpoints within our CommonsCloudAPI.create_application method
 """
 from CommonsCloudAPI.models.pod import Pod
 from CommonsCloudAPI.models.application import Application as Model
-
-from CommonsCloudAPI.extensions import db
 
 
 """
@@ -76,6 +77,14 @@ class Seed(Pod):
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
+    """
+    A `name` field is required to create an `Application`
+    """
+    if not data.get('name'):
+      abort(400, **{
+        'description': 'You must include a `name` for your field to be created'
+      })
+    
   def preprocessor_delete(**kw):
     logger.debug('`Application` preprocessor_delete')
     authorization = verify_authorization()

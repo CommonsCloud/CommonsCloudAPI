@@ -10,14 +10,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from flask import json
-from flask import request
+
+"""
+Import Flask Dependencies
+"""
+from flask import abort
 
 
 """
 Import CommonsCloudAPI Dependencies
 """
-from CommonsCloudAPI.extensions import db
 from CommonsCloudAPI.extensions import logger
 
 from CommonsCloudAPI.permissions import verify_authorization
@@ -76,6 +78,20 @@ class Seed(Pod):
     logger.debug('`Template` preprocessor_post')
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
+
+    """
+    A `name` field is required to create an `Application`
+    """
+    if not data.get('name'):
+      abort(400, **{
+        'description': 'You must include a `name` for your field to be created'
+      })
+
+    if not data.get('application'):
+      abort(400, **{
+        'description': 'You must include an `application` array with at least \
+          one fully qualified `application` object'
+      })
 
     """
     All Templates must have a storage mechanism and it must be attached to the

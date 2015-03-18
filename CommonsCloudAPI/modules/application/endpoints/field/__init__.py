@@ -15,15 +15,12 @@ limitations under the License.
 Import Flask Dependencies
 """
 from flask import abort
-from flask import json
-from flask import request
 
 
 """
 Import CommonsCloudAPI Dependencies
 """
 from CommonsCloudAPI.extensions import logger
-from CommonsCloudAPI.extensions import status as status_
 
 from CommonsCloudAPI.permissions import verify_authorization
 from CommonsCloudAPI.permissions import verify_roles
