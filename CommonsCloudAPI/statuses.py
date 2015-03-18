@@ -175,13 +175,12 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_400(self, system_message=None, stack_trace=None):
+  def status_400(self, system_message=""):
 
     message = {
       'status': '400 Bad Request',
       'code': '400',
-      'error': str(system_message),
-      'details': stack_trace
+      'error': str(system_message)
     }
 
     response = jsonify(message)

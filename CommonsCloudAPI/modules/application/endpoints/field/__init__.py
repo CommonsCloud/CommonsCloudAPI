@@ -93,13 +93,13 @@ class Seed(Pod):
     if not data.get('name'):
       abort(400, **{
         'description': 'You must include a `name` for your field to be created'
-      }), 400
+      })
     
     if not data.get('data_type'):
       abort(400, **{
         'description': 'You must include a `data_type` for your field to be\
           created'
-      }), 400
+      })
 
     if not data.get('template'):
       abort(400, **{
