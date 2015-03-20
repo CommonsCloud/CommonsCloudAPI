@@ -84,28 +84,9 @@ user_telephone = db.Table('user_telephone',
   extend_existing = True
 )
 
-# user_applications = db.Table('user_applications',
-#   db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-#   db.Column('application_id', db.Integer(), db.ForeignKey('application.id')),
-#   db.Column('read', db.Boolean),
-#   db.Column('write', db.Boolean),
-#   db.Column('admin', db.Boolean),
-#   extend_existing = True
-# )
-
-# user_templates = db.Table('user_templates',
-#   db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-#   db.Column('template_id', db.Integer(), db.ForeignKey('template.id')),
-#   db.Column('read', db.Boolean),
-#   db.Column('write', db.Boolean),
-#   db.Column('admin', db.Boolean),
-#   extend_existing = True
-# )
-
-
 class UserApplications(db.Model):
 
-  __tablename__ = 'user_applications'
+  __tablename__ = 'application_access'
   __table_args__ = {
     'extend_existing': True
   }
@@ -115,7 +96,6 @@ class UserApplications(db.Model):
   read = db.Column(db.Boolean())
   write = db.Column(db.Boolean())
   admin = db.Column(db.Boolean())
-  users = db.relationship('User', backref=db.backref("user_applications", cascade="all,delete"))
 
   def __init__(self, user_id, application_id, read=True, write=False, admin=False):
     self.user_id = user_id
@@ -218,15 +198,8 @@ class User(db.Model, UserMixin):
     'backref': db.backref('users')
   })
 
-  # application_permissions = db.relationship('UserApplications', **{
-  #   'secondary': UserApplications,
-  #   'backref': db.backref('users')
-  # })
+  application_access = db.relationship('UserApplications', backref=db.backref("users", cascade="all,delete"))
 
-  # # templates = db.relationship('Template', **{
-  # #   'secondary': user_templates,
-  # #   'backref': db.backref('users')
-  # # })
 
 
   """

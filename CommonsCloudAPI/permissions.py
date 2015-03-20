@@ -132,65 +132,15 @@ def load_signals(app):
   """
   Define the most basic Principal need for our Application module
   """ 
-  # from CommonsCloudAPI.modules.application.permissions import ReadApplicationNeed
-  # from CommonsCloudAPI.modules.application.permissions import WriteApplicationNeed
-  # from CommonsCloudAPI.modules.application.permissions import AdminApplicationNeed
-
-
-  """
-  Import Python Dependencies
-  """
-  from collections import namedtuple
-  from functools import partial
-
-
-  """
-  Import Flask Dependencies
-  """
-  from flask import current_app
-
-  from flask.ext.security import current_user
-
-  from flask.ext.principal import identity_loaded
-  from flask.ext.principal import Permission
-  from flask.ext.principal import RoleNeed
-  from flask.ext.principal import UserNeed
-
-
-  """
-  Import CommonsCloud Dependencies
-  """
-  from CommonsCloudAPI.extensions import principal
-
-  ApplicationNeed = namedtuple('application', ['method', 'value'])
-
-  ReadApplicationNeed = partial(ApplicationNeed, 'read')
-  class ReadApplicationPermission(Permission):
-      def __init__(self, post_id):
-          need = ReadApplicationNeed(unicode(post_id))
-          super(ReadApplicationPermission, self).__init__(need)
-
-  WriteApplicationNeed = partial(ApplicationNeed, 'write')
-  class WriteApplicationPermission(Permission):
-      def __init__(self, application_id):
-          need = WriteApplicationNeed(application_id)
-          super(WriteApplicationPermission, self).__init__(need)
-
-
-  AdminApplicationNeed = partial(ApplicationNeed, 'admin')
-  class AdminApplicationPermission(Permission):
-      def __init__(self, application_id):
-          need = AdminApplicationNeed(application_id)
-          super(AdminApplicationPermission, self).__init__(need)
+  from CommonsCloudAPI.modules.application.permissions import ReadApplicationNeed
+  from CommonsCloudAPI.modules.application.permissions import WriteApplicationNeed
+  from CommonsCloudAPI.modules.application.permissions import AdminApplicationNeed
 
   @identity_loaded.connect_via(app)
   def on_identity_loaded(sender, identity):
 
-      print 'on_identity_loaded fired'
-
-      identity.user = identity.auth_type
-
       current_user = identity.auth_type
+      identity.user = current_user
 
       # Add the UserNeed to the identity
       if hasattr(current_user, 'id'):
@@ -206,7 +156,10 @@ def load_signals(app):
       # has authored, add the needs to the identity
       if hasattr(current_user, 'user_applications'):
         for application in current_user.user_applications:
-          identity.provides.add(ReadApplicationNeed(application.application_id))
-          identity.provides.add(WriteApplicationNeed(application.application_id))
-          identity.provides.add(AdminApplicationNeed(application.application_id))
+          if application.read:
+            identity.provides.add(ReadApplicationNeed(unicode(application.application_id)))
+          if application.write:
+            identity.provides.add(WriteApplicationNeed(unicode(application.application_id)))
+          if application.admin:
+            identity.provides.add(AdminApplicationNeed(unicode(application.application_id)))
 

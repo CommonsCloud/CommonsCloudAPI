@@ -667,12 +667,12 @@
     </object>
     <object type="LMREQUEST" id="z153">
         <attribute name="uuid" type="string">CCAACDB9-FD00-4676-9098-FF997CE7B8F6</attribute>
-        <attribute name="url" type="string">http://127.0.0.1:5000/v2.1/application/1?access_token=tPChNypkSFZ0VS7Ta7L1V1Kgu2Xb61</attribute>
+        <attribute name="url" type="string">http://127.0.0.1:5000/v2.1/user/1/application_access?access_token=tPChNypkSFZ0VS7Ta7L1V1Kgu2Xb61</attribute>
         <attribute name="storecookies" type="bool">1</attribute>
         <attribute name="sendcookies" type="bool">1</attribute>
         <attribute name="redirectmethod" type="bool">0</attribute>
         <attribute name="redirectauthorization" type="bool">0</attribute>
-        <attribute name="method" type="string">GET</attribute>
+        <attribute name="method" type="string">DELETE</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
         <attribute name="body" type="string">[{"data":{"json":"{\\"name\\":\\"WaterReporter\\"}"},"identifier":"com.luckymarmot.JSONDynamicValue"}]</attribute>
         <attribute name="order" type="int64">2</attribute>

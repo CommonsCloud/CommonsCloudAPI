@@ -11,6 +11,9 @@ limitations under the License.
 """
 
 
+from testfixtures import compare
+
+
 """
 Import Flask Dependencies
 """
@@ -64,22 +67,24 @@ class Seed(Pod):
     authorization = verify_authorization()
     role = verify_roles(authorization, ['admin'])
 
+    """
+    Ensure the `User` object is setup correctly and that we let the system
+    know that this step is completed
+    """
     user_identity = Identity(authorization.id, auth_type=authorization)
     identity_loaded.send(current_app._get_current_object(), **{
       'identity': user_identity
     })
 
-
     """
     Now that we've made sure the `User` object is valid we need to make sure
     that the `User` requesting this resource, has the permission to do so
     """
-    print "kw['instance_id']", kw['instance_id']
-    permission = ReadApplicationPermission(kw['instance_id'])
-    print permission.can()
+    resource_needs = ReadApplicationPermission(unicode(kw['instance_id']))
+    has_permission = resource_needs.allows(user_identity)
 
-    # if not permission.get('can_read', False):
-    #   abort(403, 'You do not have permission to access this `Application`')
+    if not has_permission:
+      abort(403, 'You do not have permission to access this `Application`')
 
 
   def preprocessor_put_single(data=None, **kw):

@@ -89,6 +89,16 @@ class Seed(Pod):
   """
   Postprocessors
   """
+  def user_postprocessor_get_single(result=None, **kw):
+    logger.debug('`User` user_postprocessor_get_single')
+
+    """
+    The `User` list object here is useless, so just get rid of it, prior to
+    displaying the permission results to the `User`
+    """
+    for index, feature in enumerate(result.get('objects')):
+      del result.get('objects')[index]['users']
+
   def user_postprocessor_post(result=None, **kw):
     logger.debug('`User` user_postprocessor_post')
     authorization = verify_authorization()
@@ -125,9 +135,6 @@ class Seed(Pod):
     db.session.add(modified_user)
     db.session.commit()
 
-  """
-  Postprocessors
-  """
   def user_postprocessor_patch_single(result=None, **kw):
 
     """
@@ -141,9 +148,6 @@ class Seed(Pod):
     db.session.add(modified_user)
     db.session.commit()
 
-  """
-  Postprocessors
-  """
   def user_postprocessor_put_single(result=None, **kw):
 
     """
@@ -196,6 +200,7 @@ class Seed(Pod):
       'DELETE': [preprocessor_delete]
     },
     'postprocessors': {
+      'GET_SINGLE': [user_postprocessor_get_single],
       'POST': [user_postprocessor_post],
       'PATCH_SINGLE': [user_postprocessor_patch_single],
       'PUT_SINGLE': [user_postprocessor_put_single]

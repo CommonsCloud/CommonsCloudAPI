@@ -303,13 +303,13 @@ class CommonsStatus():
       Either a jsonfied dictionary or just the dictionary
 
   """
-  def status_405(self):
+  def status_405(self, system_message=''):
 
     message = {
       'status': '405 Method Not Allowed',
       'code': '405',
-      'message': 'The method is not allowed for the requested URL.',
-      'details': 'Check the documentation to ensure the method you\'re attempting to use is one of GET, POST, PATCH, or DELETE'
+      'message': 'Check the documentation to ensure the method you\'re attempting to use is one of GET, POST, PATCH, or DELETE',
+      'error': system_message if system_message else 'The method is not allowed for the requested URL.'
     }
 
     return jsonify(message) if self.return_type == 'json' else message
