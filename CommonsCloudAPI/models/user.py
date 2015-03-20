@@ -84,6 +84,11 @@ user_telephone = db.Table('user_telephone',
   extend_existing = True
 )
 
+
+"""
+The following tables help us expose read-only permission to the current user
+or to administrators
+"""
 class UserApplications(db.Model):
 
   __tablename__ = 'application_access'
@@ -104,6 +109,45 @@ class UserApplications(db.Model):
     self.write = write
     self.admin = admin
 
+class UserTemplates(db.Model):
+
+  __tablename__ = 'template_access'
+  __table_args__ = {
+    'extend_existing': True
+  }
+
+  user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
+  template_id = db.Column(db.Integer(), db.ForeignKey('template.id'), primary_key=True)
+  read = db.Column(db.Boolean())
+  write = db.Column(db.Boolean())
+  admin = db.Column(db.Boolean())
+
+  def __init__(self, user_id, template_id, read=True, write=False, admin=False):
+    self.user_id = user_id
+    self.template_id = template_id
+    self.read = read
+    self.write = write
+    self.admin = admin
+
+class UserFields(db.Model):
+
+  __tablename__ = 'field_access'
+  __table_args__ = {
+    'extend_existing': True
+  }
+
+  user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), primary_key=True)
+  field_id = db.Column(db.Integer(), db.ForeignKey('field.id'), primary_key=True)
+  read = db.Column(db.Boolean())
+  write = db.Column(db.Boolean())
+  admin = db.Column(db.Boolean())
+
+  def __init__(self, user_id, field_id, read=True, write=False, admin=False):
+    self.user_id = user_id
+    self.field_id = field_id
+    self.read = read
+    self.write = write
+    self.admin = admin
 
 """
 This defines our basic User model, we have to have this becasue of the
@@ -198,9 +242,17 @@ class User(db.Model, UserMixin):
     'backref': db.backref('users')
   })
 
-  application_access = db.relationship('UserApplications', backref=db.backref("users", cascade="all,delete"))
+  application_access = db.relationship('UserApplications', **{
+    'backref': db.backref("users", cascade="all,delete")
+  })
 
+  template_access = db.relationship('UserTemplates', **{
+    'backref': db.backref("users", cascade="all,delete")
+  })
 
+  field_access = db.relationship('UserFields', **{
+    'backref': db.backref("users", cascade="all,delete")
+  })
 
   """
   Initialize the data model and let the system know how each field should be
