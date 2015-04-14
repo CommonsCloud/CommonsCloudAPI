@@ -72,4 +72,13 @@ def create_application(name = __name__, env = 'testing'):
     # Load default application routes/paths
     load_errorhandlers(app)
 
+    def add_cors_header(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Authorization, Accept, Content-Type, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Cache-Control, Expires, Set-Cookie'
+        response.headers['Access-Control-Allow-Credentials'] = True
+        return response
+
+    app.after_request(add_cors_header)
+
     return app

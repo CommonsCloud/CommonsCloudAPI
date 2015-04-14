@@ -167,7 +167,7 @@ class CommonsModel(object):
   letters to lowercase letters, and return the updated string.
   """
   def generate_machine_name(self, human_name):
-    machine_name = re.sub('[\W_]+', '', human_name).replace(' ','_').lower()
+    machine_name = re.sub('[\W_ ]+', '', human_name).replace(' ','_').lower()
     return machine_name
 
 
