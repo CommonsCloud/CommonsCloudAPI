@@ -59,8 +59,7 @@ class is_public(object):
 
           keywords = kwargs
 
-          # if not element_.is_public:
-          if not hasattr(element_, 'is_public'):
+          if not element_.is_public:
             keywords['is_public'] = False
           else:
             keywords['is_public'] = True
