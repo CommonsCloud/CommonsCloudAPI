@@ -409,7 +409,7 @@ class Feature(CommonsModel):
         rstorage = self.validate_storage(relationship)
         rtemplate = Template.query.filter_by(storage=rstorage).first()
 
-        logger.warning(type(rtemplate))
+        logger.warning('%s %s', rtemplate.name, type(rtemplate))
 
         if rtemplate is None:
           if relationship.startswith('attachment_'):
