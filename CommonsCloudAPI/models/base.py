@@ -577,7 +577,7 @@ class CommonsModel(object):
       relationship_message = 'Relationships found'
       for relationship in relationships:
 
-        logger.debug('Adding relationship (%s) to model', relationship)
+        logger.debug('Adding relationship %s (%s) to model', relationship.name, relationship.relationship)
 
         table_name = str(relationship.relationship)
 
